@@ -10,6 +10,11 @@ import DraftRecipes from './pages/Recipes/DraftRecipes';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
+import Search from './pages/Search';
+import Statistics from './pages/Statistics';
+import Interactions from './pages/Interactions';
+import Premium from './pages/Premium';
+import Challenges from './pages/Challenges';
 import Sidebar from './components/Sidebar';
 
 function App() {
@@ -21,6 +26,11 @@ function App() {
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/stats" element={<Statistics />} />
+            <Route path="/challenges" element={<Challenges />} />
+            <Route path="/premium" element={<Premium />} />
+            <Route path="/interactions" element={<Interactions />} />
             <Route path="/recipes" element={<RecipesLayout />}>
               <Route index path="all" element={<AllRecipes />} />
               <Route path="saved" element={<SavedRecipes />} />
