@@ -186,7 +186,7 @@ export default function Sidebar() {
             <img src={pCook} className="w-10" alt="logo" />
             {!effectiveCollapsed && (
               <span className="text-lg ml-2 font-bold text-gray-900">
-                Cookpad
+                PCook
               </span>
             )}
           </Link>

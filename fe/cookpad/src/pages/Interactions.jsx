@@ -67,7 +67,7 @@ const recipes = [
   },
 ];
 
-export default function Home() {
+export default function Interactions() {
   return (
     <main className="max-w-7xl mx-auto p-6">
       {/* Banner */}
