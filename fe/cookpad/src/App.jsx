@@ -15,7 +15,7 @@ import Sidebar from './components/Sidebar';
 function App() {
   return (
     <Router>
-      <div className="flex flex-col-reverse md:flex-col lg:flex-row min-h-screen bg-gray-50">
+      <div className="flex flex-col-reverse md:flex-col lg:flex-row min-h-screen bg-gray-50 relative">
         <Sidebar />
         <div className="flex flex-col flex-1 w-full lg:w-auto min-h-screen">
           <Header />
