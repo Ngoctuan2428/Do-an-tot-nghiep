@@ -107,17 +107,6 @@ export default function Search() {
           />
         </div>
       </section>
-
-      {/* Footer Banner */}
-      <div className="bg-gray-100 p-4 rounded-lg text-center text-sm text-gray-600">
-        <p>
-          Có sẵn trên US, UK, ES, AR, UY, MX, CL, VN, ID, FR, SA, AR, IT, IN,
-          HU, NG, GR, MY, PT, UA, KR, TW
-        </p>
-        <p className="mt-2">
-          Tìm kiếm & Thêm | Giới thiệu Premium | Sử dụng Cookpad
-        </p>
-      </div>
     </main>
   );
 }
