@@ -11,6 +11,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import Search from './pages/Search';
+import SearchDetail from './pages/SearchDetail';
 import Statistics from './pages/Statistics';
 import Interactions from './pages/Interactions';
 import Premium from './pages/Premium';
@@ -27,6 +28,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<Search />} />
+            <Route path="/search/:query" element={<SearchDetail />} />
             <Route path="/stats" element={<Statistics />} />
             <Route path="/challenges" element={<Challenges />} />
             <Route path="/premium" element={<Premium />} />
