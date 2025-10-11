@@ -13,7 +13,7 @@ export default function Footer() {
             Chúng tôi có hơn 100 triệu người dùng trên toàn thế giới!
           </p>
           <a
-            href="#"
+            href="/premium"
             className="text-sm text-cookpad-orange font-semibold underline hover:no-underline"
           >
             Đăng ký Gold Premium để truy cập công thức độc quyền và ưu đãn khác!

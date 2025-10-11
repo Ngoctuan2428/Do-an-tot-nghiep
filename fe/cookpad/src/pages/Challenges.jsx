@@ -1,118 +1,65 @@
-import RecipeCard from '../components/RecipeCard';
+import { ArrowLeft, ChefHat } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import ChallengeItem from '../components/ChallengeItem';
 
-const recipes = [
+const challenges = [
   {
     id: 1,
-    title: 'Thịt',
-    image: 'https://via.placeholder.com/300x200?text=Thịt+Kho+Tàu',
-    premium: false,
-    views: 1200,
-    likes: 250,
+    img: 'https://thumbs.dreamstime.com/b/cooking-master-competition-vector-illustration-53111191.jpg',
+    title: 'Thử thách nấu món chay 7 ngày',
+    daysLeft: 3,
+    number: 8723,
   },
   {
     id: 2,
-    title: 'Bánh mì',
-    image: 'https://via.placeholder.com/300x200?text=Bánh+Mì',
-    premium: true,
-    views: 800,
-    likes: 180,
+    img: 'https://d1csarkz8obe9u.cloudfront.net/posterpreviews/chef-cooking-channel-youtube-banner-design-template-34ca10abd27afc282c16b6d2864cff25_screen.jpg?ts=1665921135',
+    title: 'Nấu 5 món mới trong tuần',
+    daysLeft: 5,
+    number: 1293,
   },
   {
     id: 3,
-    title: 'Cá',
-    image: 'https://via.placeholder.com/300x200?text=Bánh+Mì',
-    premium: true,
-    views: 1800,
-    likes: 120,
-  },
-  {
-    id: 4,
-    title: 'Đậu hũ',
-    image: 'https://via.placeholder.com/300x200?text=Bánh+Mì',
-    premium: true,
-    views: 80,
-    likes: 10,
-  },
-  {
-    id: 5,
-    title: 'Cá tầm',
-    image: 'https://via.placeholder.com/300x200?text=Bánh+Mì',
-    premium: true,
-    views: 2570,
-    likes: 102,
-  },
-  {
-    id: 6,
-    title: 'Trứng',
-    image: 'https://via.placeholder.com/300x200?text=Bánh+Mì',
-    premium: true,
-    views: 1450,
-    likes: 450,
-  },
-  {
-    id: 7,
-    title: 'Món ngon mỗi ngày',
-    image: 'https://via.placeholder.com/300x200?text=Bánh+Mì',
-    premium: true,
-    views: 3500,
-    likes: 3000,
-  },
-  {
-    id: 8,
-    title: 'Spaghetti',
-    image: 'https://via.placeholder.com/300x200?text=Bánh+Mì',
-    premium: true,
-    views: 2090,
-    likes: 235,
+    img: 'https://content.instructables.com/FPX/RK1O/IPWWVZYC/FPXRK1OIPWWVZYC.jpg?auto=webp',
+    title: 'Thử món Á trong 3 ngày',
+    daysLeft: 1,
+    number: 353,
   },
 ];
 
 export default function Challenges() {
+  const navigate = useNavigate();
+
   return (
-    <main className="max-w-7xl mx-auto p-6">
-      {/* Banner */}
-      <div className="bg-gradient-to-r from-cookpad-orange to-cookpad-yellow text-white p-6 rounded-lg mb-6 text-center">
-        <h2 className="text-2xl font-bold mb-2">Chào mừng đến với Cookpad!</h2>
-        <p className="text-sm">Khám phá hàng ngàn công thức nấu ăn dễ làm.</p>
-      </div>
-
-      {/* Grid Recipes */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {recipes.map((recipe) => (
-          <RecipeCard key={recipe.id} {...recipe} />
-        ))}
-      </div>
-
-      {/* Premium Section */}
-      <section className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <h3 className="text-lg font-bold mb-4 flex items-center">
-          <span className="bg-yellow-400 text-black px-2 py-1 rounded mr-2 text-sm">
-            Premium
-          </span>
-          Top Món Ăn Premium
-        </h3>
-        <div className="grid grid-cols-3 gap-4">
-          {/* Thêm 3 cards premium */}
-          <RecipeCard
-            title="Cá kho tộ"
-            image="https://via.placeholder.com/150x100?text=Cá+Kho"
-            premium
-            views={500}
-            likes={100}
-          />
+    <div className="min-h-screen bg-gray-50 py-6">
+      <div className="max-w-3xl mx-auto px-4">
+        {/* Challenges Content */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
+            Danh sách thử thách
+          </h2>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {challenges.map((challenge) => (
+              <ChallengeItem
+                key={challenge.id}
+                img={challenge.img}
+                title={challenge.title}
+                daysLeft={challenge.daysLeft}
+                number={challenge.number}
+              />
+            ))}
+          </ul>
         </div>
-      </section>
 
-      {/* Footer Banner */}
-      <div className="bg-gray-100 p-4 rounded-lg text-center text-sm text-gray-600">
-        <p>
-          Có sẵn trên US, UK, ES, AR, UY, MX, CL, VN, ID, FR, SA, AR, IT, IN,
-          HU, NG, GR, MY, PT, UA, KR, TW
-        </p>
-        <p className="mt-2">
-          Tìm kiếm & Thêm | Giới thiệu Premium | Sử dụng Cookpad
-        </p>
+        {/* Statistics */}
+        <div className="bg-white rounded-lg shadow-sm p-2 pl-4">
+          <p className="p-2 font-semibold text-lg text-gray-700">
+            0 thử thách sắp diễn ra
+          </p>
+          <p className="p-2 font-semibold text-lg text-gray-700">
+            0 thử thách đã qua
+          </p>
+        </div>
       </div>
-    </main>
+    </div>
   );
 }
