@@ -13,6 +13,7 @@ import Home from './pages/Home';
 import Search from './pages/Search';
 import SearchDetail from './pages/SearchDetail';
 import Statistics from './pages/Statistics';
+import Profile from './pages/Profile';
 import Interactions from './pages/Interactions';
 import Premium from './pages/Premium';
 import Challenges from './pages/Challenges';
@@ -34,6 +35,7 @@ function App() {
             <Route path="/challenges" element={<Challenges />} />
             <Route path="/premium" element={<Premium />} />
             <Route path="/interactions" element={<Interactions />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/recipe/:id" element={<RecipeDetail />} />
             <Route path="/recipes" element={<RecipesLayout />}>
               <Route index path="all" element={<AllRecipes />} />
