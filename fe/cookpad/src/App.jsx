@@ -16,6 +16,7 @@ import Statistics from './pages/Statistics';
 import Interactions from './pages/Interactions';
 import Premium from './pages/Premium';
 import Challenges from './pages/Challenges';
+import RecipeDetail from './pages/RecipeDetail';
 import Sidebar from './components/Sidebar';
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
             <Route path="/challenges" element={<Challenges />} />
             <Route path="/premium" element={<Premium />} />
             <Route path="/interactions" element={<Interactions />} />
+            <Route path="/recipe/:id" element={<RecipeDetail />} />
             <Route path="/recipes" element={<RecipesLayout />}>
               <Route index path="all" element={<AllRecipes />} />
               <Route path="saved" element={<SavedRecipes />} />
