@@ -1,0 +1,780 @@
+{
+  "settings": {
+    "languages": [
+      "vi"
+    ],
+    "forceNER": true,
+    "tag": "nlp",
+    "threshold": 0.5,
+    "autoLoad": true,
+    "autoSave": true,
+    "modelFileName": "model.nlp",
+    "executeActionsBeforeAnswers": false,
+    "calculateSentiment": true
+  },
+  "nluManager": {
+    "settings": {
+      "tag": "nlu-manager"
+    },
+    "locales": [
+      "vi"
+    ],
+    "languageNames": {},
+    "domainManagers": {
+      "vi": {
+        "settings": {
+          "locale": "vi",
+          "trainByDomain": false,
+          "tag": "domain-manager-vi",
+          "nluByDomain": {
+            "default": {
+              "className": "NeuralNlu",
+              "settings": {}
+            }
+          },
+          "useStemDict": true
+        },
+        "stemDict": {
+          "ban,chao": {
+            "intent": "intent.chao_hoi",
+            "domain": "default"
+          },
+          "hello": {
+            "intent": "intent.chao_hoi",
+            "domain": "default"
+          },
+          "bot,hi": {
+            "intent": "intent.chao_hoi",
+            "domain": "default"
+          },
+          "cong,ga,mon,thuc,tim": {
+            "intent": "intent.tim_kiem",
+            "domain": "default"
+          },
+          "bo,cach,chi,kho,lam,toi": {
+            "intent": "intent.tim_kiem",
+            "domain": "default"
+          },
+          "ca,co,khong,mon,nao,nau,tu": {
+            "intent": "intent.tim_kiem",
+            "domain": "default"
+          },
+          "an,cong,heo,nau,thit,thuc,voi": {
+            "intent": "intent.tim_kiem",
+            "domain": "default"
+          },
+          "chay,mon,tim": {
+            "intent": "intent.tim_kiem",
+            "domain": "default"
+          },
+          "bao,bo,lau,mon,nau,pho": {
+            "intent": "intent.hoi_thoi_gian",
+            "domain": "default"
+          },
+          "bi,chuan,cua,ga,gian,mon,nuong,thoi": {
+            "intent": "intent.hoi_thoi_gian",
+            "domain": "default"
+          },
+          "bao,ca,kho,lau,mat,mon,nau": {
+            "intent": "intent.hoi_thoi_gian",
+            "domain": "default"
+          }
+        },
+        "intentDict": {
+          "intent.chao_hoi": "default",
+          "intent.tim_kiem": "default",
+          "intent.hoi_thoi_gian": "default"
+        },
+        "sentences": [
+          {
+            "domain": "default",
+            "utterance": "chào bạn",
+            "intent": "intent.chao_hoi"
+          },
+          {
+            "domain": "default",
+            "utterance": "hello",
+            "intent": "intent.chao_hoi"
+          },
+          {
+            "domain": "default",
+            "utterance": "hi bot",
+            "intent": "intent.chao_hoi"
+          },
+          {
+            "domain": "default",
+            "utterance": "tìm công thức món gà",
+            "intent": "intent.tim_kiem"
+          },
+          {
+            "domain": "default",
+            "utterance": "chỉ tôi cách làm bò kho",
+            "intent": "intent.tim_kiem"
+          },
+          {
+            "domain": "default",
+            "utterance": "có món nào nấu từ cá không",
+            "intent": "intent.tim_kiem"
+          },
+          {
+            "domain": "default",
+            "utterance": "công thức nấu ăn với thịt heo",
+            "intent": "intent.tim_kiem"
+          },
+          {
+            "domain": "default",
+            "utterance": "tìm món chay",
+            "intent": "intent.tim_kiem"
+          },
+          {
+            "domain": "default",
+            "utterance": "món phở bò nấu bao lâu",
+            "intent": "intent.hoi_thoi_gian"
+          },
+          {
+            "domain": "default",
+            "utterance": "thời gian chuẩn bị của món gà nướng",
+            "intent": "intent.hoi_thoi_gian"
+          },
+          {
+            "domain": "default",
+            "utterance": "nấu món cá kho mất bao lâu",
+            "intent": "intent.hoi_thoi_gian"
+          }
+        ],
+        "domains": {
+          "master_domain": {
+            "settings": {
+              "locale": "vi",
+              "tag": "nlu-vi",
+              "keepStopwords": true,
+              "nonefeatureValue": 1,
+              "nonedeltaMultiplier": 1.2,
+              "spellCheck": false,
+              "spellCheckDistance": 1,
+              "filterZeros": true,
+              "log": true
+            },
+            "features": {
+              "chao": 1,
+              "ban": 1,
+              "hello": 1,
+              "hi": 1,
+              "bot": 1,
+              "tim": 1,
+              "cong": 1,
+              "thuc": 1,
+              "mon": 1,
+              "ga": 1,
+              "chi": 1,
+              "toi": 1,
+              "cach": 1,
+              "lam": 1,
+              "bo": 1,
+              "kho": 1,
+              "co": 1,
+              "nao": 1,
+              "nau": 1,
+              "tu": 1,
+              "ca": 1,
+              "khong": 1,
+              "an": 1,
+              "voi": 1,
+              "thit": 1,
+              "heo": 1,
+              "chay": 1,
+              "pho": 1,
+              "bao": 1,
+              "lau": 1,
+              "thoi": 1,
+              "gian": 1,
+              "chuan": 1,
+              "bi": 1,
+              "cua": 1,
+              "nuong": 1,
+              "mat": 1
+            },
+            "intents": {
+              "intent.chao_hoi": 1,
+              "intent.tim_kiem": 1,
+              "intent.hoi_thoi_gian": 1
+            },
+            "intentFeatures": {
+              "intent.chao_hoi": {
+                "chao": 1,
+                "ban": 1,
+                "hello": 1,
+                "hi": 1,
+                "bot": 1
+              },
+              "intent.tim_kiem": {
+                "tim": 1,
+                "cong": 1,
+                "thuc": 1,
+                "mon": 1,
+                "ga": 1,
+                "chi": 1,
+                "toi": 1,
+                "cach": 1,
+                "lam": 1,
+                "bo": 1,
+                "kho": 1,
+                "co": 1,
+                "nao": 1,
+                "nau": 1,
+                "tu": 1,
+                "ca": 1,
+                "khong": 1,
+                "an": 1,
+                "voi": 1,
+                "thit": 1,
+                "heo": 1,
+                "chay": 1
+              },
+              "intent.hoi_thoi_gian": {
+                "mon": 1,
+                "pho": 1,
+                "bo": 1,
+                "nau": 1,
+                "bao": 1,
+                "lau": 1,
+                "thoi": 1,
+                "gian": 1,
+                "chuan": 1,
+                "bi": 1,
+                "cua": 1,
+                "ga": 1,
+                "nuong": 1,
+                "ca": 1,
+                "kho": 1,
+                "mat": 1
+              }
+            },
+            "featuresToIntent": {
+              "chao": [
+                "intent.chao_hoi"
+              ],
+              "ban": [
+                "intent.chao_hoi"
+              ],
+              "hello": [
+                "intent.chao_hoi"
+              ],
+              "hi": [
+                "intent.chao_hoi"
+              ],
+              "bot": [
+                "intent.chao_hoi"
+              ],
+              "tim": [
+                "intent.tim_kiem"
+              ],
+              "cong": [
+                "intent.tim_kiem"
+              ],
+              "thuc": [
+                "intent.tim_kiem"
+              ],
+              "mon": [
+                "intent.tim_kiem",
+                "intent.hoi_thoi_gian"
+              ],
+              "ga": [
+                "intent.tim_kiem",
+                "intent.hoi_thoi_gian"
+              ],
+              "chi": [
+                "intent.tim_kiem"
+              ],
+              "toi": [
+                "intent.tim_kiem"
+              ],
+              "cach": [
+                "intent.tim_kiem"
+              ],
+              "lam": [
+                "intent.tim_kiem"
+              ],
+              "bo": [
+                "intent.tim_kiem",
+                "intent.hoi_thoi_gian"
+              ],
+              "kho": [
+                "intent.tim_kiem",
+                "intent.hoi_thoi_gian"
+              ],
+              "co": [
+                "intent.tim_kiem"
+              ],
+              "nao": [
+                "intent.tim_kiem"
+              ],
+              "nau": [
+                "intent.tim_kiem",
+                "intent.hoi_thoi_gian"
+              ],
+              "tu": [
+                "intent.tim_kiem"
+              ],
+              "ca": [
+                "intent.tim_kiem",
+                "intent.hoi_thoi_gian"
+              ],
+              "khong": [
+                "intent.tim_kiem"
+              ],
+              "an": [
+                "intent.tim_kiem"
+              ],
+              "voi": [
+                "intent.tim_kiem"
+              ],
+              "thit": [
+                "intent.tim_kiem"
+              ],
+              "heo": [
+                "intent.tim_kiem"
+              ],
+              "chay": [
+                "intent.tim_kiem"
+              ],
+              "pho": [
+                "intent.hoi_thoi_gian"
+              ],
+              "bao": [
+                "intent.hoi_thoi_gian"
+              ],
+              "lau": [
+                "intent.hoi_thoi_gian"
+              ],
+              "thoi": [
+                "intent.hoi_thoi_gian"
+              ],
+              "gian": [
+                "intent.hoi_thoi_gian"
+              ],
+              "chuan": [
+                "intent.hoi_thoi_gian"
+              ],
+              "bi": [
+                "intent.hoi_thoi_gian"
+              ],
+              "cua": [
+                "intent.hoi_thoi_gian"
+              ],
+              "nuong": [
+                "intent.hoi_thoi_gian"
+              ],
+              "mat": [
+                "intent.hoi_thoi_gian"
+              ]
+            },
+            "neuralNetwork": {
+              "settings": {
+                "locale": "vi",
+                "tag": "nlu-vi",
+                "keepStopwords": true,
+                "nonefeatureValue": 1,
+                "nonedeltaMultiplier": 1.2,
+                "spellCheck": false,
+                "spellCheckDistance": 1,
+                "filterZeros": true,
+                "log": true
+              },
+              "features": [
+                "chao",
+                "ban",
+                "hello",
+                "hi",
+                "bot",
+                "tim",
+                "cong",
+                "thuc",
+                "mon",
+                "ga",
+                "chi",
+                "toi",
+                "cach",
+                "lam",
+                "bo",
+                "kho",
+                "co",
+                "nao",
+                "nau",
+                "tu",
+                "ca",
+                "khong",
+                "an",
+                "voi",
+                "thit",
+                "heo",
+                "chay",
+                "pho",
+                "bao",
+                "lau",
+                "thoi",
+                "gian",
+                "chuan",
+                "bi",
+                "cua",
+                "nuong",
+                "mat"
+              ],
+              "intents": [
+                "intent.chao_hoi",
+                "intent.tim_kiem",
+                "intent.hoi_thoi_gian"
+              ],
+              "perceptrons": [
+                [
+                  4.212371826171875,
+                  4.212371826171875,
+                  7.8957624435424805,
+                  4.19590950012207,
+                  4.19590950012207,
+                  -1.7633317708969116,
+                  -1.0436416864395142,
+                  -1.0436416864395142,
+                  -2.8081064224243164,
+                  -0.7920256853103638,
+                  -0.9513278007507324,
+                  -0.9513278007507324,
+                  -0.9513278007507324,
+                  -0.9513278007507324,
+                  -1.1577633619308472,
+                  -0.995296835899353,
+                  -0.38004299998283386,
+                  -0.38004299998283386,
+                  -1.2934662103652954,
+                  -0.38004299998283386,
+                  -0.4250706732273102,
+                  -0.38004299998283386,
+                  -0.6448350548744202,
+                  -0.6448350548744202,
+                  -0.6448350548744202,
+                  -0.6448350548744202,
+                  -1.3645247220993042,
+                  -0.20535296201705933,
+                  -0.24932357668876648,
+                  -0.24932357668876648,
+                  -0.3932185173034668,
+                  -0.3932185173034668,
+                  -0.3932185173034668,
+                  -0.3932185173034668,
+                  -0.3932185173034668,
+                  -0.3932185173034668,
+                  -0.028576862066984177,
+                  5.961505351515138
+                ],
+                [
+                  -0.9651491045951843,
+                  -0.9651491045951843,
+                  -1.7062015533447266,
+                  -0.9405679106712341,
+                  -0.9405679106712341,
+                  5.032858371734619,
+                  2.418147325515747,
+                  2.418147325515747,
+                  2.9950051307678223,
+                  -0.33979442715644836,
+                  2.584099769592285,
+                  2.584099769592285,
+                  2.584099769592285,
+                  2.584099769592285,
+                  1.0668714046478271,
+                  1.051452398300171,
+                  2.055863857269287,
+                  2.055863857269287,
+                  0.7259135246276855,
+                  2.055863857269287,
+                  0.5232164263725281,
+                  2.055863857269287,
+                  1.719385027885437,
+                  1.719385027885437,
+                  1.719385027885437,
+                  1.719385027885437,
+                  4.330460071563721,
+                  -1.2722829580307007,
+                  -2.9722306728363037,
+                  -2.9722306728363037,
+                  -0.9503501057624817,
+                  -0.9503501057624817,
+                  -0.9503501057624817,
+                  -0.9503501057624817,
+                  -0.9503501057624817,
+                  -0.9503501057624817,
+                  -1.4420768022537231,
+                  1.8343070209204955
+                ],
+                [
+                  -0.24321457743644714,
+                  -0.24321457743644714,
+                  -0.30092164874076843,
+                  -0.2256099283695221,
+                  -0.2256099283695221,
+                  -1.737631916999817,
+                  -1.1153644323349,
+                  -1.1153644323349,
+                  2.1924495697021484,
+                  0.8257495760917664,
+                  -0.6055179834365845,
+                  -0.6055179834365845,
+                  -0.6055179834365845,
+                  -0.6055179834365845,
+                  1.1549415588378906,
+                  1.0101914405822754,
+                  -1.2282536029815674,
+                  -1.2282536029815674,
+                  1.9150434732437134,
+                  -1.2282536029815674,
+                  0.28917503356933594,
+                  -1.2282536029815674,
+                  -0.11862075328826904,
+                  -0.11862075328826904,
+                  -0.11862075328826904,
+                  -0.11862075328826904,
+                  -0.7217028141021729,
+                  1.8151708841323853,
+                  3.4855592250823975,
+                  3.4855592250823975,
+                  1.838376760482788,
+                  1.838376760482788,
+                  1.838376760482788,
+                  1.838376760482788,
+                  1.838376760482788,
+                  1.838376760482788,
+                  1.6704208850860596,
+                  0.23725531197056088
+                ]
+              ]
+            }
+          }
+        }
+      }
+    },
+    "intentDomains": {},
+    "extraSentences": [
+      [
+        "vi",
+        "chào bạn"
+      ],
+      [
+        "vi",
+        "hello"
+      ],
+      [
+        "vi",
+        "hi bot"
+      ],
+      [
+        "vi",
+        "tìm công thức món gà"
+      ],
+      [
+        "vi",
+        "chỉ tôi cách làm bò kho"
+      ],
+      [
+        "vi",
+        "có món nào nấu từ cá không"
+      ],
+      [
+        "vi",
+        "công thức nấu ăn với thịt heo"
+      ],
+      [
+        "vi",
+        "tìm món chay"
+      ],
+      [
+        "vi",
+        "món phở bò nấu bao lâu"
+      ],
+      [
+        "vi",
+        "thời gian chuẩn bị của món gà nướng"
+      ],
+      [
+        "vi",
+        "nấu món cá kho mất bao lâu"
+      ]
+    ]
+  },
+  "ner": {
+    "settings": {
+      "tag": "ner",
+      "entityPreffix": "%",
+      "entitySuffix": "%"
+    },
+    "rules": {
+      "gà": {
+        "vi": {
+          "name": "vi",
+          "type": "enum",
+          "rules": [
+            {
+              "option": "nguyen_lieu",
+              "texts": [
+                "gà",
+                "thịt gà"
+              ]
+            }
+          ]
+        }
+      },
+      "bò": {
+        "vi": {
+          "name": "vi",
+          "type": "enum",
+          "rules": [
+            {
+              "option": "nguyen_lieu",
+              "texts": [
+                "bò",
+                "thịt bò"
+              ]
+            }
+          ]
+        }
+      },
+      "cá": {
+        "vi": {
+          "name": "vi",
+          "type": "enum",
+          "rules": [
+            {
+              "option": "nguyen_lieu",
+              "texts": [
+                "cá"
+              ]
+            }
+          ]
+        }
+      },
+      "heo": {
+        "vi": {
+          "name": "vi",
+          "type": "enum",
+          "rules": [
+            {
+              "option": "nguyen_lieu",
+              "texts": [
+                "heo",
+                "thịt heo"
+              ]
+            }
+          ]
+        }
+      },
+      "chay": {
+        "vi": {
+          "name": "vi",
+          "type": "enum",
+          "rules": [
+            {
+              "option": "nguyen_lieu",
+              "texts": [
+                "chay",
+                "đồ chay"
+              ]
+            }
+          ]
+        }
+      },
+      "phở bò": {
+        "vi": {
+          "name": "vi",
+          "type": "enum",
+          "rules": [
+            {
+              "option": "ten_mon_an",
+              "texts": [
+                "phở bò"
+              ]
+            }
+          ]
+        }
+      },
+      "gà nướng": {
+        "vi": {
+          "name": "vi",
+          "type": "enum",
+          "rules": [
+            {
+              "option": "ten_mon_an",
+              "texts": [
+                "gà nướng"
+              ]
+            }
+          ]
+        }
+      },
+      "cá kho": {
+        "vi": {
+          "name": "vi",
+          "type": "enum",
+          "rules": [
+            {
+              "option": "ten_mon_an",
+              "texts": [
+                "cá kho",
+                "cá kho tộ"
+              ]
+            }
+          ]
+        }
+      },
+      "thời gian": {
+        "vi": {
+          "name": "vi",
+          "type": "enum",
+          "rules": [
+            {
+              "option": "chi_tiet",
+              "texts": [
+                "thời gian",
+                "bao lâu"
+              ]
+            }
+          ]
+        }
+      },
+      "nguyên liệu": {
+        "vi": {
+          "name": "vi",
+          "type": "enum",
+          "rules": [
+            {
+              "option": "chi_tiet",
+              "texts": [
+                "nguyên liệu",
+                "cần gì"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "nlgManager": {
+    "settings": {
+      "tag": "nlg-manager"
+    },
+    "responses": {
+      "vi": {
+        "intent.chao_hoi": [
+          {
+            "answer": "Chào bạn! Tôi là trợ lý ảo nấu ăn, tôi có thể giúp bạn tìm công thức."
+          }
+        ]
+      }
+    }
+  },
+  "actionManager": {
+    "settings": {
+      "tag": "action-manager"
+    },
+    "actions": {}
+  },
+  "slotManager": {}
+}
