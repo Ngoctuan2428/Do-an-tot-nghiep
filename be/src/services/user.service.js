@@ -11,28 +11,49 @@ const getUserProfile = async (userId) => {
     return user;
 };
 
-// Hàm này cho admin
+// --- CẢI TIẾN ---
+// Thêm logic phân trang đầy đủ
 const getAllUsers = async (queryOptions) => {
-    // Thêm logic phân trang...
-    return await User.findAll({ attributes: { exclude: ['password_hash'] } });
+    const { page = 1, limit = 10 } = queryOptions;
+    const offset = (page - 1) * limit;
+
+    return await User.findAndCountAll({
+        attributes: { exclude: ['password_hash'] },
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+        order: [['created_at', 'DESC']],
+    });
 };
 
-// Hàm này cho admin
+// --- CẢI TIẾN ---
+// Cho phép admin cập nhật nhiều trường hơn
 const updateUserById = async (userId, updateData) => {
     const user = await getUserProfile(userId); // Dùng lại hàm trên để kiểm tra user tồn tại
     
-    // Chỉ cho phép admin cập nhật các trường nhất định, ví dụ: role
-    const { role } = updateData;
-    if (role) {
-        user.role = role;
-    }
-    await user.save();
+    // Admin có thể cập nhật các trường này
+    const allowedUpdates = ['username', 'bio', 'role'];
+    const updates = {};
+
+    Object.keys(updateData).forEach(key => {
+        if (allowedUpdates.includes(key)) {
+            updates[key] = updateData[key];
+        }
+    });
+    
+    await user.update(updates);
     return user;
+};
+
+const deleteUserById = async (userId) => {
+    const user = await getUserProfile(userId);
+    await user.destroy();
+    return { message: 'User deleted successfully.' };
 };
 
 
 module.exports = {
     getUserProfile,
     getAllUsers,
-    updateUserById
+    updateUserById,
+    deleteUserById,
 };

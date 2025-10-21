@@ -38,9 +38,15 @@ const getAllRecipes = async (queryOptions) => {
     });
 };
 
-const updateRecipe = async (recipeId, userId, updateData) => {
+
+// Thêm `userRole` vào tham số của hàm
+const updateRecipe = async (recipeId, userId, userRole, updateData) => {
     const recipe = await getRecipeById(recipeId);
-    if (recipe.user_id !== userId) throw new ApiError(403, 'You are not authorized to update this recipe');
+    
+    //Nếu user không phải chủ sở hữu VÀ cũng không phải admin -> báo lỗi
+    if (recipe.user_id !== userId && userRole !== 'admin') {
+        throw new ApiError(403, 'You are not authorized to update this recipe');
+    }
 
     const { categoryIds, tags, ...rest } = updateData;
     if (rest.title) rest.slug = generateSlug(rest.title) + '-' + Date.now();
