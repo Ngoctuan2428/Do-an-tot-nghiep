@@ -11,21 +11,21 @@ const createComment = async (userId, recipeId, commentData) => {
     });
 };
 
-const getCommentsByRecipeId = async (recipeId, queryOptions) => {
-    const { page = 1, limit = 10 } = queryOptions;
-    const offset = (page - 1) * limit;
+    const getCommentsByRecipeId = async (recipeId, queryOptions) => {
+        const { page = 1, limit = 10 } = queryOptions;
+        const offset = (page - 1) * limit;
 
-    return await Comment.findAndCountAll({
-        where: { recipe_id: recipeId },
-        include: [{
-            model: User,
-            attributes: ['id', 'username', 'avatar_url']
-        }],
-        limit: parseInt(limit),
-        offset: parseInt(offset),
-        order: [['created_at', 'DESC']],
-    });
-};
+        return await Comment.findAndCountAll({
+            where: { recipe_id: recipeId },
+            include: [{
+                model: User,
+                attributes: ['id', 'username', 'avatar_url']
+            }],
+            limit: parseInt(limit),
+            offset: parseInt(offset),
+            order: [['created_at', 'DESC']],
+        });
+    };
 
 const updateComment = async (commentId, userId, updateData) => {
     const comment = await Comment.findByPk(commentId);

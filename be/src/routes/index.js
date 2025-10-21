@@ -4,6 +4,7 @@ const userRoutes = require('./user.routes');
 const categoryRoutes = require('./category.routes');
 const recipeRoutes = require('./recipe.routes');
 const adminRoutes = require('./admin.routes');
+const chatbotRoutes = require('./chatbot.routes');
 
 const router = express.Router();
 
@@ -13,5 +14,5 @@ router.use('/users', userRoutes);
 router.use('/categories', categoryRoutes);
 router.use('/recipes', recipeRoutes);
 router.use('/admin', adminRoutes);
-
+router.use('/chatbot', chatbotRoutes);
 module.exports = router;
