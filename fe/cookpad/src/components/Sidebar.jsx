@@ -270,7 +270,7 @@ export default function Sidebar() {
                         className={`flex items-center px-2 py-1 rounded text-xs transition-colors ${
                           isActive
                             ? 'bg-cookpad-orange text-white'
-                            : 'text-gray-600 hover:bg-gray-50'
+                            : 'text-gray-600 hover:bg-gray-100'
                         }`}
                       >
                         <Icon
