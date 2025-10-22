@@ -13,11 +13,12 @@ import Home from './pages/Home';
 import Search from './pages/Search';
 import SearchDetail from './pages/SearchDetail';
 import Statistics from './pages/Statistics';
-import Profile from './pages/Profile';
+import User from './pages/User';
 import Interactions from './pages/Interactions';
 import Premium from './pages/Premium';
 import Challenges from './pages/Challenges';
 import RecipeDetail from './pages/RecipeDetail';
+import UserProfileEmpty from './pages/UserProfileEmpty';
 import Sidebar from './components/Sidebar';
 
 function App() {
@@ -35,7 +36,8 @@ function App() {
             <Route path="/challenges" element={<Challenges />} />
             <Route path="/premium" element={<Premium />} />
             <Route path="/interactions" element={<Interactions />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/user/:id" element={<User />} />
+            <Route path="/profile" element={<UserProfileEmpty />} />
             <Route path="/recipe/:id" element={<RecipeDetail />} />
             <Route path="/recipes" element={<RecipesLayout />}>
               <Route index path="all" element={<AllRecipes />} />
