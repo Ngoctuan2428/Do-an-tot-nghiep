@@ -10,7 +10,7 @@ import {
   Hand,
 } from 'lucide-react';
 
-export default function Profile() {
+export default function User() {
   const [activeTab, setActiveTab] = useState('recipes');
 
   const user = {
