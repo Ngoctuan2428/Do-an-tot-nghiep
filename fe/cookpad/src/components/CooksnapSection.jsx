@@ -12,7 +12,7 @@ import {
   User,
   MapPin,
 } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 
 export default function CooksnapSection({ recipe }) {
   const [isFriend, setIsFriend] = useState(false);

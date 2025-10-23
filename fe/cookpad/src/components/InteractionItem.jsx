@@ -1,7 +1,5 @@
-import { useNavigate } from 'react-router-dom';
 
 const InteractionItem = ({ user, action, time }) => {
-  const navigate = useNavigate();
 
   return (
     <li className="border-b border-gray-200 pb-4">

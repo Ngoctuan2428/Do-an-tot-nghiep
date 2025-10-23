@@ -21,6 +21,7 @@ import RecipeDetail from './pages/RecipeDetail';
 import UserProfileEmpty from './pages/UserProfileEmpty';
 import CreateRecipe from './pages/CreateRecipe';
 import Sidebar from './components/Sidebar';
+import ChallengeDetail from './components/ChallengeDetail';
 
 function App() {
   return (
@@ -35,6 +36,11 @@ function App() {
             <Route path="/search/:query" element={<SearchDetail />} />
             <Route path="/stats" element={<Statistics />} />
             <Route path="/challenges" element={<Challenges />} />
+            <Route
+              path="/challenge/:challengeSlug"
+              element={<ChallengeDetail />}
+            />
+
             <Route path="/premium" element={<Premium />} />
             <Route path="/interactions" element={<Interactions />} />
             <Route path="/user/:id" element={<User />} />
