@@ -28,6 +28,7 @@ import DeleteAccount from './pages/Settings/DeleteAccount';
 import Notification from './pages/Settings/Notification';
 import Policy from './pages/Settings/Policy';
 import Faq from './pages/Settings/Faq';
+import Feedback from './pages/Settings/Feedback';
 import Sidebar from './components/Sidebar';
 
 function App() {
@@ -57,7 +58,7 @@ function App() {
               <Route path="notification" element={<Notification />} />
               <Route path="policy" element={<Policy />} />
               <Route path="faq" element={<Faq />} />
-              <Route path="drafts" element={<DraftRecipes />} />
+              <Route path="feedback" element={<Feedback />} />
               <Route path="drafts" element={<DraftRecipes />} />
             </Route>
             <Route path="/recipes" element={<RecipesLayout />}>
