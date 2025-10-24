@@ -22,6 +22,7 @@ import UserProfileEmpty from './pages/UserProfileEmpty';
 import CreateRecipe from './pages/CreateRecipe';
 import Sidebar from './components/Sidebar';
 import ChallengeDetail from './components/ChallengeDetail';
+import Chatbox from './components/Chatbox';
 
 function App() {
   return (
@@ -30,7 +31,7 @@ function App() {
         <Sidebar />
         <div className="flex flex-col flex-1 w-full lg:w-auto min-h-screen">
           <Header />
-          <Routes>
+          <Routes>  
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<Search />} />
             <Route path="/search/:query" element={<SearchDetail />} />
@@ -59,6 +60,7 @@ function App() {
           <Footer />
         </div>
       </div>
+      <Chatbox />
     </Router>
   );
 }
