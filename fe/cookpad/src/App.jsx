@@ -15,6 +15,7 @@ import SearchDetail from './pages/SearchDetail';
 import Statistics from './pages/Statistics';
 import User from './pages/User';
 import Interactions from './pages/Interactions';
+import DetailInteraction from './pages/DetailInteraction';
 import Premium from './pages/Premium';
 import Challenges from './pages/Challenges';
 import RecipeDetail from './pages/RecipeDetail';
@@ -46,6 +47,7 @@ function App() {
             <Route path="/challenges" element={<Challenges />} />
             <Route path="/premium" element={<Premium />} />
             <Route path="/interactions" element={<Interactions />} />
+            <Route path="/detail-interaction" element={<DetailInteraction />} />
             <Route path="/user/:id" element={<User />} />
             <Route path="/profile" element={<UserProfileEmpty />} />
             <Route path="/recipe/:id" element={<RecipeDetail />} />
