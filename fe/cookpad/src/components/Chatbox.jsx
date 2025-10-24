@@ -5,8 +5,6 @@ function ChatBox() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    // --- CONTAINER CHÍNH ---
-    // Nó sẽ thay đổi kích thước và vị trí dựa trên `isOpen` và kích thước màn hình
     <div className={`
       fixed z-50
       bottom-20 right-4 
