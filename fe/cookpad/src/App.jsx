@@ -21,6 +21,10 @@ import RecipeDetail from './pages/RecipeDetail';
 import UserProfileEmpty from './pages/UserProfileEmpty';
 import CreateRecipe from './pages/CreateRecipe';
 import Setting from './pages/Setting';
+import AllSetting from './pages/Settings/AllSetting';
+import Account from './pages/Settings/Account';
+import Blocked from './pages/Settings/Blocked';
+import DeleteAccount from './pages/Settings/DeleteAccount';
 import Sidebar from './components/Sidebar';
 
 function App() {
@@ -42,7 +46,14 @@ function App() {
             <Route path="/profile" element={<UserProfileEmpty />} />
             <Route path="/recipe/:id" element={<RecipeDetail />} />
             <Route path="/create-recipe" element={<CreateRecipe />} />
-            <Route path="/setting" element={<Setting />} />
+            <Route path="/setting" element={<Setting />}>
+              <Route index path="" element={<AllSetting />} />
+              <Route path="account" element={<Account />} />
+              <Route path="blocked" element={<Blocked />} />
+              <Route path="delete-account" element={<DeleteAccount />} />
+              <Route path="published" element={<PublishedRecipes />} />
+              <Route path="drafts" element={<DraftRecipes />} />
+            </Route>
             <Route path="/recipes" element={<RecipesLayout />}>
               <Route index path="all" element={<AllRecipes />} />
               <Route path="saved" element={<SavedRecipes />} />
