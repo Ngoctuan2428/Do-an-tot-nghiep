@@ -20,6 +20,7 @@ import Challenges from './pages/Challenges';
 import RecipeDetail from './pages/RecipeDetail';
 import UserProfileEmpty from './pages/UserProfileEmpty';
 import CreateRecipe from './pages/CreateRecipe';
+import Setting from './pages/Setting';
 import Sidebar from './components/Sidebar';
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
             <Route path="/profile" element={<UserProfileEmpty />} />
             <Route path="/recipe/:id" element={<RecipeDetail />} />
             <Route path="/create-recipe" element={<CreateRecipe />} />
+            <Route path="/setting" element={<Setting />} />
             <Route path="/recipes" element={<RecipesLayout />}>
               <Route index path="all" element={<AllRecipes />} />
               <Route path="saved" element={<SavedRecipes />} />

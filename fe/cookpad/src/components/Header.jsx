@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SearchBar from './SearchBar';
 import LoginModal from './LoginModal';
 import { ChevronLeft, ArrowDownToLine, Plus } from 'lucide-react';
 
 export default function Header() {
+  const navigate = useNavigate();
   const handleAdd = () => {
     console.log('Thêm mới món');
   };
@@ -16,7 +18,9 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         {/* Back */}
         <div className="flex items-center space-x-4 p-2 rounded-full bg-gray-100 hover:bg-gray-200 cursor-pointer">
-          <ChevronLeft size={20} />
+          <button onClick={() => navigate(-1)}>
+            <ChevronLeft size={20} />
+          </button>
         </div>
 
         {/* Search */}
