@@ -8,7 +8,7 @@ export default function AllSettings() {
     { label: 'Tài khoản', route: '/setting/account' },
     {
       label: 'Điều chỉnh chức năng thông báo',
-      route: '/setting/notifications',
+      route: '/setting/notification',
     },
     { label: 'Điều khoản Dịch Vụ và Chính sách', route: '/setting/policy' },
     { label: 'Những câu hỏi thường gặp', route: '/setting/faq' },

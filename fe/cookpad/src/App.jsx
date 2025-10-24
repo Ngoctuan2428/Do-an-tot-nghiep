@@ -25,6 +25,9 @@ import AllSetting from './pages/Settings/AllSetting';
 import Account from './pages/Settings/Account';
 import Blocked from './pages/Settings/Blocked';
 import DeleteAccount from './pages/Settings/DeleteAccount';
+import Notification from './pages/Settings/Notification';
+import Policy from './pages/Settings/Policy';
+import Faq from './pages/Settings/Faq';
 import Sidebar from './components/Sidebar';
 
 function App() {
@@ -51,7 +54,10 @@ function App() {
               <Route path="account" element={<Account />} />
               <Route path="blocked" element={<Blocked />} />
               <Route path="delete-account" element={<DeleteAccount />} />
-              <Route path="published" element={<PublishedRecipes />} />
+              <Route path="notification" element={<Notification />} />
+              <Route path="policy" element={<Policy />} />
+              <Route path="faq" element={<Faq />} />
+              <Route path="drafts" element={<DraftRecipes />} />
               <Route path="drafts" element={<DraftRecipes />} />
             </Route>
             <Route path="/recipes" element={<RecipesLayout />}>
