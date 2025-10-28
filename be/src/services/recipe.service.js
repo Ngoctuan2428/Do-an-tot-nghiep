@@ -2,6 +2,17 @@ const { Recipe, User, Category, Tag } = require('../models');
 const ApiError = require('../utils/ApiError');
 const generateSlug = require('../utils/slugify');
 
+// === HÀM MỚI THÊM VÀO ===
+/**
+ * Đếm tổng số công thức
+ */
+const getRecipeCount = async () => {
+    // Dùng hàm .count() của Sequelize để đếm
+    const count = await Recipe.count();
+    return count;
+};
+// =========================
+
 const createRecipe = async (userId, recipeData) => {
     const { title, categoryIds, tags, ...rest } = recipeData;
     const slug = generateSlug(title) + '-' + Date.now();
@@ -55,7 +66,7 @@ const updateRecipe = async (recipeId, userId, userRole, updateData) => {
     if (categoryIds) await recipe.setCategories(categoryIds);
     if (tags) {
         const tagInstances = await Promise.all(tags.map(tagName => Tag.findOrCreate({ where: { name: tagName } })));
-        await recipe.setTags(tagInstances.map(t => t[0]));
+        await newRecipe.setTags(tagInstances.map(t => t[0]));
     }
     return getRecipeById(recipeId);
 };
@@ -64,9 +75,16 @@ const deleteRecipe = async (recipeId, userId, userRole) => {
     const recipe = await getRecipeById(recipeId);
     if (userRole !== 'admin' && recipe.user_id !== userId) {
         throw new ApiError(403, 'You are not authorized to delete this recipe');
-    }
+  M   }
     await recipe.destroy();
     return { message: 'Recipe deleted successfully' };
 };
 
-module.exports = { createRecipe, getRecipeById, getAllRecipes, updateRecipe, deleteRecipe };
+module.exports = { 
+    getRecipeCount, 
+    createRecipe, 
+    getRecipeById, 
+    getAllRecipes, 
+    updateRecipe, 
+    deleteRecipe 
+};

@@ -1,60 +1,189 @@
-const { NlpManager } = require('node-nlp');
+require("dotenv").config();
+const fs = require("fs");
+const path = require("path");
+const { Sequelize, DataTypes } = require("sequelize");
 
+console.log("🚀 Bắt đầu huấn luyện 'bộ não' chatbot...");
+
+// ====================
+// 1️⃣ KẾT NỐI DATABASE
+// ====================
+const sequelize = new Sequelize(
+  process.env.DB_NAME || "cooking",
+  process.env.DB_USER || "tuan",
+  process.env.DB_PASSWORD || "123456",
+  {
+    host: process.env.DB_HOST || "localhost",
+    dialect: "mysql",
+    logging: false,
+  }
+);
+
+// ====================
+// 2️⃣ KHAI BÁO MODEL
+// ====================
+const Recipe = sequelize.define(
+  "Recipe",
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true },
+    title: DataTypes.STRING,
+    description: DataTypes.TEXT,
+    ingredients: DataTypes.JSON,
+  },
+  { tableName: "recipes", timestamps: false }
+);
+
+const Category = sequelize.define(
+  "Category",
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true },
+    name: DataTypes.STRING,
+  },
+  { tableName: "categories", timestamps: false }
+);
+
+const Tag = sequelize.define(
+  "Tag",
+  {
+    name: { type: DataTypes.STRING(100), primaryKey: true },
+  },
+  { tableName: "tags", timestamps: false }
+);
+
+// ➕ Thêm bảng recipe_steps
+const RecipeStep = sequelize.define(
+  "RecipeStep",
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    recipe_id: DataTypes.INTEGER,
+    step_order: DataTypes.INTEGER,
+    instruction: DataTypes.TEXT,
+    image_url: DataTypes.STRING(500),
+  },
+  { tableName: "recipe_steps", timestamps: false }
+);
+
+// ====================
+// 3️⃣ HÀM HUẤN LUYỆN
+// ====================
 async function trainChatbot() {
-    console.log('🚀 Bắt đầu quá trình huấn luyện "bộ não" chatbot...');
-    const manager = new NlpManager({ languages: ['vi'], forceNER: true });
+  try {
+    console.log("📥 Đang tải dữ liệu từ CSDL...");
 
-    // --- 1. Dạy cho bot các Ý ĐỊNH (Intents) ---
+    const recipes = await Recipe.findAll({ raw: true });
+    const categories = await Category.findAll({ raw: true });
+    const tags = await Tag.findAll({ attributes: ["name"], raw: true });
+    const steps = await RecipeStep.findAll({ raw: true });
 
-    // Ý định: Chào hỏi
-    manager.addDocument('vi', 'chào bạn', 'intent.chao_hoi');
-    manager.addDocument('vi', 'hello', 'intent.chao_hoi');
-    manager.addDocument('vi', 'hi bot', 'intent.chao_hoi');
+    console.log(`✅ Đã nạp ${recipes.length} món ăn.`);
+    console.log(`✅ Đã nạp ${categories.length} danh mục.`);
+    console.log(`✅ Đã nạp ${tags.length} tag.`);
+    console.log(`✅ Đã nạp ${steps.length} bước nấu ăn.`);
 
-    // Ý định: Tìm kiếm công thức
-    manager.addDocument('vi', 'tìm công thức món gà', 'intent.tim_kiem');
-    manager.addDocument('vi', 'chỉ tôi cách làm bò kho', 'intent.tim_kiem');
-    manager.addDocument('vi', 'có món nào nấu từ cá không', 'intent.tim_kiem');
-    manager.addDocument('vi', 'công thức nấu ăn với thịt heo', 'intent.tim_kiem');
-    manager.addDocument('vi', 'tìm món chay', 'intent.tim_kiem');
+    const trainingData = [];
 
-    // Ý định: Hỏi chi tiết (ví dụ: thời gian nấu)
-    manager.addDocument('vi', 'món phở bò nấu bao lâu', 'intent.hoi_thoi_gian');
-    manager.addDocument('vi', 'thời gian chuẩn bị của món gà nướng', 'intent.hoi_thoi_gian');
-    manager.addDocument('vi', 'nấu món cá kho mất bao lâu', 'intent.hoi_thoi_gian');
+    // ====================
+    // Xử lý dữ liệu món ăn
+    // ====================
+    for (const recipe of recipes) {
+      // --- Ingredients ---
+      let ingredients = [];
+      try {
+        const parsed =
+          typeof recipe.ingredients === "string"
+            ? JSON.parse(recipe.ingredients)
+            : recipe.ingredients;
 
+        if (Array.isArray(parsed)) {
+          parsed.forEach((i) => {
+            if (typeof i === "string") {
+              ingredients.push(i.trim().toLowerCase());
+            } else if (i && typeof i === "object" && i.name) {
+              ingredients.push(i.name.trim().toLowerCase());
+            }
+          });
+        }
+      } catch {
+        console.warn(`⚠️ Không thể parse ingredients cho món ${recipe.title}`);
+      }
 
-    // --- 2. Dạy cho bot các THỰC THỂ (Entities) ---
-    // Sửa lại tên hàm thành "addNamedEntityText"
+      // --- Description ---
+      trainingData.push({
+        intent: "ask_recipe",
+        input: `Cách nấu món ${recipe.title} như thế nào?`,
+        output: recipe.description || "",
+      });
 
-    // Entity: Nguyên liệu
-    manager.addNamedEntityText('vi', 'nguyen_lieu', 'gà', ['gà', 'thịt gà']);
-    manager.addNamedEntityText('vi', 'nguyen_lieu', 'bò', ['bò', 'thịt bò']);
-    manager.addNamedEntityText('vi', 'nguyen_lieu', 'cá', ['cá']);
-    manager.addNamedEntityText('vi', 'nguyen_lieu', 'heo', ['heo', 'thịt heo']);
-    manager.addNamedEntityText('vi', 'nguyen_lieu', 'chay', ['chay', 'đồ chay']);
+      // --- Tìm món theo nguyên liệu ---
+      if (ingredients.length > 0) {
+        trainingData.push({
+          intent: "ask_ingredient",
+          input: `Tìm món có nguyên liệu ${ingredients.join(", ")}`,
+          output: `Các món có thể dùng nguyên liệu ${ingredients.join(", ")} bao gồm: ${recipe.title}`,
+        });
+      }
 
-    // Entity: Tên món ăn (ví dụ)
-    manager.addNamedEntityText('vi', 'ten_mon_an', 'phở bò', ['phở bò']);
-    manager.addNamedEntityText('vi', 'ten_mon_an', 'gà nướng', ['gà nướng']);
-    manager.addNamedEntityText('vi', 'ten_mon_an', 'cá kho', ['cá kho', 'cá kho tộ']);
+      // --- Các bước nấu ăn kèm ảnh ---
+      const recipeSteps = steps
+        .filter((s) => s.recipe_id === recipe.id)
+        .sort((a, b) => a.step_order - b.step_order);
 
-    // Entity: Loại chi tiết
-    manager.addNamedEntityText('vi', 'chi_tiet', 'thời gian', ['thời gian', 'bao lâu']);
-    manager.addNamedEntityText('vi', 'chi_tiet', 'nguyên liệu', ['nguyên liệu', 'cần gì']);
+      if (recipeSteps.length > 0) {
+        const stepTexts = recipeSteps
+          .map((s, idx) => {
+            let text = `Bước ${idx + 1}: ${s.instruction}`;
+            if (s.image_url) {
+              text += `\n🖼️ Ảnh minh họa: ${s.image_url}`;
+            }
+            return text;
+          })
+          .join("\n\n");
 
-    // --- 3. Dạy bot các câu trả lời TĨNH (không cần database) ---
-    manager.addAnswer('vi', 'intent.chao_hoi', 'Chào bạn! Tôi là trợ lý ảo nấu ăn, tôi có thể giúp bạn tìm công thức.');
+        trainingData.push({
+          intent: "ask_steps",
+          input: `Các bước làm món ${recipe.title}`,
+          output: `Dưới đây là các bước để làm món ${recipe.title}:\n\n${stepTexts}`,
+        });
+      }
+    }
 
+    // ====================
+    // Xử lý danh mục
+    // ====================
+    categories.forEach((cat) => {
+      trainingData.push({
+        intent: "ask_category",
+        input: `Cho tôi xem các món trong danh mục ${cat.name}`,
+        output: `Đây là các món trong danh mục ${cat.name}.`,
+      });
+    });
 
-    // --- 4. Bắt đầu huấn luyện ---
-    console.log('Đang xử lý dữ liệu huấn luyện...');
-    await manager.train();
-    console.log('✅ Huấn luyện hoàn thành!');
-    
-    // 5. Lưu "bộ não" ra file
-    manager.save('./src/config/chatbot-model.json');
-    console.log('💾 Đã lưu "bộ não" vào file /src/config/chatbot-model.json');
+    // ====================
+    // Xử lý tag
+    // ====================
+    tags.forEach((tag) => {
+      trainingData.push({
+        intent: "ask_tag",
+        input: `Tìm món có tag ${tag.name}`,
+        output: `Các món có tag ${tag.name}.`,
+      });
+    });
+
+    // ====================
+    // Ghi ra file JSON
+    // ====================
+    const filePath = path.join(__dirname, "chatbot-data.json");
+    fs.writeFileSync(filePath, JSON.stringify(trainingData, null, 2), "utf8");
+
+    console.log(`✅ Huấn luyện hoàn tất. Đã lưu vào ${filePath}`);
+  } catch (err) {
+    console.error("❌ Lỗi huấn luyện chatbot:", err);
+  } finally {
+    await sequelize.close();
+  }
 }
 
+// ====================
+// 4️⃣ CHẠY
+// ====================
 trainChatbot();
