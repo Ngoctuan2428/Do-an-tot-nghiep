@@ -14,7 +14,13 @@ export const uploadMedia = (file, meta = {}) => {
   Object.entries(meta).forEach(([k, v]) => {
     if (v !== undefined && v !== null) form.append(k, v);
   });
-  return axiosInstance.post("/media", form);
+
+  // ✅ Thêm config để ghi đè 'Content-Type'
+  return axiosInstance.post("/media", form, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
 /**

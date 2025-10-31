@@ -1,46 +1,59 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database');
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/database");
 
-const User = sequelize.define('User', {
+const User = sequelize.define(
+  "User",
+  {
     id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
     },
     username: {
-        type: DataTypes.STRING(100),
-        allowNull: false,
+      type: DataTypes.STRING(100),
+      allowNull: false,
     },
     email: {
-        type: DataTypes.STRING(255),
-        allowNull: false,
-        unique: true,
-        validate: {
-            isEmail: true,
-        },
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: true,
+      },
     },
     password_hash: {
-        type: DataTypes.STRING(255),
-        allowNull: false,
+      type: DataTypes.STRING(255),
+      allowNull: true,
     },
     avatar_url: {
-        type: DataTypes.STRING(512),
-        allowNull: true,
+      type: DataTypes.STRING(512),
+      allowNull: true,
     },
     bio: {
-        type: DataTypes.TEXT,
-        allowNull: true,
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
     role: {
-        type: DataTypes.ENUM('user', 'admin'),
-        defaultValue: 'user',
+      type: DataTypes.ENUM("user", "admin"),
+      defaultValue: "user",
     },
-}, {
-    tableName: 'users',
+    provider: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      defaultValue: "local", // 'local' = đăng ký bằng email/pass
+    },
+    provider_id: {
+      type: DataTypes.STRING(255),
+      allowNull: true, // ID từ Google/Facebook
+    },
+  },
+  {
+    tableName: "users",
     // Sequelize sẽ tự động quản lý created_at và updated_at
-    timestamps: true, 
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
-});
+    timestamps: true,
+    createdAt: "created_at",
+    updatedAt: "updated_at",
+  }
+);
 
 module.exports = User;

@@ -2,9 +2,14 @@ const express = require("express");
 const cors = require("cors");
 const config = require("./src/config/environment");
 const { connectDB } = require("./src/config/database");
+const passport = require("passport");
+require("./src/config/passport");
 const mainRouter = require("./src/routes");
 const errorHandler = require("./src/middlewares/error.middleware");
 const ApiError = require("./src/utils/ApiError");
+const path = require("path");
+
+// 1. Import file config của passport (để nó chạy và đăng ký strategies)
 
 const app = express();
 
@@ -22,6 +27,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(passport.initialize()); // ✅ Dòng này bây giờ sẽ hoạt động
+app.use("/public", express.static(path.join(__dirname, "public")));
 
 // 3. Routes
 app.use("/api", mainRouter); // Gắn router chính vào /api
