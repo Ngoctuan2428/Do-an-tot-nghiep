@@ -20,6 +20,7 @@ connectDB();
 // Cấu hình CORS: cho phép FE tại http://localhost:5173
 const corsOptions = {
   origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  exposedHeaders: ["X-Total-Count"],
   credentials: true,
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
