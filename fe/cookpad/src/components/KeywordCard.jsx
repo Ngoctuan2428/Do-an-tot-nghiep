@@ -1,15 +1,27 @@
-export default function KeywordCard({ title, image }) {
-  return (
-    <div className="relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-      <img src={image} alt={title} className="w-full h-36 object-cover" />
-      <div className="absolute inset-0 bg-black/40"></div>
+import { useNavigate } from "react-router-dom";
 
-      <div className="absolute top-2 right-2 bg-yellow-400 text-black px-2 py-1 rounded text-xs font-bold">
-        Premium
+export default function KeywordCard({ title, image }) {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/search/${encodeURIComponent(title.toLowerCase())}`);
+  };
+
+  return (
+    <div
+      onClick={handleClick}
+      className="relative cursor-pointer group overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow"
+    >
+      <img
+        src={image}
+        alt={title}
+        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
+        <h3 className="absolute bottom-4 left-4 text-white font-medium">
+          {title}
+        </h3>
       </div>
-      <h3 className="absolute bottom-1 left-4 font-semibold text-white mb-2 line-clamp-2">
-        {title}
-      </h3>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 const searchService = require("../services/search.service");
 const ApiError = require("../utils/ApiError");
-const { Recipe } = require("../models"); // Adjust the path as necessary
-const { Op } = require("sequelize");
+const db = require("../models"); // Thêm để debug
+const { Recipe, Op } = db; // Thêm để debug
 
 async function searchRecipes(req, res, next) {
   try {
@@ -12,6 +12,8 @@ async function searchRecipes(req, res, next) {
       page: parseInt(req.query.page) || 1,
       limit: parseInt(req.query.limit) || 20,
       sortBy: req.query.sortBy || "newest",
+      include: req.query.include?.trim() || "",
+      exclude: req.query.exclude?.trim() || "",
     };
 
     console.log("Search params:", params); // Debug log

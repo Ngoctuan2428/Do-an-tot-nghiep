@@ -4,32 +4,53 @@ const { Recipe, User } = db;
 
 async function searchRecipes(params = {}) {
   try {
-    const { q = "", page = 1, limit = 20, sortBy = "newest" } = params;
+    const {
+      q = "",
+      page = 1,
+      limit = 20,
+      sortBy = "newest", // ✅ LẤY THAM SỐ FILTER
+      include = "",
+      exclude = "",
+    } = params; // Điều kiện tìm kiếm cơ bản (query chính)
 
-    // Log dữ liệu gốc trước khi filter
-    const debugResults = await Recipe.findAll({
-      where: {
-        [Op.or]: [
-          { title: { [Op.like]: `%${q}%` } },
-          { ingredients: { [Op.like]: `%${q}%` } },
-          { description: { [Op.like]: `%${q}%` } },
-        ],
-      },
-      attributes: ["id", "title", "ingredients", "status"],
-      raw: true,
-    });
-    console.log("Debug - Found recipes:", debugResults);
-
-    // Điều kiện tìm kiếm cơ bản
     const where = {
       [Op.or]: [
         { title: { [Op.like]: `%${q}%` } },
         { ingredients: { [Op.like]: `%${q}%` } },
         { description: { [Op.like]: `%${q}%` } },
       ],
-    };
+    }; // 🛑 BỘ LỌC NGUYÊN LIỆU (INCLUDE)
 
-    // ✅ Kiểm tra cột 'status' và chỉ thêm điều kiện published nếu cần
+    if (include) {
+      const includeKeywords = include
+        .split(",")
+        .map((keyword) => keyword.trim())
+        .filter(Boolean); // Lấy các từ khóa không rỗng
+
+      if (includeKeywords.length > 0) {
+        // Yêu cầu CỘT ingredients PHẢI chứa TẤT CẢ các từ khóa
+        const includeConditions = includeKeywords.map((keyword) => ({
+          ingredients: { [Op.like]: `%${keyword}%` },
+        })); // Thêm điều kiện AND cho tất cả include conditions
+        where[Op.and] = [...(where[Op.and] || []), ...includeConditions];
+      }
+    } // 🛑 BỘ LỌC NGUYÊN LIỆU (EXCLUDE)
+
+    if (exclude) {
+      const excludeKeywords = exclude
+        .split(",")
+        .map((keyword) => keyword.trim())
+        .filter(Boolean); // Lấy các từ khóa không rỗng
+
+      if (excludeKeywords.length > 0) {
+        // Yêu cầu CỘT ingredients KHÔNG được chứa BẤT KỲ từ khóa nào
+        const excludeConditions = excludeKeywords.map((keyword) => ({
+          ingredients: { [Op.notLike]: `%${keyword}%` },
+        })); // Thêm điều kiện AND cho tất cả exclude conditions
+        where[Op.and] = [...(where[Op.and] || []), ...excludeConditions];
+      }
+    } // ✅ Kiểm tra cột 'status' và chỉ thêm điều kiện published nếu cần
+
     const desc = await Recipe.describe();
     if (desc.status) {
       const hasPublished = await Recipe.count({
@@ -40,7 +61,12 @@ async function searchRecipes(params = {}) {
       }
     }
 
-    console.log("Final where clause:", JSON.stringify(where, null, 2));
+    console.log("Final where clause:", JSON.stringify(where, null, 2)); // Logic sắp xếp
+
+    let order = [["created_at", "DESC"]];
+    if (sortBy === "views") {
+      order = [["views", "DESC"]];
+    }
 
     const result = await Recipe.findAndCountAll({
       where,
@@ -50,7 +76,7 @@ async function searchRecipes(params = {}) {
           attributes: ["id", "username", "avatar_url"],
         },
       ],
-      order: [["created_at", "DESC"]],
+      order, // Áp dụng order
       limit: Number(limit),
       offset: (Number(page) - 1) * Number(limit),
       distinct: true,
@@ -75,15 +101,13 @@ async function searchRecipes(params = {}) {
 async function getSuggestions(q) {
   if (!q) return { suggestions: [] };
 
-  const limit = 8;
-  // tag suggestions
+  const limit = 8; // tag suggestions
   const tagRows = await Tag.findAll({
     where: { name: { [Op.like]: `%${q}%` } },
     attributes: ["name"],
     limit,
-  });
+  }); // recipe title suggestions
 
-  // recipe title suggestions
   const recipeRows = await Recipe.findAll({
     where: { title: { [Op.like]: `%${q}%` } },
     attributes: ["title"],

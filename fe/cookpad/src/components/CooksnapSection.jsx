@@ -11,8 +11,8 @@ import {
   X,
   User,
   MapPin,
-} from 'lucide-react';
-import { useState, useRef } from 'react';
+} from "lucide-react";
+import { useState, useRef } from "react";
 
 export default function CooksnapSection({ recipe }) {
   const [isFriend, setIsFriend] = useState(false);
@@ -40,17 +40,17 @@ export default function CooksnapSection({ recipe }) {
 
   // Toggle hàm
   const toggle = (type) => {
-    if (type === 'like') {
+    if (type === "like") {
       setLikes((prev) => ({
         liked: !prev.liked,
         count: prev.count + (prev.liked ? -1 : 1),
       }));
-    } else if (type === 'heart') {
+    } else if (type === "heart") {
       setHearts((prev) => ({
         liked: !prev.liked,
         count: prev.count + (prev.liked ? -1 : 1),
       }));
-    } else if (type === 'clap') {
+    } else if (type === "clap") {
       setClaps((prev) => ({
         liked: !prev.liked,
         count: prev.count + (prev.liked ? -1 : 1),
@@ -62,42 +62,42 @@ export default function CooksnapSection({ recipe }) {
     <section className="max-w-3xl mx-auto px-4 py-10 border-t border-gray-200">
       <div className="flex items-center gap-2 text-gray-600 mb-3">
         <button
-          onClick={() => toggle('like')}
+          onClick={() => toggle("like")}
           className={`flex items-center gap-1 transition ${
-            likes.liked ? 'text-blue-500' : 'hover:text-blue-400'
+            likes.liked ? "text-blue-500" : "hover:text-blue-400"
           }`}
         >
           <ThumbsUp
             className={`w-4 h-4 ${
-              likes.liked ? 'fill-blue-500 text-blue-500' : ''
+              likes.liked ? "fill-blue-500 text-blue-500" : ""
             }`}
           />
           <span>{likes.count}</span>
         </button>
 
         <button
-          onClick={() => toggle('heart')}
+          onClick={() => toggle("heart")}
           className={`flex items-center gap-1 transition ${
-            hearts.liked ? 'text-red-500' : 'hover:text-red-400'
+            hearts.liked ? "text-red-500" : "hover:text-red-400"
           }`}
         >
           <Heart
             className={`w-4 h-4 ${
-              hearts.liked ? 'fill-red-500 text-red-500' : ''
+              hearts.liked ? "fill-red-500 text-red-500" : ""
             }`}
           />
           <span>{hearts.count}</span>
         </button>
 
         <button
-          onClick={() => toggle('clap')}
+          onClick={() => toggle("clap")}
           className={`flex items-center gap-1 transition ${
-            claps.liked ? 'text-yellow-500' : 'hover:text-yellow-400'
+            claps.liked ? "text-yellow-500" : "hover:text-yellow-400"
           }`}
         >
           <Hand
             className={`w-4 h-4 ${
-              claps.liked ? 'fill-yellow-500 text-yellow-500' : ''
+              claps.liked ? "fill-yellow-500 text-yellow-500" : ""
             }`}
           />
           <span>{claps.count}</span>
@@ -137,29 +137,34 @@ export default function CooksnapSection({ recipe }) {
       </p>
 
       {/* Thông tin tác giả */}
-      <div className="flex items-center gap-4 mt-8">
-        <img
-          src={recipe.author.avatar}
-          alt={recipe.author.name}
-          className="w-20 h-20 rounded-full object-cover"
-        />
-        <div className="flex-1">
-          <p className="font-semibold text-lg">{recipe.author.name}</p>
-          <p className="text-gray-600 text-sm">
-            vào {recipe.author.joined} · {recipe.author.location}
-          </p>
-          <button
-            onClick={() => setIsFriend(!isFriend)}
-            className={`mt-2  px-4 py-1 rounded-lg text-sm border border-gray-300 ${
-              isFriend ? 'text-black bg-white' : 'bg-gray-700 text-white'
-            }`}
-          >
-            {' '}
-            {isFriend ? ' Bạn bếp' : ' Kết bạn bếp '}
-          </button>
+      {recipe.author && (
+        <div className="flex items-center gap-4 mt-8">
+          <img
+            src={recipe.author?.avatar || "/default-avatar.png"}
+            alt={recipe.author?.name || "Tác giả"}
+            className="w-20 h-20 rounded-full object-cover"
+          />
+          <div className="flex-1">
+            <p className="font-semibold text-lg">
+              {recipe.author?.name || "Ẩn danh"}
+            </p>
+            <p className="text-gray-600 text-sm">
+              {recipe.author?.joined ? `vào ${recipe.author.joined}` : ""}
+              {recipe.author?.location ? ` · ${recipe.author.location}` : ""}
+            </p>
+            <button
+              onClick={() => setIsFriend(!isFriend)}
+              className={`mt-2 px-4 py-1 rounded-lg text-sm border border-gray-300 ${
+                isFriend ? "text-black bg-white" : "bg-gray-700 text-white"
+              }`}
+            >
+              {isFriend ? "Bạn bếp" : "Kết bạn bếp"}
+            </button>
+          </div>
         </div>
-      </div>
-      <p className="mt-4 text-gray-700">{recipe.author.bio}</p>
+      )}
+
+      <p className="mt-4 text-gray-700">{recipe.author?.bio || ""}</p>
 
       {/* Bình luận */}
       <div className="mt-10">

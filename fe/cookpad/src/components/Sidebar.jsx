@@ -1,18 +1,19 @@
-import { useState } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+// src/components/Sidebar.jsx
+import { useState } from "react";
+import { useLocation, Link } from "react-router-dom";
 import {
   Search,
   Crown,
   BarChart3,
   Award,
-  BookOpen,
+  BookOpen, // Thay thế cho Search trong kho món
   GraduationCap,
   Refrigerator,
   ShoppingBag,
   ChevronDown,
   ChevronRight,
   ChevronLeft,
-  Plus, // Thêm icon cho FAB
+  Plus,
   Bookmark,
   CheckCircle,
   User,
@@ -24,55 +25,74 @@ import {
   ChevronsLeft,
   ChevronsRight,
   ArrowDownToLine,
-} from 'lucide-react';
-import { khoMonItems } from '../data/sidebarData';
-import pCook from '../../public/pCook.png';
+} from "lucide-react";
+import { khoMonItems } from "../data/sidebarData"; // Vẫn dùng để lấy (path, label, icon)
+import pCook from "../../public/pCook.png";
+
+// 1. Import Hook
+import { useRecipeCounts } from "../contexts/RecipeCountContext";
 
 export default function Sidebar() {
   const location = useLocation();
   const [isKhoMonOpen, setIsKhoMonOpen] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false); // Mặc định mở rộng; toggle chỉ trên lg+
+
+  // 2. Lấy 'counts' động từ Context
+  const { counts } = useRecipeCounts();
+
   const handleDownloadApp = () => {
-    console.log('Tải ứng dụng');
+    console.log("Tải ứng dụng");
   };
   const handleAddRecipe = () => {
-    console.log('Thêm món'); // TODO: Navigate to create recipe page
+    console.log("Thêm món"); // TODO: Navigate to create recipe page
   };
 
   const mainMenu = [
     {
-      path: '/search',
-      label: 'Tìm kiếm',
+      path: "/search",
+      label: "Tìm kiếm",
       icon: Search, // Đổi icon cho phù hợp
-      active: location.pathname === '/search',
+      active: location.pathname === "/search",
     },
     {
-      path: '/premium',
-      label: 'Premium',
+      path: "/premium",
+      label: "Premium",
       icon: Crown,
-      active: location.pathname === '/premium',
+      active: location.pathname === "/premium",
     },
     {
-      path: '/stats',
-      label: 'Thống kê bếp',
+      path: "/stats",
+      label: "Thống kê bếp",
       icon: BarChart3,
-      active: location.pathname === '/stats',
+      active: location.pathname === "/stats",
     },
     {
-      path: '/challenges',
-      label: 'Thử thách',
+      path: "/challenges",
+      label: "Thử thách",
       icon: Award,
-      active: location.pathname === '/challenges',
+      active: location.pathname === "/challenges",
     },
     {
-      path: '/interactions',
-      label: 'Tương tác',
+      path: "/interactions",
+      label: "Tương tác",
       icon: GraduationCap,
-      active: location.pathname === '/interactions',
+      active: location.pathname === "/interactions",
     },
   ];
 
-  const khoMonItems2 = khoMonItems;
+  // 3. Tạo mảng động: Kết hợp dữ liệu tĩnh (label, icon) với 'counts' từ Context
+  const dynamicKhoMonItems = khoMonItems.map((item) => {
+    // Lấy key từ path (vd: '/recipes/all' -> 'all')
+    const key = item.path.split("/").pop();
+
+    // Lấy count từ context, nếu không có (undefined) thì dùng count tĩnh (là 0)
+    const count = counts[key] !== undefined ? counts[key] : item.count;
+
+    return {
+      ...item,
+      count: count, // Ghi đè count
+    };
+  });
 
   // Logic collapsed: Tự động true trên <lg, false trên lg+
   const effectiveCollapsed = isCollapsed || window.innerWidth < 1024;
@@ -108,14 +128,14 @@ export default function Sidebar() {
                   to={item.path}
                   className={`flex items-center px-2 py-1 rounded-md text-xs transition-colors ${
                     item.active
-                      ? 'bg-cookpad-orange text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? "bg-cookpad-orange text-white"
+                      : "text-gray-700 hover:bg-gray-100"
                   } flex-shrink-0`}
                 >
                   <Icon
                     size={16}
                     className={`mr-1 ${
-                      item.active ? 'text-white' : 'text-gray-500'
+                      item.active ? "text-white" : "text-gray-500"
                     }`}
                   />
                   <span className="truncate max-w-16">{item.label}</span>
@@ -145,14 +165,14 @@ export default function Sidebar() {
                   to={item.path}
                   className={`flex items-center p-2 rounded-md transition-colors ${
                     item.active
-                      ? 'bg-cookpad-orange text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? "bg-cookpad-orange text-white"
+                      : "text-gray-700 hover:bg-gray-100"
                   }`}
                   title={item.label} // Tooltip cho accessibility
                 >
                   <Icon
                     size={20}
-                    className={item.active ? 'text-white' : 'text-gray-500'}
+                    className={item.active ? "text-white" : "text-gray-500"}
                   />
                 </Link>
               );
@@ -166,21 +186,21 @@ export default function Sidebar() {
       {/* Desktop vertical sidebar - Giữ nguyên */}
       <aside
         className={`hidden lg:block sticky top-0 z-40 h-screen bg-white border-r border-gray-200 flex flex-col justify-between items-center overflow-y-auto transition-all duration-300 ${
-          effectiveCollapsed ? 'w-16' : 'w-64'
+          effectiveCollapsed ? "w-16" : "w-64"
         }`}
       >
         {/* Logo + Toggle */}
         <div
           className={`p-2 ${
             effectiveCollapsed
-              ? 'border-b flex-col-reverse space-y-4 gap-2 justify-stretch items-center'
-              : 'border-b p-4'
+              ? "border-b flex-col-reverse space-y-4 gap-2 justify-stretch items-center"
+              : "border-b p-4"
           } border-gray-200 flex items-center justify-between`}
         >
           <Link
             to="/"
             className={`flex items-center ${
-              effectiveCollapsed ? 'space-x-0' : 'space-x-2'
+              effectiveCollapsed ? "space-x-0" : "space-x-2"
             }`}
           >
             <img src={pCook} className="w-10" alt="logo" />
@@ -193,7 +213,7 @@ export default function Sidebar() {
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className={`text-gray-500 hover:text-gray-700  ${
-              effectiveCollapsed ? 'm-0' : 'ml-2'
+              effectiveCollapsed ? "m-0" : "ml-2"
             }`}
           >
             {effectiveCollapsed ? (
@@ -207,7 +227,7 @@ export default function Sidebar() {
         {/* Main Menu */}
         <nav
           className={`flex-1 justify-between items-center p-2 space-y-1 ${
-            effectiveCollapsed ? 'pt-4' : ''
+            effectiveCollapsed ? "pt-4" : ""
           }`}
         >
           {mainMenu.map((item) => {
@@ -218,14 +238,14 @@ export default function Sidebar() {
                 to={item.path}
                 className={`flex items-center px-2 lg:px-3 py-2 rounded-md text-sm transition-colors ${
                   item.active
-                    ? 'bg-cookpad-orange text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                } ${effectiveCollapsed ? 'justify-center px-2' : ''}`}
+                    ? "bg-cookpad-orange text-white"
+                    : "text-gray-700 hover:bg-gray-100"
+                } ${effectiveCollapsed ? "justify-center px-2" : ""}`}
               >
                 <Icon
                   size={18}
                   className={`mr-0 flex-shrink-0 ${
-                    item.active ? 'text-white' : 'text-gray-500'
+                    item.active ? "text-white" : "text-gray-500"
                   }`}
                 />
                 {!effectiveCollapsed && (
@@ -243,7 +263,7 @@ export default function Sidebar() {
                 className="w-full flex items-center justify-between px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-100"
               >
                 <div className="flex items-center">
-                  <Search size={18} className="mr-3 text-gray-500" />
+                  <BookOpen size={18} className="mr-3 text-gray-500" />
                   <span className="truncate">Kho món ngon của bạn</span>
                 </div>
                 {isKhoMonOpen ? (
@@ -260,7 +280,9 @@ export default function Sidebar() {
                     placeholder="Tìm trong kho món"
                     className="w-full px-3 py-1 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-cookpad-orange"
                   />
-                  {khoMonItems2.map((subItem) => {
+
+                  {/* 4. SỬ DỤNG MẢNG ĐỘNG Ở ĐÂY */}
+                  {dynamicKhoMonItems.map((subItem) => {
                     const Icon = subItem.icon;
                     const isActive = location.pathname === subItem.path;
                     return (
@@ -269,22 +291,23 @@ export default function Sidebar() {
                         to={subItem.path}
                         className={`flex items-center px-2 py-1 rounded text-xs transition-colors ${
                           isActive
-                            ? 'bg-cookpad-orange text-white'
-                            : 'text-gray-600 hover:bg-gray-100'
+                            ? "bg-cookpad-orange text-white"
+                            : "text-gray-600 hover:bg-gray-100"
                         }`}
                       >
                         <Icon
                           size={14}
                           className={`mr-2 flex-shrink-0 ${
-                            isActive ? 'text-white' : 'text-gray-500'
+                            isActive ? "text-white" : "text-gray-500"
                           }`}
                         />
                         <span className="truncate flex-1">{subItem.label}</span>
                         <span
                           className={`ml-auto text-xs ${
-                            isActive ? 'text-white' : 'text-gray-400'
+                            isActive ? "text-white" : "text-gray-400"
                           }`}
                         >
+                          {/* Sử dụng count động */}
                           {subItem.count} món
                         </span>
                       </Link>

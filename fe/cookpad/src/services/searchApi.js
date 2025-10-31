@@ -1,4 +1,4 @@
-import axiosInstance from "./axiosClient";
+import axiosClient from "./axiosClient";
 
 /**
  * @typedef {Object} SearchParams
@@ -15,7 +15,7 @@ import axiosInstance from "./axiosClient";
  * @param {SearchParams} params
  */
 export const searchRecipes = (params = {}) => {
-  return axiosInstance.get("/search/recipes", { params });
+  return axiosClient.get("/search/recipes", { params });
 };
 
 /**
@@ -23,8 +23,8 @@ export const searchRecipes = (params = {}) => {
  * @param {string} keyword
  */
 export const getSearchSuggestions = (keyword) => {
-  return axiosInstance.get("/search/suggestions", {
-    params: { keyword },
+  return axiosClient.get("/search/suggestions", {
+    params: { q: keyword },
   });
 };
 
@@ -34,7 +34,7 @@ export const getSearchSuggestions = (keyword) => {
  * @param {SearchParams} params
  */
 export const searchByCategory = (categorySlug, params = {}) => {
-  return axiosInstance.get(`/categories/${categorySlug}/recipes`, { params });
+  return axiosClient.get(`/categories/${categorySlug}/recipes`, { params });
 };
 
 /**
@@ -43,14 +43,14 @@ export const searchByCategory = (categorySlug, params = {}) => {
  * @param {SearchParams} params
  */
 export const searchByTag = (tag, params = {}) => {
-  return axiosInstance.get(`/tags/${tag}/recipes`, { params });
+  return axiosClient.get(`/tags/${tag}/recipes`, { params });
 };
 
 /**
  * Get trending searches
  */
 export const getTrendingSearches = () => {
-  return axiosInstance.get("/search/trending");
+  return axiosClient.get("/search/trending");
 };
 
 /**
@@ -58,19 +58,19 @@ export const getTrendingSearches = () => {
  * @param {string} keyword
  */
 export const saveSearchHistory = (keyword) => {
-  return axiosInstance.post("/search/history", { keyword });
+  return axiosClient.post("/search/history", { keyword });
 };
 
 /**
  * Get user's search history
  */
 export const getSearchHistory = () => {
-  return axiosInstance.get("/search/history");
+  return axiosClient.get("/search/history");
 };
 
 /**
  * Clear search history
  */
 export const clearSearchHistory = () => {
-  return axiosInstance.delete("/search/history");
+  return axiosClient.delete("/search/history");
 };
