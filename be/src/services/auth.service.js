@@ -32,17 +32,21 @@ const loginUser = async (loginData) => {
 
     // 1. Tìm người dùng theo email
     const user = await User.findOne({ where: { email } });
-    if (!user) {
+
+    // 2. ⚡ SỬA LỖI BẢO MẬT TẠI ĐÂY
+    // Kiểm tra xem user có tồn tại không VÀ user có password_hash không
+    // Nếu !user.password_hash (là NULL), nghĩa là họ đăng ký qua Google
+    if (!user || !user.password_hash) {
         throw new ApiError(401, 'Invalid email or password.');
     }
 
-    // 2. So sánh mật khẩu
+    // 3. So sánh mật khẩu (Code này bây giờ đã an toàn)
     const isPasswordMatch = await bcrypt.compare(password, user.password_hash);
     if (!isPasswordMatch) {
         throw new ApiError(401, 'Invalid email or password.');
     }
 
-    // 3. Tạo token
+    // 4. Tạo token
     const accessToken = generateToken(user.id);
 
     user.password_hash = undefined;
