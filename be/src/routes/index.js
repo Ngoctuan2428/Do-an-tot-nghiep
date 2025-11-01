@@ -1,10 +1,14 @@
+// src/routes/index.js
 const express = require('express');
+
+// Import các router con
 const authRoutes = require('./auth.routes');
 const userRoutes = require('./user.routes');
 const categoryRoutes = require('./category.routes');
 const recipeRoutes = require('./recipe.routes');
 const adminRoutes = require('./admin.routes');
 const chatbotRoutes = require('./chatbot.routes');
+const challengeRoutes = require('./challenge.routes');
 
 const router = express.Router();
 
@@ -15,4 +19,6 @@ router.use('/categories', categoryRoutes);
 router.use('/recipes', recipeRoutes);
 router.use('/admin', adminRoutes);
 router.use('/chatbot', chatbotRoutes);
+router.use('/challenges', challengeRoutes); 
+
 module.exports = router;
