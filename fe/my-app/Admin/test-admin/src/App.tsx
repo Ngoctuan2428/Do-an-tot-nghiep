@@ -14,6 +14,10 @@ import "./mylogout.css";
 import { UserEdit } from "./pages/users/UserEdit";
 import { UserShow } from "./pages/users/UserShow";
 import { RecipeCreate } from "./pages/recipes/RecipeCreate";
+import { ChallengeList } from "./pages/challenges/ChallengeList";
+import { ChallengeCreate } from "./pages/challenges/ChallengeCreate";
+import { ChallengeEdit } from "./pages/challenges/ChalengeEdit";
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -52,6 +56,13 @@ export const App = () => {
         edit={RecipeEdit}
         create={RecipeCreate}
         />
+        <Resource
+        icon={EmojiEventsIcon}
+        name="challenges"
+        list={ChallengeList}
+        create={ChallengeCreate}
+        edit={ChallengeEdit}
+        />
     </Admin>
   );
 }
