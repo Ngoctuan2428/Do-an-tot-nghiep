@@ -1,11 +1,13 @@
 const express = require('express');
 const adminController = require('../controllers/admin.controller');
-const { protect, isAdmin } = require('../middlewares/auth.middleware');
+// 1. Sửa 'isAdmin' thành 'restrictTo'
+const { protect, restrictTo } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
 
 // Yêu cầu tất cả các route trong file này phải đăng nhập và là admin
-router.use(protect, isAdmin);
+// 2. Sửa 'isAdmin' thành 'restrictTo('admin')'
+router.use(protect, restrictTo('admin'));
 
 // Quản lý người dùng
 router.route('/users')

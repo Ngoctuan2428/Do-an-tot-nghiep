@@ -1,5 +1,15 @@
 const recipeService = require("../services/recipe.service");
 
+const getRecipeCount = async (req, res, next) => {
+    try {
+        const count = await recipeService.getRecipeCount();
+        res.status(200).json({ status: 'success', data: { count } });
+    } catch (error) {
+        next(error);
+    }
+};
+// =====================
+
 const createRecipe = async (req, res, next) => {
   try {
     const newRecipe = await recipeService.createRecipe(req.user.id, req.body);

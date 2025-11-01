@@ -35,15 +35,15 @@ app.use("/public", express.static(path.join(__dirname, "public")));
 // 3. Routes
 app.use("/api", mainRouter); // Gắn router chính vào /api
 
-// 4. Xử lý route không tồn tại (404)
+// 5. Xử lý route không tồn tại (404)(Số thứ tự cũ là 4)
 app.use((req, res, next) => {
   next(new ApiError(404, "Not Found"));
 });
 
-// 5. Middleware xử lý lỗi tập trung (PHẢI đặt ở cuối cùng)
+// 6. Middleware xử lý lỗi tập trung 
 app.use(errorHandler);
 
-// 6. Khởi chạy server
+// 7. Khởi chạy server
 const PORT = config.port;
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
