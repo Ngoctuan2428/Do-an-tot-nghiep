@@ -53,5 +53,5 @@ export const authProvider: AuthProvider = {
       : Promise.reject();
   },
 
-  getPermissions: () => Promise.resolve(),
+  getPermissions: () => Promise.resolve("admin"),
 };

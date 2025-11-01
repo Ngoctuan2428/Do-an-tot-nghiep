@@ -5,6 +5,8 @@ import {
     NumberField,
     UrlField,
     DateField,
+    EditButton,
+    DeleteButton,
     ReferenceField,
   } from "react-admin";
   
@@ -43,6 +45,9 @@ import {
         <DateField source="updated_at" showTime />
   
         <TextField source="User.username" label="User" />
+
+        <EditButton />
+        <DeleteButton />
       </Datagrid>
     </List>
   );

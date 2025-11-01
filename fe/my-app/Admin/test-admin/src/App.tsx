@@ -1,15 +1,19 @@
-import { Admin, Resource, ListGuesser, ShowGuesser } from "react-admin";
-import { Layout } from "./Layout";
-import { dataProvider } from "./dataProvider";
+import { Admin, Resource } from "react-admin";
+import { Layout } from "./components/Layout";
+import { dataProvider } from "../services/dataProvider";
 import PersonIcon from "@mui/icons-material/Person";
-import { HomePage } from "./homepage";
-import { authProvider } from "./authProvider";
+import InventoryTwoToneIcon from '@mui/icons-material/InventoryTwoTone';
+import { HomePage } from "./pages/HomePage";
+import { authProvider } from "../services/authProvider";
 import { RecipeList } from "./pages/recipes/RecipesList";
 import { RecipeShow } from "./pages/recipes/RecipeShow";
 import { RecipeEdit } from "./pages/recipes/RecipeEdit";
 import { UserList } from "./pages/users/UserList";
 import { QueryClient } from "@tanstack/react-query";
 import "./mylogout.css";
+import { UserEdit } from "./pages/users/UserEdit";
+import { UserShow } from "./pages/users/UserShow";
+import { RecipeCreate } from "./pages/recipes/RecipeCreate";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -37,12 +41,16 @@ export const App = () => {
         icon={PersonIcon}
         name="users"
         list={UserList}
-        show={ShowGuesser} />
+        show={UserShow} 
+        edit={UserEdit}
+        />
       <Resource
+        icon={InventoryTwoToneIcon}
         name="recipes"
         list={RecipeList}
         show={RecipeShow} 
         edit={RecipeEdit}
+        create={RecipeCreate}
         />
     </Admin>
   );

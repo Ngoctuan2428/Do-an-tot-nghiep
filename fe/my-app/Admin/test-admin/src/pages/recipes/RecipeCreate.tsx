@@ -1,22 +1,18 @@
 import {
-    Edit,
+    Create,
     SimpleForm,
     TextInput,
     NumberInput,
     SelectInput,
     ArrayInput,
     SimpleFormIterator,
-    ReferenceInput,
     required,
   } from 'react-admin';
   
-  export const RecipeEdit = () => (
-    <Edit>
+  export const RecipeCreate = () => (
+    <Create>
       <SimpleForm>
-        <TextInput source="id" disabled />
-  
         <TextInput source="title" validate={required()} fullWidth />
-        <TextInput source="slug" fullWidth />
         <TextInput source="description" multiline fullWidth />
         <TextInput source="image_url" fullWidth />
         <TextInput source="servings" />
@@ -37,6 +33,7 @@ import {
   
         <SelectInput
           source="difficulty"
+          defaultValue="Dễ" // Đặt giá trị mặc định
           choices={[
             { id: 'Dễ', name: 'Dễ' },
             { id: 'Trung bình', name: 'Trung bình' },
@@ -46,17 +43,13 @@ import {
         
         <SelectInput
           source="status"
+          defaultValue="draft" // Đặt giá trị mặc định
           choices={[
             { id: 'public', name: 'Public' },
             { id: 'private', name: 'Private' },
             { id: 'draft', name: 'Draft' },
           ]}
         />
-        
-        <ReferenceInput source="user_id" reference="users">
-          {/* Giả sử bạn có resource "users" */}
-          <SelectInput optionText="username" disabled />
-        </ReferenceInput>
       </SimpleForm>
-    </Edit>
+    </Create>
   );
