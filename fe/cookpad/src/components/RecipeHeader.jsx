@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import ReactionModal from '../components/ReactionModal';
 import {
   Soup,
   Bookmark,
@@ -16,6 +17,7 @@ import {
  * @param {Object} props.recipe - Thông tin món ăn
  */
 export default function RecipeHeader({ recipe }) {
+  const [showReactions, setShowReactions] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isFavourite, setIsFavourite] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -110,12 +112,32 @@ export default function RecipeHeader({ recipe }) {
             </button>
 
             {/* Thông tin số người */}
-            <p className="text-gray-600 flex items-center gap-2 mb-4">
-              <User className="w-4 h-4" />{' '}
-              {recipe.interestedCount
-                ? `${recipe.interestedCount} bếp khác đang định nấu món này`
-                : 'Chưa có ai định nấu'}
-            </p>
+            <div>
+              <p className="text-gray-600 flex items-center gap-2 mb-4">
+                <User className="w-4 h-4" />
+
+                {recipe.interestedCount ? (
+                  <>
+                    <span>
+                      {recipe.interestedCount} bếp khác đang định nấu món này
+                    </span>
+                    <button
+                      onClick={() => setShowReactions(true)}
+                      className="text-orange-600 font-medium hover:underline"
+                    >
+                      Xem người tương tác
+                    </button>
+
+                    <ReactionModal
+                      open={showReactions}
+                      onClose={() => setShowReactions(false)}
+                    />
+                  </>
+                ) : (
+                  <span>Chưa có ai định nấu</span>
+                )}
+              </p>
+            </div>
 
             {/* Thông tin tác giả */}
             <div className="flex items-center gap-3 p-3 rounded-lg">
