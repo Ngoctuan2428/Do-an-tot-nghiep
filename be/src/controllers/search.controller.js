@@ -68,9 +68,20 @@ async function debugSearch(req, res, next) {
   }
 }
 
+async function trendingTags(req, res, next) {
+  try {
+    const limit = req.query.limit || 8; // Lấy 8 tags
+    const tags = await searchService.getTrendingTags(limit);
+    return res.json({ tags }); // Trả về dạng { tags: ['thịt', 'cá', ...] }
+  } catch (err) {
+    return next(ApiError.internal(err.message));
+  }
+}
+
 module.exports = {
   searchRecipes,
   suggestions,
   trending,
   debugSearch, // Export the debug function
+  trendingTags,
 };

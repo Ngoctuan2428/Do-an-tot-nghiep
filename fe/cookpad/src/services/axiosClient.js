@@ -25,10 +25,17 @@ axiosClient.interceptors.request.use(
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // 1. Chỉ xử lý lỗi 401 nếu không phải là lỗi đăng nhập/đăng ký
+    if (
+      error.response?.status === 401 &&
+      !error.config.url.includes("/auth/")
+    ) {
       // Handle unauthorized access
       localStorage.removeItem("token");
-      window.location.href = "/login";
+
+      // ✅ SỬA: Chuyển hướng về trang Home (route gốc)
+      // Nếu không có token, trang Home sẽ mở LoginModal
+      window.location.href = "/";
     }
     return Promise.reject(error);
   }

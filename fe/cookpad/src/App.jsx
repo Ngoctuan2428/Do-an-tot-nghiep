@@ -18,7 +18,7 @@ import Interactions from "./pages/Interactions";
 import Premium from "./pages/Premium";
 import Challenges from "./pages/Challenges";
 import RecipeDetail from "./pages/RecipeDetail";
-import UserProfileEmpty from "./pages/UserProfileEmpty";
+import UserProfile from "./pages/UserProfile";
 import CreateRecipe from "./pages/CreateRecipe";
 import Sidebar from "./components/Sidebar";
 import ChallengeDetail from "./components/ChallengeDetail";
@@ -40,15 +40,12 @@ function App() {
               <Route path="/search/:query" element={<SearchDetail />} />
               <Route path="/stats" element={<Statistics />} />
               <Route path="/challenges" element={<Challenges />} />
-              <Route
-                path="/challenge/:challengeSlug"
-                element={<ChallengeDetail />}
-              />
+              <Route path="/challenge/:hashtag" element={<ChallengeDetail />} />
 
               <Route path="/premium" element={<Premium />} />
               <Route path="/interactions" element={<Interactions />} />
               <Route path="/user/:id" element={<User />} />
-              <Route path="/profile" element={<UserProfileEmpty />} />
+              <Route path="/profile" element={<UserProfile />} />
               <Route path="/recipes/:id" element={<RecipeDetail />} />
               <Route path="/create-recipe" element={<CreateRecipe />} />
               <Route path="/login-success" element={<LoginCallback />} />

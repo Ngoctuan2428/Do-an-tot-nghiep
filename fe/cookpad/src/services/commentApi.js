@@ -1,81 +1,29 @@
-import axiosInstance from "./axiosClient";
+// src/services/commentApi.js
+import axiosClient from "./axiosClient";
 
 /**
- * @typedef {Object} Comment
- * @property {string} id
- * @property {string} content
- * @property {string} userId
- * @property {string} recipeId
- * @property {Date} createdAt
- * @property {Date} updatedAt
+ * Lấy danh sách bình luận của một công thức
+ * GET /api/recipes/:recipeId/comments
  */
+export const getComments = (recipeId, params = {}) => {
+  return axiosClient.get(`/recipes/${recipeId}/comments`, { params });
+};
 
 /**
- * @typedef {Object} CommentPayload
- * @property {string} content
- * @property {string} recipeId
+ * Gửi bình luận mới
+ * POST /api/recipes/:recipeId/comments
  */
-
-// Get comments for a recipe
-export const getRecipeComments = (recipeId) => {
-  return axiosInstance.get(`/recipes/${recipeId}/comments`);
+export const createComment = (recipeId, data) => {
+  return axiosClient.post(`/recipes/${recipeId}/comments`, data);
 };
 
-// Create a new comment
-export const createComment = (data) => {
-  return axiosInstance.post(`/recipes/${data.recipeId}/comments`, data);
+// (Các hàm update/delete nếu cần sau này)
+export const deleteComment = (recipeId, commentId) => {
+  return axiosClient.delete(`/recipes/${recipeId}/comments/${commentId}`);
 };
 
-// Update a comment
-export const updateComment = (commentId, data) => {
-  return axiosInstance.put(`/comments/${commentId}`, data);
-};
-
-// Delete a comment
-export const deleteComment = (commentId) => {
-  return axiosInstance.delete(`/comments/${commentId}`);
-};
-
-// Get replies for a comment
-export const getCommentReplies = (commentId) => {
-  return axiosInstance.get(`/comments/${commentId}/replies`);
-};
-
-// Create a reply to a comment
-export const createReply = (commentId, data) => {
-  return axiosInstance.post(`/comments/${commentId}/replies`, data);
-};
-
-// Like/unlike a comment
-export const toggleCommentLike = (commentId) => {
-  return axiosInstance.post(`/comments/${commentId}/like`);
-};
-
-// Get comment counts for a recipe
-export const getCommentCounts = (recipeId) => {
-  return axiosInstance.get(`/recipes/${recipeId}/comments/count`);
-};
-
-import { getRecipeComments, createComment } from "../services/commentApi";
-
-// Trong component
-const fetchComments = async () => {
-  try {
-    const response = await getRecipeComments(recipeId);
-    setComments(response.data);
-  } catch (error) {
-    console.error("Failed to fetch comments:", error);
-  }
-};
-
-const handleAddComment = async (content) => {
-  try {
-    await createComment({
-      recipeId,
-      content,
-    });
-    await fetchComments(); // Refresh comments
-  } catch (error) {
-    console.error("Failed to add comment:", error);
-  }
+export default {
+  getComments,
+  createComment,
+  deleteComment,
 };

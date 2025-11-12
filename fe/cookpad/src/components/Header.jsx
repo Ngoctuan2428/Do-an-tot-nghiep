@@ -1,6 +1,6 @@
 // src/components/Header.jsx
 import { useState, useMemo, useEffect } from "react"; // ⬅️ Thêm useEffect
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom"; // ✅ Thêm Link vào đây
 import LoginModal from "./LoginModal";
 import { ChevronLeft, ArrowDownToLine, Plus } from "lucide-react";
 // import { getCurrentUser } from '../services/userApi'; // (Tùy chọn)
@@ -91,17 +91,19 @@ export default function Header() {
             </button>
           </div>
 
-          {/* ---- ⬇️ SỬA LOGIC HIỂN THỊ ---- */}
-          {isLoggedIn ? ( // Dùng isLoggedIn thay vì user
-            <div className="flex items-center space-x-2">
-              <img
-                src="https://placehold.co/32x32/E88413/FFFFFF?text=A" // (Nên thay bằng userInfo.avatar_url)
-                alt="Avatar"
-                className="w-8 h-8 rounded-full"
-                onError={(e) => {
-                  e.target.src = "https://placehold.co/32x32";
-                }}
-              />
+          {isLoggedIn ? (
+            <div className="flex items-center space-x-3">
+              {/* ✅ BỌC AVATAR TRONG LINK ĐẾN /profile */}
+              <Link to="/profile" className="flex-shrink-0">
+                <img
+                  src="https://placehold.co/32x32/E88413/FFFFFF?text=A"
+                  alt="Avatar"
+                  className="w-8 h-8 rounded-full border border-gray-200 hover:opacity-80 transition-opacity"
+                  onError={(e) => {
+                    e.target.src = "https://placehold.co/32x32";
+                  }}
+                />
+              </Link>
               <button
                 onClick={handleLogout}
                 className="text-sm text-gray-600 hover:text-cookpad-orange"

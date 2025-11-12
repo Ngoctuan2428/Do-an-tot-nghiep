@@ -74,3 +74,7 @@ export const getSearchHistory = () => {
 export const clearSearchHistory = () => {
   return axiosClient.delete("/search/history");
 };
+
+export const getTrendingTags = (params = {}) => {
+  return axiosClient.get("/search/trending-tags", { params });
+};

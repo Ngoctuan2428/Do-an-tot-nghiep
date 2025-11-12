@@ -1,205 +1,335 @@
 // src/pages/CreateRecipe.jsx
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Camera, Trash2, Upload, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Camera, Trash2, Upload, Loader2, Save, X } from "lucide-react";
 import IngredientList from "../components/IngredientList";
 import StepList from "../components/StepList";
+import { createRecipe, updateRecipe } from "../services/recipeApi";
 
-// 1. Import các API service cần thiết
-import { createRecipe } from "../services/recipeApi";
+// Import API services
 import { uploadMedia } from "../services/uploadApi";
-
-// 2. Import Hook
+import { getCurrentUser } from "../services/userApi";
 import { useRecipeCounts } from "../contexts/RecipeCountContext";
 
-export default function CreateRecipe() {
-  const navigate = useNavigate(); // Hook để chuyển trang
+// ✅ 1. THÊM HÀM uid() BỊ THIẾU
+const uid = () =>
+  `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 
-  // 3. Lấy hàm 'refreshCounts' từ Context
+export default function CreateRecipe() {
+  const navigate = useNavigate();
   const { refreshCounts } = useRecipeCounts();
 
-  // --- 4. Quản lý State ---
-  const [title, setTitle] = useState(""); // Tiêu đề
-  const [desc, setDesc] = useState(""); // Mô tả
-  const [imageUrl, setImageUrl] = useState(null); // URL ảnh (để xem trước)
-  const [imageFile, setImageFile] = useState(null); // File ảnh (để upload)
+  const location = useLocation();
+  const recipeToEdit = location.state?.recipeToEdit;
+  const isEditMode = !!recipeToEdit; // Cờ (flag) chế độ Chỉnh sửa
 
-  // State để nhận dữ liệu từ 2 component con
-  const [ingredients, setIngredients] = useState([]);
-  const [steps, setSteps] = useState([]);
+  let initialIngredients = [];
+  let initialSteps = [];
 
-  const [loading, setLoading] = useState(false); // State xử lý loading
+  // ✅ SỬA LỖI 4: Parse dữ liệu (nếu ở chế độ Chỉnh sửa)
+  if (recipeToEdit) {
+    try {
+      const ingredientsData = recipeToEdit.ingredients;
 
-  // Thông tin user giả (bạn có thể thay bằng API /auth/me sau)
-  const user = {
-    name: "Page One",
-    username: "cook_114380624",
-    avatar: "https://i.pravatar.cc/100?img=45",
-  };
+      if (Array.isArray(ingredientsData)) {
+        initialIngredients = ingredientsData;
+      } else if (
+        typeof ingredientsData === "string" &&
+        ingredientsData.startsWith("[")
+      ) {
+        initialIngredients = JSON.parse(ingredientsData);
+      } else {
+        initialIngredients = [];
+      }
+    } catch (e) {
+      console.error("Lỗi parse ingredients khi sửa:", e);
+    }
+
+    try {
+      // 2. Xử lý Steps (JSON)
+      // (Bị lỗi tương tự nếu steps là "" hoặc null)
+      const stepsData = recipeToEdit.steps;
+      if (Array.isArray(stepsData)) {
+        initialSteps = stepsData.map((s) => ({ ...s, id: s.id || uid() }));
+      } else if (typeof stepsData === "string" && stepsData.startsWith("[")) {
+        initialSteps = JSON.parse(stepsData).map((s) => ({
+          ...s,
+          id: s.id || uid(),
+        }));
+      } else {
+        initialSteps = [];
+      }
+    } catch (e) {
+      console.error("Lỗi parse steps khi sửa:", e);
+    }
+  }
+
+  // Khởi tạo state với dữ liệu (nếu có)
+  const [title, setTitle] = useState(recipeToEdit?.title || "");
+  const [desc, setDesc] = useState(recipeToEdit?.description || "");
+  const [imageUrl, setImageUrl] = useState(recipeToEdit?.image_url || null);
+  const [imageFile, setImageFile] = useState(null);
+
+  // State của Ingredients/Steps
+  const [ingredients, setIngredients] = useState(initialIngredients);
+  const [steps, setSteps] = useState(initialSteps);
+
+  const [loading, setLoading] = useState(false);
+  const [saveStatus, setSaveStatus] = useState("Đã lưu");
+  const [user, setUser] = useState(null);
+
+  // Lấy dữ liệu user thật khi component tải
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await getCurrentUser();
+        setUser(res.data.data);
+      } catch (error) {
+        console.error("Không thể tải thông tin user:", error);
+      }
+    };
+    fetchUser();
+  }, []);
 
   // Cập nhật state khi chọn ảnh
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImageUrl(URL.createObjectURL(file)); // Tạo URL xem trước
-      setImageFile(file); // Lưu file để upload
+      setImageUrl(URL.createObjectURL(file));
+      setImageFile(file);
     }
   };
 
-  // --- 5. Hàm xử lý "Lên Sóng" ---
+  // --- Hàm Chung để tạo Payload ---
+  const createPayload = async (status) => {
+    let finalImageUrl = imageUrl;
+    if (imageFile) {
+      const uploadRes = await uploadMedia(imageFile);
+      finalImageUrl = uploadRes.data.url;
+    }
+
+    const ingredientsList = ingredients.flatMap((section) =>
+      section.items.map((item) => item.text)
+    );
+    const stepsList = steps.map((s) => ({
+      text: s.text,
+      image: s.image || null,
+    }));
+
+    return {
+      title: title || "Không đề",
+      description: desc,
+      image_url: finalImageUrl,
+      ingredients: JSON.stringify(ingredientsList),
+      steps: stepsList,
+      status: status,
+    };
+  };
+
+  // --- Sửa handlePublish ---
   const handlePublish = async () => {
     setLoading(true);
-    let finalImageUrl = null;
-
+    setSaveStatus("Đang lưu...");
     try {
-      // BƯỚC 1: Upload ảnh (nếu có)
-      if (imageFile) {
-        // 'uploadMedia' trả về { data: { url: '...' } }
-        // (Đảm bảo uploadApi.js đã được sửa để thêm 'multipart/form-data' header)
-        const uploadRes = await uploadMedia(imageFile);
-        finalImageUrl = uploadRes.data.url; // Lấy URL từ phản hồi
+      const payload = await createPayload("public");
+      let response;
+
+      if (isEditMode) {
+        response = await updateRecipe(recipeToEdit.id, payload);
+      } else {
+        response = await createRecipe(payload);
       }
 
-      // BƯỚC 2: Định dạng (flatten) dữ liệu từ component con
-      // Chuyển [{ id, title, items: [{ id, text }] }] -> ["250g bột", "100ml nước"]
-      const ingredientsList = ingredients.flatMap((section) =>
-        section.items.map((item) => item.text)
-      );
-
-      // Chuyển [{ id, text, image }] -> ["Trộn bột...", "Đậy kín..."]
-      const stepsList = steps.map((step) => step.text);
-
-      // BƯỚC 3: Tạo payload gửi đi
-      const payload = {
-        title: title,
-        description: desc,
-        image_url: finalImageUrl,
-        ingredients: JSON.stringify(ingredientsList), // Gửi chuỗi JSON (fix lỗi TEXT)
-        steps: stepsList, // Gửi mảng (Model BE là JSON)
-        status: "public", // 'public' nghĩa là "Đã lên sóng"
-      };
-
-      // BƯỚC 4: Gọi API tạo công thức
-      const response = await createRecipe(payload);
-
-      // 6. SAU KHI THÀNH CÔNG: Gọi hàm refresh
-      await refreshCounts(); // YÊU CẦU CẬP NHẬT COUNT MỚI
-
+      await refreshCounts();
+      setSaveStatus("Đã lưu");
       setLoading(false);
       alert("Đăng món thành công!");
-
-      // Chuyển đến trang chi tiết món ăn vừa tạo
       navigate(`/recipes/${response.data.data.id}`);
     } catch (error) {
       setLoading(false);
+      setSaveStatus("Lỗi!");
       console.error("Lỗi khi đăng món:", error);
       alert(`Đã xảy ra lỗi: ${error.response?.data?.message || error.message}`);
     }
   };
 
-  return (
-    <div className="p-8 w-full px-4 md:px-10 bg-white">
-      {/* Top Header */}
-      <div className="flex justify-end gap-3 mb-6">
-        <button
-          className="border border-red-400 text-red-500 px-4 py-1.5 rounded-md hover:bg-red-50 flex items-center gap-2"
-          disabled={loading}
-        >
-          <Trash2 className="w-4 h-4" /> Xóa
-        </button>
-        <button
-          className="border text-gray-600 px-4 py-1.5 rounded-md hover:bg-gray-50"
-          disabled={loading}
-        >
-          Lưu và Đóng
-        </button>
+  const handleSaveDraft = async () => {
+    setLoading(true);
+    setSaveStatus("Đang lưu (Nháp)...");
+    try {
+      const payload = await createPayload("draft");
 
-        {/* Nút "Lên sóng" */}
-        <button
-          onClick={handlePublish}
-          disabled={loading || !title} // Vô hiệu hóa nếu đang tải hoặc chưa có tiêu đề
-          className="bg-orange-500 text-white px-4 py-1.5 rounded-md hover:bg-orange-600 flex items-center gap-2 disabled:bg-orange-300 disabled:cursor-not-allowed"
-        >
-          {loading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <Upload className="w-4 h-4" />
-          )}
-          {loading ? "Đang xử lý..." : "Lên sóng"}
-        </button>
+      if (isEditMode) {
+        await updateRecipe(recipeToEdit.id, payload);
+      } else {
+        await createRecipe(payload);
+      }
+
+      await refreshCounts();
+      setSaveStatus("Đã lưu");
+      setLoading(false);
+      alert("Đã lưu bản nháp thành công!");
+      navigate("/recipes/all");
+    } catch (error) {
+      setLoading(false);
+      setSaveStatus("Lỗi!");
+      console.error("Lỗi khi lưu nháp:", error);
+      alert(`Đã xảy ra lỗi: ${error.response?.data?.message || error.message}`);
+    }
+  };
+
+  const handleDelete = () => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa công thức này?")) {
+      alert("Chức năng đang phát triển!");
+      navigate("/recipes/all");
+    }
+  };
+
+  // Hiển thị loading trong khi chờ lấy thông tin user
+  if (!user) {
+    return (
+      <div
+        className="flex justify-center items-center"
+        style={{ height: "calc(100vh - 70px)" }}
+      >
+        <Loader2 className="w-10 h-10 animate-spin text-orange-500" />
+      </div>
+    );
+  }
+
+  // --- (Render JSX) ---
+  return (
+    <div className="bg-white lg:bg-gray-50">
+      {/* 1. Header (Nút Lên Sóng, Lưu, Xóa) */}
+      <div className="sticky top-0 z-30 bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <button onClick={() => navigate(-1)} className="p-2 lg:hidden">
+              <X size={20} />
+            </button>
+            <span className="text-sm text-gray-500">{saveStatus}</span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleDelete}
+              className="px-4 py-2 rounded-md border border-red-300 text-red-500 hover:bg-red-50 text-sm font-medium flex items-center gap-2"
+              disabled={loading}
+            >
+              <Trash2 className="w-4 h-4" />
+              <span className="hidden md:inline">Xóa</span>
+            </button>
+            <button
+              onClick={handleSaveDraft}
+              className="px-4 py-2 rounded-md border text-gray-700 hover:bg-gray-50 text-sm font-medium"
+              disabled={loading}
+            >
+              Lưu và Đóng
+            </button>
+            <button
+              onClick={handlePublish}
+              disabled={loading || !title}
+              className="px-4 py-2 rounded-md bg-orange-500 text-white hover:bg-orange-600 text-sm font-medium flex items-center gap-2 disabled:bg-orange-300"
+            >
+              {loading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Upload className="w-4 h-4" />
+              )}
+              {loading ? "Đang xử lý..." : "Lên sóng"}
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Main section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Left: Image upload */}
-        <div className="flex flex-col items-center justify-center border rounded-md bg-orange-50 aspect-[3/4]">
-          {!imageUrl ? (
+      {/* 2. Bố cục 2 cột (Grid) */}
+      <div className="max-w-7xl mx-auto p-4 lg:grid lg:grid-cols-[min(35%,300px)_1fr] lg:gap-8">
+        {/* CỘT TRÁI (Ảnh và Nguyên liệu) */}
+        <div className="lg:sticky lg:top-20 h-fit">
+          {/* Box Ảnh */}
+          <div className="relative mb-6">
             <label
-              htmlFor="file"
-              className="flex flex-col items-center justify-center cursor-pointer text-gray-600 text-center p-6"
+              htmlFor="file-upload"
+              className="cursor-pointer aspect-[3/4] bg-orange-50 border rounded-md flex items-center justify-center text-center p-4 text-gray-600"
             >
-              <Camera className="w-10 h-10 mb-2 text-gray-400" />
-              <p className="font-medium">
-                Bạn đã đăng hình món mình nấu ở đây chưa?
-              </p>
-              <p className="text-sm text-gray-500">
-                Chia sẻ với mọi người thành phẩm nấu nướng của bạn!
-              </p>
-              <input
-                type="file"
-                id="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt="preview"
+                  className="w-full h-full object-cover rounded-md"
+                />
+              ) : (
+                <div className="flex flex-col items-center">
+                  <Camera className="w-10 h-10 mb-2 text-gray-400" />
+                  <p className="font-medium">
+                    Bạn đã đăng hình món mình nấu ở đây chưa?
+                  </p>
+                </div>
+              )}
             </label>
-          ) : (
-            <img
-              src={imageUrl}
-              alt="preview"
-              className="w-full h-full object-cover rounded-md"
+            <input
+              id="file-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="hidden"
             />
-          )}
+          </div>
+
+          {/* ✅ 2. THÊM PROP 'ingredientsData' (Sửa lỗi 2) */}
+          <IngredientList
+            ingredientsData={initialIngredients}
+            onChange={setIngredients}
+          />
         </div>
 
-        {/* Right: Title + description */}
-        <div>
-          <input
-            type="text"
+        {/* CỘT PHẢI (Tiêu đề, Mô tả, Các bước) */}
+        <div className="mt-6 lg:mt-0">
+          {/* Tiêu đề */}
+          <textarea
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="text-xl font-semibold border-0 border-b w-full focus:ring-0 focus:border-orange-400 mb-4"
-            placeholder="Tên món..."
+            placeholder="Tên món: Món canh bí ngon nhất nhà mình"
+            rows={1}
+            className="w-full text-2xl md:text-3xl font-bold border-0 border-b-2 border-gray-200 p-2 focus:ring-0 focus:border-orange-400 resize-none overflow-hidden"
+            style={{ height: "auto", minHeight: "54px" }}
           />
 
-          {/* Author info */}
-          <div className="flex items-center gap-2 mb-4">
+          {/* Tác giả (Sử dụng 'user' từ state) */}
+          <div className="flex items-center gap-3 my-4">
             <img
-              src={user.avatar}
-              alt="user"
-              className="w-10 h-10 rounded-full"
+              src={user.avatar_url || "https://placehold.co/40"}
+              alt="author"
+              className="w-10 h-10 rounded-full object-cover"
+              onError={(e) => {
+                e.target.src = "https://placehold.co/40";
+              }}
             />
             <div>
-              <p className="font-medium">{user.name}</p>
-              <p className="text-sm text-gray-500">@{user.username}</p>
+              <div className="font-semibold text-gray-800">{user.username}</div>
+              <div className="text-sm text-gray-500">@{user.username}</div>
             </div>
           </div>
 
-          {/* Description */}
+          {/* Mô tả (Story) */}
           <textarea
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
             placeholder="Hãy chia sẻ với mọi người về món này của bạn nhé..."
-            className="w-full border rounded-md p-3 text-gray-700 h-24 focus:outline-none focus:border-orange-400"
+            rows={3}
+            className="w-full text-base border-0 border-b-2 border-gray-200 p-2 focus:ring-0 focus:border-orange-400 resize-none"
           />
-        </div>
-      </div>
 
-      {/* Ingredients + Steps */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
-        {/* 7. Truyền prop 'onChange' để nhận dữ liệu */}
-        <IngredientList onChange={setIngredients} />
-        <StepList onChange={setSteps} />
+          <p className="text-xs text-gray-500 mt-1 px-2">
+            Để tham gia thử thách, hãy thêm hashtag (ví dụ:{" "}
+            <span className="text-orange-500">#monchay7ngay</span>) vào đây nhé!
+          </p>
+
+          {/* Box Các Bước */}
+          <div className="mt-8">
+            <StepList stepsData={steps} onChange={setSteps} />
+          </div>
+        </div>
       </div>
     </div>
   );

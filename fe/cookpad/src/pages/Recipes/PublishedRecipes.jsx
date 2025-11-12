@@ -1,25 +1,109 @@
-import RecipeSubPageLayout from '../../components/RecipeSubPageLayout';
-import RecipeCard from '../../components/RecipeCard';
-import { khoMonItems } from '../../data/sidebarData';
+import { useState, useEffect, useMemo } from "react";
+import RecipeSubPageLayout from "../../components/RecipeSubPageLayout";
+import RecipeListItem from "../../components/RecipeListItem";
+import { khoMonItems } from "../../data/sidebarData";
+// ✅ SỬA LỖI Ở ĐÂY: Import đúng hàm
+import { getPublishedRecipes } from "../../services/recipeApi";
+import { useRecipeCounts } from "../../contexts/RecipeCountContext";
 
 const currentItem = khoMonItems.find(
-  (item) => item.path === '/recipes/published'
+  (item) => item.path === "/recipes/published"
 );
-const recipes = []; // Giả sử empty; fetch từ API nếu có
 
-export default function PublishedRecipes() {
+export default function AllRecipes() {
+  const [recipes, setRecipes] = useState([]);
+  const [filteredRecipes, setFilteredRecipes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOption, setSortOption] = useState("Đã xem gần nhất");
+  const { counts } = useRecipeCounts();
+  const dynamicCount = counts.all || 0;
+
+  // 🟠 Lấy danh sách món từ API
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      try {
+        setLoading(true);
+        // Hàm này giờ đã được import và sẽ chạy đúng
+        const response = await getPublishedRecipes();
+        const rows = response.data.data.rows || [];
+        setRecipes(rows);
+        setFilteredRecipes(rows);
+      } catch (error) {
+        // Tên lỗi này có vẻ hơi sai (nên là 'Publish Recipes'),
+        // nhưng không ảnh hưởng đến việc sửa lỗi crash
+        console.error("Failed to fetch 'Publish Recipes':", error);
+        setRecipes([]);
+        setFilteredRecipes([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRecipes();
+  }, []);
+
+  // 🟢 Hàm tìm kiếm
+  const handleSearch = (keyword) => {
+    setSearchTerm(keyword);
+  };
+
+  // 🟢 Hàm chọn sắp xếp
+  const handleSortChange = (option) => {
+    setSortOption(option);
+  };
+
+  // 🧠 Tự động lọc và sắp xếp lại khi search hoặc sort thay đổi
+  useEffect(() => {
+    let results = [...recipes];
+
+    // 🔍 Lọc theo từ khóa
+    if (searchTerm.trim() !== "") {
+      results = results.filter((recipe) =>
+        recipe.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // 🔄 Sắp xếp
+    if (sortOption === "Mới nhất") {
+      results.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    } else if (sortOption === "Đã xem gần nhất") {
+      // Nếu có trường `updatedAt` thì dùng, không thì fallback về `createdAt`
+      results.sort(
+        (a, b) =>
+          new Date(b.updatedAt || b.createdAt) -
+          new Date(a.updatedAt || a.createdAt)
+      );
+    }
+
+    setFilteredRecipes(results);
+  }, [searchTerm, sortOption, recipes]);
+
+  // 🟡 Trạng thái loading
+  if (loading) {
+    return (
+      <RecipeSubPageLayout title={currentItem.label} count={dynamicCount}>
+        <p>Đang tải món ăn của bạn...</p>
+      </RecipeSubPageLayout>
+    );
+  }
+
+  // 🟢 Giao diện chính
   return (
     <RecipeSubPageLayout
       title={currentItem.label}
-      count={currentItem.count}
-      descriptionEmpty="Bạn chưa lưu món nào. Hãy duyệt công thức và lưu những món yêu thích!"
+      count={filteredRecipes.length}
+      descriptionEmpty="Bạn chưa có món nào. Hãy tạo món ăn và lưu lại công thức của bạn!"
+      onSearchSubmit={handleSearch}
+      onSortChange={handleSortChange}
     >
-      {recipes.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {recipes.map((recipe) => (
-            <RecipeCard key={recipe.id} {...recipe} />
+      {filteredRecipes.length > 0 ? (
+        <ul className="space-y-4">
+          {filteredRecipes.map((recipe) => (
+            <RecipeListItem key={recipe.id} recipe={recipe} />
           ))}
-        </div>
+        </ul>
+      ) : (
+        <p className="text-gray-500 text-sm">Không tìm thấy món nào phù hợp.</p>
       )}
     </RecipeSubPageLayout>
   );

@@ -11,4 +11,6 @@ router.get("/suggestions", searchController.suggestions);
 // GET /api/search/trending?limit=10
 router.get("/trending", searchController.trending);
 
+router.get("/trending-tags", searchController.trendingTags);
+
 module.exports = router;

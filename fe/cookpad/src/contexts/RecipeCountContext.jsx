@@ -6,40 +6,67 @@ import {
   useEffect,
   useCallback,
 } from "react";
-// Import API (đã có sẵn) để lấy số lượng
-import { getRecipeCounts } from "../services/recipeApi";
+// ✅ Import thêm getLikedRecipesIds
+import {
+  getRecipeCounts,
+  getSavedRecipes,
+  getLikedRecipesIds,
+} from "../services/recipeApi";
 
-// 1. Tạo Context
 const RecipeCountContext = createContext();
 
-// 2. Tạo Provider (Component cha)
 export function RecipeCountProvider({ children }) {
-  const [counts, setCounts] = useState({}); // VD: { all: 0, saved: 0, mine: 0, ... }
+  const [counts, setCounts] = useState({});
+  const [savedRecipeIds, setSavedRecipeIds] = useState(new Set());
+  // ✅ THÊM STATE CHO LIKE
+  const [likedRecipeIds, setLikedRecipeIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
 
-  // 3. Hàm gọi API để lấy số lượng mới nhất
   const refreshCounts = useCallback(async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setCounts({});
+      setSavedRecipeIds(new Set());
+      setLikedRecipeIds(new Set()); // ✅ Reset
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
-      // Giả sử API trả về: { data: { all: 5, mine: 2, published: 2, ... } }
-      const response = await getRecipeCounts();
-      setCounts(response.data.data || {}); // Lưu kết quả vào state
+      // ✅ Gọi song song 3 API
+      const [countsRes, savedRes, likedRes] = await Promise.all([
+        getRecipeCounts(),
+        getSavedRecipes(),
+        getLikedRecipesIds(),
+      ]);
+
+      setCounts(countsRes.data.data || {});
+      setSavedRecipeIds(new Set(savedRes.data.data.rows.map((r) => r.id)));
+      // ✅ Lưu danh sách ID đã like
+      setLikedRecipeIds(new Set(likedRes.data.data));
     } catch (error) {
-      console.error("Failed to fetch recipe counts:", error);
-      // Nếu lỗi (vd: chưa đăng nhập), có thể trả về state rỗng
+      console.error("Failed to fetch recipe data:", error);
+      // Reset nếu lỗi (ví dụ token hết hạn)
       setCounts({});
+      setSavedRecipeIds(new Set());
+      setLikedRecipeIds(new Set());
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // 4. Tự động gọi hàm này khi app khởi động
   useEffect(() => {
     refreshCounts();
   }, [refreshCounts]);
 
-  // 5. Cung cấp state và hàm refresh cho các component con
-  const value = { counts, loading, refreshCounts };
+  // ✅ Thêm likedRecipeIds vào value
+  const value = {
+    counts,
+    loading,
+    refreshCounts,
+    savedRecipeIds,
+    likedRecipeIds,
+  };
 
   return (
     <RecipeCountContext.Provider value={value}>
@@ -48,13 +75,6 @@ export function RecipeCountProvider({ children }) {
   );
 }
 
-// 6. Tạo Hook (để component con dễ sử dụng)
 export function useRecipeCounts() {
-  const context = useContext(RecipeCountContext);
-  if (context === undefined) {
-    throw new Error(
-      "useRecipeCounts must be used within a RecipeCountProvider"
-    );
-  }
-  return context;
+  return useContext(RecipeCountContext);
 }

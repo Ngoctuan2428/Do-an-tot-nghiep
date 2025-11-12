@@ -8,6 +8,7 @@ const mainRouter = require("./src/routes");
 const errorHandler = require("./src/middlewares/error.middleware");
 const ApiError = require("./src/utils/ApiError");
 const path = require("path");
+const db = require("./src/models"); // Đảm bảo đường dẫn đúng tới file models/index.js
 
 // 1. Import file config của passport (để nó chạy và đăng ký strategies)
 
@@ -42,8 +43,17 @@ app.use((req, res, next) => {
 // 5. Middleware xử lý lỗi tập trung (PHẢI đặt ở cuối cùng)
 app.use(errorHandler);
 
-// 6. Khởi chạy server
+// { alter: true } sẽ tự động cập nhật bảng nếu có thay đổi mà không xóa dữ liệu cũ
 const PORT = config.port;
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
+// app.listen(PORT, () => {
+//   console.log(`Server is running on port ${PORT}`);
+// });
+
+db.sequelize.sync({ alter: true }).then(() => {
+  console.log("✅ Database & tables synced!");
+
+  // Khởi động server sau khi đã sync DB thành công
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
 });

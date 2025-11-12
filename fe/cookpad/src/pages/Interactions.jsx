@@ -1,32 +1,52 @@
-import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import InteractionItem from '../components/InteractionItem';
-
-const interactions = [
-  { id: 1, user: 'Nguyen Van A', action: 'Thích món Phở', time: '2h ago' },
-  { id: 2, user: 'Tran Thi B', action: 'Bình luận: Ngon quá!', time: '5h ago' },
-  { id: 3, user: 'Le Van C', action: 'Đã lưu công thức', time: '1d ago' },
-];
+// src/pages/Interactions.jsx
+import { useState, useEffect } from "react";
+import { Loader2 } from "lucide-react";
+import InteractionItem from "../components/InteractionItem";
+import { getInteractions } from "../services/interactionApi"; // Import API mới
 
 export default function Interactions() {
-  const navigate = useNavigate();
+  const [interactions, setInteractions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeed = async () => {
+      try {
+        setLoading(true);
+        const res = await getInteractions();
+        setInteractions(res.data.data || []);
+      } catch (error) {
+        console.error("Lỗi tải tương tác:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFeed();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
       <div className="max-w-3xl mx-auto px-4">
-        {/* Interactions Content */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 className="text-3xl font-bold text-gray-700 mb-4">Tương tác</h2>
-          <ul className="space-y-4">
-            {interactions.map((interaction) => (
-              <InteractionItem
-                key={interaction.id}
-                user={interaction.user}
-                action={interaction.action}
-                time={interaction.time}
-              />
-            ))}
-          </ul>
+          <h2 className="text-3xl font-bold text-gray-800 mb-6">Tương tác</h2>
+
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-orange-500" />
+            </div>
+          ) : interactions.length === 0 ? (
+            <p className="text-center text-gray-500 py-10">
+              Bạn chưa có tương tác mới nào.
+            </p>
+          ) : (
+            <ul className="space-y-0">
+              {interactions.map((interaction, index) => (
+                <InteractionItem
+                  key={`${interaction.type}-${interaction.item.id}-${index}`}
+                  interaction={interaction}
+                />
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </div>

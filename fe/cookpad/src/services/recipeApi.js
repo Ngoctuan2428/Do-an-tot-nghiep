@@ -28,12 +28,18 @@ export const getCookedRecipes = () => {
   return axiosInstance.get("/recipes/cooked");
 };
 
-export const getMyRecipes = () => {
-  return axiosInstance.get("/recipes/mine");
+export const getMyRecipes = (params = {}) => {
+  // ✅ Thêm (params = {})
+  return axiosInstance.get("/recipes/mine", { params }); // ✅ Thêm { params }
 };
 
 export const getPublishedRecipes = () => {
   return axiosInstance.get("/recipes/published");
+};
+
+// ✅ HÀM MỚI
+export const getPublicRecipesByUserId = (userId) => {
+  return axiosInstance.get(`/recipes/user/${userId}/public`);
 };
 
 export const getDraftRecipes = () => {
@@ -50,7 +56,7 @@ export const createRecipe = (data) => {
 };
 
 export const updateRecipe = (id, data) => {
-  return axiosInstance.put(`/recipes/${id}`, data);
+  return axiosInstance.patch(`/recipes/${id}`, data);
 };
 
 export const deleteRecipe = (id) => {
@@ -62,8 +68,8 @@ export const saveRecipe = (id) => {
   return axiosInstance.post(`/recipes/${id}/save`);
 };
 
-export const markAsCooked = (id) => {
-  return axiosInstance.post(`/recipes/${id}/cook`);
+export const sendCooksnap = (id, imageUrl, comment = "") => {
+  return axiosInstance.post(`/recipes/${id}/cooksnap`, { imageUrl, comment });
 };
 
 export const publishRecipe = (id) => {
@@ -77,4 +83,16 @@ export const unpublishRecipe = (id) => {
 // Recipe stats/counts
 export const getRecipeCounts = () => {
   return axiosInstance.get("/recipes/counts");
+};
+
+export const likeRecipe = (id) => {
+  return axiosInstance.post(`/recipes/${id}/like`);
+};
+
+export const getLikedRecipesIds = () => {
+  return axiosInstance.get("/recipes/liked-ids");
+};
+
+export const getRecipeReacters = (recipeId, params = {}) => {
+  return axiosInstance.get(`/recipes/${recipeId}/reacters`, { params });
 };
