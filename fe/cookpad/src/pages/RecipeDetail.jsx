@@ -2,6 +2,7 @@ import RecipeHeader from '../components/RecipeHeader';
 import RecipeContent from '../components/RecipeContent';
 import CooksnapSection from '../components/CooksnapSection';
 import RelatedRecipes from '../components/RelatedRecipes';
+import { useState, useEffect, useRef } from 'react';
 
 export default function RecipeDetail() {
   // Mock data để bạn gắn API sau này
@@ -83,11 +84,20 @@ export default function RecipeDetail() {
     ],
   };
 
+  const [cooksnaps, setCooksnaps] = useState([]);
+
   return (
     <div className="bg-white text-gray-900">
-      <RecipeHeader recipe={recipe} />
+      <RecipeHeader
+        recipe={recipe}
+        onAddCooksnap={(snap) => setCooksnaps([...cooksnaps, snap])}
+      />
       <RecipeContent recipe={recipe} />
-      <CooksnapSection recipe={recipe} />
+      <CooksnapSection
+        recipe={recipe}
+        cooksnaps={cooksnaps}
+        onAddCooksnap={(snap) => setCooksnaps([...cooksnaps, snap])}
+      />
       <RelatedRecipes recipes={recipe.related} />
     </div>
   );

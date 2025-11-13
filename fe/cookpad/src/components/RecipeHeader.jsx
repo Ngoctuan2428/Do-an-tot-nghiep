@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import ReactionModal from '../components/ReactionModal';
+import CooksnapModal from '../components/CooksnapModal';
 import {
   Soup,
   Bookmark,
@@ -16,8 +17,10 @@ import {
  * @param {Object} props
  * @param {Object} props.recipe - Thông tin món ăn
  */
-export default function RecipeHeader({ recipe }) {
+export default function RecipeHeader({ recipe, onAddCooksnap }) {
   const [showReactions, setShowReactions] = useState(false);
+  const [showCooksnapModal, setShowCooksnapModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
   const [isFavourite, setIsFavourite] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -71,10 +74,13 @@ export default function RecipeHeader({ recipe }) {
   // Xử lý file được chọn
   const handleFileChange = (event) => {
     const file = event.target.files?.[0];
-    if (file) {
-      alert(`Đã chọn hình: ${file.name}`);
-      // Tại đây bạn có thể upload hoặc preview file
-    }
+    // if (file) {
+    //   alert(`Đã chọn hình: ${file.name}`);
+    // }
+    if (!file) return;
+    const imageURL = URL.createObjectURL(file);
+    setSelectedImage(imageURL);
+    setShowCooksnapModal(true);
   };
 
   if (!recipe) return null; // tránh lỗi nếu chưa có dữ liệu
@@ -250,34 +256,12 @@ export default function RecipeHeader({ recipe }) {
       </div>
 
       {/* Modal Cooksnap */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96 relative shadow-lg">
-            <button
-              onClick={() => setShowModal(false)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <h2 className="text-center font-semibold text-lg mb-4">
-              Chọn Hình
-            </h2>
-            <button
-              onClick={handleChooseFile}
-              className="mx-auto block border px-4 py-2 rounded-lg hover:bg-gray-50 font-medium text-gray-700"
-            >
-              Chọn Hình
-            </button>
-            <input
-              ref={fileInputRef}
-              id="file"
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-          </div>
-        </div>
+      {showCooksnapModal && (
+        <CooksnapModal
+          image={selectedImage}
+          onClose={() => setShowCooksnapModal(false)}
+          onSubmit={onAddCooksnap}
+        />
       )}
     </div>
   );

@@ -13,14 +13,22 @@ import {
   MapPin,
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
+import CooksnapModal from '../components/CooksnapModal';
 
-export default function CooksnapSection({ recipe }) {
+export default function CooksnapSection({ recipe, cooksnaps, onAddCooksnap }) {
   const [isFriend, setIsFriend] = useState(false);
+  // const [cooksnaps, setCooksnaps] = useState([]);
+  const [showCooksnapModal, setShowCooksnapModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
   // Trạng thái mỗi loại reaction (đã bấm hay chưa)
   const [likes, setLikes] = useState({ liked: false, count: 7 });
   const [hearts, setHearts] = useState({ liked: false, count: 9 });
   const [claps, setClaps] = useState({ liked: false, count: 5 });
   const fileInputRef = useRef(null);
+
+  const handleAddCooksnap = (data) => {
+    setCooksnaps((prev) => [...prev, data]);
+  };
 
   // Mở file picker khi click nút “Chọn hình”
   const handleChooseFile = () => {
@@ -32,10 +40,13 @@ export default function CooksnapSection({ recipe }) {
   // Xử lý file được chọn
   const handleFileChange = (event) => {
     const file = event.target.files?.[0];
-    if (file) {
-      alert(`Đã chọn hình: ${file.name}`);
-      // Tại đây bạn có thể upload hoặc preview file
-    }
+    // if (file) {
+    //   alert(`Đã chọn hình: ${file.name}`);
+    // }
+    if (!file) return;
+    const imageURL = URL.createObjectURL(file);
+    setSelectedImage(imageURL);
+    setShowCooksnapModal(true);
   };
 
   // Toggle hàm
@@ -127,7 +138,28 @@ export default function CooksnapSection({ recipe }) {
             className="hidden"
           />
         </button>
-        <a href="#" className="text-blue-500 text-sm block text-center">
+        {/* Danh sách cooksnap */}
+        {cooksnaps.length > 0 && (
+          <div className="mt-6 space-y-6">
+            {cooksnaps.map((snap, i) => (
+              <div
+                key={i}
+                className="bg-white border rounded-lg shadow-sm p-4 flex flex-col gap-3"
+              >
+                <img
+                  src={snap.image}
+                  alt="cooksnap"
+                  className="w-full h-64 object-cover rounded-lg"
+                />
+                <p className="text-gray-800">{snap.comment}</p>
+                <p className="text-gray-400 text-sm">
+                  Gửi lúc: {new Date(snap.createdAt).toLocaleString()}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+        <a href="#" className="text-blue-500 text-sm block text-center mt-4">
           Tìm hiểu thêm về Cooksnap
         </a>
       </div>
@@ -180,6 +212,18 @@ export default function CooksnapSection({ recipe }) {
           </button>
         </div>
       </div>
+
+      {showCooksnapModal && (
+        <CooksnapModal
+          image={selectedImage}
+          onClose={() => setShowCooksnapModal(false)}
+          // onSubmit={onAddCooksnap}
+          onSubmit={(data) => {
+            onAddCooksnap(data); // gọi hàm cha
+            setShowCooksnapModal(false);
+          }}
+        />
+      )}
     </section>
   );
 }
