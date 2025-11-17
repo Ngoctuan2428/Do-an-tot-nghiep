@@ -1,3 +1,4 @@
+// src/middlewares/auth.middleware.js
 const jwt = require('jsonwebtoken');
 const config = require('../config/environment');
 const { User } = require('../models'); // Import từ /models/index.js
@@ -5,6 +6,7 @@ const ApiError = require('../utils/ApiError'); // Import class lỗi tùy chỉn
 
 /**
  * @desc Middleware để bảo vệ route. Kiểm tra JWT token có hợp lệ không.
+ * (Hàm này của bạn đã đúng, giữ nguyên)
  */
 const protect = async (req, res, next) => {
     let token;
@@ -31,7 +33,7 @@ const protect = async (req, res, next) => {
             return next(new ApiError(401, 'The user belonging to this token does no longer exist.'));
         }
 
-        // 4. Gắn thông tin người dùng vào đối tượng request để các xử lý sau có thể sử dụng
+        // 4. Gắn thông tin người dùng vào đối tượng request
         req.user = currentUser;
         next(); // Chuyển sang middleware/controller tiếp theo
     } catch (error) {
@@ -39,20 +41,27 @@ const protect = async (req, res, next) => {
     }
 };
 
-/**
- * @desc Middleware để kiểm tra vai trò admin
- */
-const isAdmin = (req, res, next) => {
-    // Middleware này phải được dùng SAU middleware 'protect'
-    if (req.user && req.user.role === 'admin') {
-        next(); // Nếu là admin, cho qua
-    } else {
-        return next(new ApiError(403, 'Access denied. You do not have permission to perform this action.'));
-    }
-};
 
+/**
+ * @desc Middleware để giới hạn vai trò (role)
+ * @param  {...string} roles - Danh sách các vai trò được phép (vd: 'admin', 'user')
+ */
+const restrictTo = (...roles) => {
+  return (req, res, next) => {
+    // roles là một mảng (ví dụ: ['admin'] khi gọi restrictTo('admin'))
+    // req.user.role được lấy từ middleware 'protect' ở trên
+    if (!roles.includes(req.user.role)) {
+      // Nếu vai trò của user (vd: 'user') không nằm trong mảng roles (vd: ['admin'])
+      return next(
+        new ApiError(403, 'You do not have permission to perform this action')
+      );
+    }
+    // Nếu vai trò hợp lệ, cho qua
+    next();
+  };
+};
 
 module.exports = {
     protect,
-    isAdmin,
+    restrictTo, // Sửa 'isAdmin' thành 'restrictTo'
 };

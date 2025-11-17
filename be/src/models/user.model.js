@@ -21,7 +21,7 @@ const User = sequelize.define('User', {
     },
     password_hash: {
         type: DataTypes.STRING(255),
-        allowNull: false,
+        allowNull: true,
     },
     avatar_url: {
         type: DataTypes.STRING(512),
