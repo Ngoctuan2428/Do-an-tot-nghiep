@@ -118,7 +118,7 @@ function FAQ() {
       ],
     },
     usingCookpad: {
-      title: 'Sử dụng Cookpad',
+      title: 'Sử dụng PCook',
       questions: [
         {
           id: 'q7',
@@ -126,21 +126,21 @@ function FAQ() {
           answer: (
             <p>
               Bạn có thể tìm kiếm công thức theo thành phần cũng như theo tên
-              món ăn hoặc dụng cụ nấu ăn. Điều đó có nghĩa là với Cookpad, bạn
-              có thể tìm thấy công thức nấu ăn với bất kỳ sự kết hợp nguyên liệu
+              món ăn hoặc dụng cụ nấu ăn. Điều đó có nghĩa là với PCook, bạn có
+              thể tìm thấy công thức nấu ăn với bất kỳ sự kết hợp nguyên liệu
               nào bạn có trong bếp.
             </p>
           ),
         },
         {
           id: 'q8',
-          question: 'Dịch vụ Cookpad Premium là gì?',
+          question: 'Dịch vụ PCook Premium là gì?',
           answer: (
             <p>
-              Dịch vụ Premium của Cookpad giúp bạn dễ dàng tìm thấy những công
-              thức nấu ăn phổ biến nhất trên Cookpad. "Phổ biến nhất" có nghĩa
-              là những công thức nấu ăn đã được hàng nghìn người dùng nấu và
-              thưởng thức nhiều nhất trong nhiều năm qua.
+              Dịch vụ Premium của PCook giúp bạn dễ dàng tìm thấy những công
+              thức nấu ăn phổ biến nhất trên PCook. "Phổ biến nhất" có nghĩa là
+              những công thức nấu ăn đã được hàng nghìn người dùng nấu và thưởng
+              thức nhiều nhất trong nhiều năm qua.
             </p>
           ),
         },
@@ -151,7 +151,7 @@ function FAQ() {
           answer: (
             <p>
               Bạn có thể duyệt qua các công thức nấu ăn từ các quốc gia khác
-              nhau trên Cookpad bằng cách chuyển đổi ngôn ngữ trong cài đặt.
+              nhau trên PCook bằng cách chuyển đổi ngôn ngữ trong cài đặt.
             </p>
           ),
         },

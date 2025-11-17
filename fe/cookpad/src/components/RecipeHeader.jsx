@@ -43,7 +43,7 @@ export default function RecipeHeader({ recipe, onAddCooksnap }) {
   const handleShare = async () => {
     const shareData = {
       title: recipe.title,
-      text: `Hãy xem món ăn này trên Cookpad: ${recipe.title}`,
+      text: `Hãy xem món ăn này trên PCook: ${recipe.title}`,
       url: window.location.href,
     };
 

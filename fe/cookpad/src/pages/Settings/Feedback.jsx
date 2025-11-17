@@ -17,7 +17,7 @@ export default function Feedback() {
     // Giả lập gửi feedback (có thể thay bằng gọi API)
     setSubmitted(true);
     setTimeout(() => {
-      alert('Cảm ơn bạn đã gửi góp ý cho Cookpad 💛');
+      alert('Cảm ơn bạn đã gửi góp ý cho PCook 💛');
       setFeedback('');
       setSubmitted(false);
       navigate(-1); // Quay lại trang trước
@@ -33,8 +33,8 @@ export default function Feedback() {
 
       {/* Mô tả */}
       <p className="text-gray-700 mb-2 leading-relaxed">
-        Cookpad luôn không ngừng hoàn thiện dịch vụ để khiến bạn hài lòng hơn.
-        Rất mong nhận được phản hồi của bạn để Cookpad có thể cải thiện tốt hơn.
+        PCook luôn không ngừng hoàn thiện dịch vụ để khiến bạn hài lòng hơn. Rất
+        mong nhận được phản hồi của bạn để PCook có thể cải thiện tốt hơn.
       </p>
       <p className="text-gray-700 mb-6">
         Nếu bạn có câu hỏi hay gặp vấn đề gì, vui lòng mở{' '}

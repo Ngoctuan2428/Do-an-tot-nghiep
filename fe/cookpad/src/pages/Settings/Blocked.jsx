@@ -14,7 +14,7 @@ function Blocked() {
           </h1>
           <p className="text-gray-600">
             Đây là các bếp bạn đã chặn. Các bếp này sẽ không thể tương tác với
-            bạn qua Cookpad.
+            bạn qua PCook.
           </p>
         </div>
 

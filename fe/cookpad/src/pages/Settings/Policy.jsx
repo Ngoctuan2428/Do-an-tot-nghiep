@@ -11,7 +11,7 @@ export default function Policy() {
       route: '/setting',
     },
     {
-      label: 'Hướng Dẫn Dành Cho Cộng Đồng Sử Dụng Cookpad',
+      label: 'Hướng Dẫn Dành Cho Cộng Đồng Sử Dụng PCook',
       route: '/setting',
     },
     {

@@ -15,10 +15,10 @@ export default function AllSettings() {
     { label: 'Góp Ý', route: '/setting/feedback' },
     {
       label:
-        'Tải ứng dụng Cookpad để tham gia cộng đồng nấu ăn tại gia lớn nhất Việt Nam!',
+        'Tải ứng dụng PCook để tham gia cộng đồng nấu ăn tại gia lớn nhất Việt Nam!',
       route: '/download',
     },
-    { label: 'Cộng tác với Cookpad', route: '/setting/collaboration' },
+    { label: 'Cộng tác với PCook', route: '/setting/collaboration' },
   ];
 
   const handleLogout = () => {

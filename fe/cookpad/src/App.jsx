@@ -10,6 +10,8 @@ import DraftRecipes from './pages/Recipes/DraftRecipes';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import Search from './pages/Search';
 import SearchDetail from './pages/SearchDetail';
 import Statistics from './pages/Statistics';
@@ -41,6 +43,8 @@ function App() {
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/search" element={<Search />} />
             <Route path="/search/:query" element={<SearchDetail />} />
             <Route path="/stats" element={<Statistics />} />

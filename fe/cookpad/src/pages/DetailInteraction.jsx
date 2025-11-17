@@ -6,15 +6,15 @@ export default function DetailInteraction() {
     {
       id: 1,
       name: 'Patricia',
-      role: 'Cookpad Community Manager',
+      role: 'PCook Community Manager',
       time: '18 ngày trước',
       avatar: 'https://www.cookpad.com/assets/images/profile_default.png',
       content: `
-👋 Welcome to Cookpad, Page One!
+👋 Welcome to PCook, Page One!
 
-I'm Patricia, one of the Cookpad Community Managers. 🧡 Thank you for joining the biggest online cooking community in the world! 🌏
+I'm Patricia, one of the PCook Community Managers. 🧡 Thank you for joining the biggest online cooking community in the world! 🌏
 
-You found us while looking for a recipe or wanting to share some of your own? 👩‍🍳 At Cookpad, you can:
+You found us while looking for a recipe or wanting to share some of your own? 👩‍🍳 At PCook, you can:
 
 🍽️ Find new ideas - Type in ingredients, a dish name, cooking method, or cuisine in the search bar.
 🧑‍🍳 Create and share your own recipes - Now even faster with our AI tool 🤖, but don't forget to upload an original picture of the final result! 📸

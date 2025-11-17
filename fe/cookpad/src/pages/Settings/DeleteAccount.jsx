@@ -30,7 +30,7 @@ function DeleteAccount() {
         {/* Warning Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
           <p className="text-gray-700 mb-4">
-            Chúng tôi rất buồn vì bạn muốn ngừng sử dụng Cookpad. Nếu bạn muốn
+            Chúng tôi rất buồn vì bạn muốn ngừng sử dụng PCook. Nếu bạn muốn
             thay đổi cài đặt cho các thông báo, bạn có thể vào phần{' '}
             <a href="#" className="text-blue-600 hover:underline">
               Cài Đặt Tin Nhắn

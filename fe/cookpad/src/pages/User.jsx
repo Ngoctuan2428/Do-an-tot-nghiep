@@ -21,7 +21,7 @@ export default function User() {
     joined: '2017',
     followers: 4469,
     following: 4990,
-    bio: 'Chào mừng bạn ghé thăm nhật ký bếp Bòn Bon. Mình gia nhập gia đình Cookpad từ năm 2017. Đây là nơi lưu giữ cách làm các món ăn mình đã nấu. Mình thích các món ăn vùng miền, thích thử các nguyên liệu mới.',
+    bio: 'Chào mừng bạn ghé thăm nhật ký bếp Bòn Bon. Mình gia nhập gia đình PCook từ năm 2017. Đây là nơi lưu giữ cách làm các món ăn mình đã nấu. Mình thích các món ăn vùng miền, thích thử các nguyên liệu mới.',
   };
 
   const recipes = [

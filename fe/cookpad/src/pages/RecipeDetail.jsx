@@ -19,7 +19,7 @@ export default function RecipeDetail() {
         'https://img-global.cpcdn.com/users/cf350f88589e7075/80x80cq50/avatar.webp',
       location: 'Hồ Chí Minh - Việt Nam',
       joined: '3 tháng 10 năm 2025',
-      bio: 'Mình gia nhập Cookpad từ năm 2017. Đây là nơi lưu giữ các món mình đã nấu.',
+      bio: 'Mình gia nhập PCook từ năm 2017. Đây là nơi lưu giữ các món mình đã nấu.',
     },
     hashtag: '#10nam1hanhtrinh',
     image:

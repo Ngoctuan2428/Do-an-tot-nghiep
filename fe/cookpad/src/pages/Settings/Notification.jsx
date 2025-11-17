@@ -47,7 +47,7 @@ function Notification() {
                 <p className="font-medium text-gray-800 mb-1">Hướng dẫn</p>
                 <p className="text-sm text-gray-600">
                   Chúng tôi sẽ email cho bạn để hướng dẫn cách tận dụng tốt nhất
-                  các tính năng của Cookpad.
+                  các tính năng của PCook.
                 </p>
               </label>
             </div>
@@ -62,7 +62,7 @@ function Notification() {
                 className="mt-1 w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500 cursor-pointer"
               />
               <label htmlFor="fromCookpad" className="flex-1 cursor-pointer">
-                <p className="font-medium text-gray-800 mb-1">Từ Cookpad</p>
+                <p className="font-medium text-gray-800 mb-1">Từ PCook</p>
                 <p className="text-sm text-gray-600">
                   Chúng tôi sẽ email cho bạn về những sự kiện theo mùa, khảo sát
                   và bí quyết hay từ đội ngũ Admin.
@@ -83,7 +83,7 @@ function Notification() {
                 <p className="font-medium text-gray-800 mb-1">Bản tin</p>
                 <p className="text-sm text-gray-600">
                   Chúng tôi sẽ email cho bạn về những bản tin, gợi ý món ngon và
-                  sự kiện nổi bật về cộng đồng Cookpad.
+                  sự kiện nổi bật về cộng đồng PCook.
                 </p>
               </label>
             </div>

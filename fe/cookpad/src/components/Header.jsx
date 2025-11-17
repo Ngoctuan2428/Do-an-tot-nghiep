@@ -28,12 +28,12 @@ export default function Header() {
 
         {/* Actions */}
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
+          {/* <div className="flex items-center space-x-2">
             <ArrowDownToLine />
             <button className="text-sm text-gray-600 hover:text-cookpad-orange">
               Tải ứng dụng
             </button>
-          </div>
+          </div> */}
           {user ? (
             <div className="flex items-center space-x-2">
               <img
