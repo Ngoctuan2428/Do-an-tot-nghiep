@@ -1,31 +1,21 @@
-import React, { useState } from "react";
-import { Search } from "lucide-react";
+import React from 'react';
+import { Search } from 'lucide-react';
 
-export default function SearchBar({ onSearch }) {
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSearch?.(searchTerm);
-  };
-
+export default function SearchBar() {
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-2xl">
+    <div className="flex-1 max-w-md mx-8">
       <div className="relative">
         <input
           type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Tìm kiếm công thức..."
-          className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cookpad-orange"
+          placeholder="Tìm tên hoặc nguyên liệu"
+          className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cookpad-orange"
         />
-        <button
-          type="submit"
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-cookpad-orange"
-        >
-          <Search size={20} />
+        {/* <button className="absolute left-3 top-2.5 text-gray-400"></button> */}
+        <Search size={16} className="absolute left-3 top-3 text-gray-400" />
+        <button className="absolute right-3 top-2.5 text-sm bg-cookpad-orange text-white px-3 py-1 rounded-md">
+          Tìm kiếm
         </button>
       </div>
-    </form>
+    </div>
   );
 }

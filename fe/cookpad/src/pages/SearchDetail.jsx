@@ -1,471 +1,310 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import {
-  Search,
-  Filter,
-  Crown,
-  ChefHat,
-  Clock,
-  Users,
-  User,
-  Bookmark, // ✅ 1. Import icon Bookmark
-} from "lucide-react";
-import { searchRecipes, getTrendingTags } from "../services/searchApi";
-//✅ 2. Import API để lưu và lấy danh sách đã lưu
-import { saveRecipe } from "../services/recipeApi";
+import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Search, Filter, Crown, ChefHat, Clock, Users } from 'lucide-react';
+import RecipeCard from '../components/RecipeCard';
 
-import { useRecipeCounts } from "../contexts/RecipeCountContext";
+const mockRankedRecipes = [
+  {
+    id: 1,
+    rank: 1,
+    image:
+      'https://cdn2.fptshop.com.vn/unsafe/1920x0/filters:format(webp):quality(75)/Thit_ran_98d4de0731.jpg',
+  },
+  {
+    id: 2,
+    rank: 2,
+    image:
+      'https://cookbeo.com/media/2020/11/thit-kho-tau/thit-kho-tau-16x9.jpg',
+  },
+  {
+    id: 3,
+    rank: 3,
+    image:
+      'https://cellphones.com.vn/sforum/wp-content/uploads/2023/08/mon-ngon-tu-thit-lon-10.jpg',
+  },
+  {
+    id: 4,
+    rank: 4,
+    image:
+      'https://cdn.tgdd.vn/Files/2019/08/11/1186405/7-mon-tu-thit-heo-khong-chi-ngon-kho-cuong-ma-con-cuc-de-lam-201908110859354934.jpg',
+  },
+];
 
-// (Hàm stringToArray/arrayToString giữ nguyên)
-const stringToArray = (str) =>
-  str
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-const arrayToString = (arr) => arr.join(",");
+const mockRecipes = [
+  {
+    id: 5,
+    title: 'Thịt Xào Mè',
+    description:
+      'thịt ba rọi rút sườn - mè trắng - hạt tim băm - nước tương - dầu hào - đường 6 món',
+    image:
+      'https://cdn.pastaxi-manager.onepas.vn/content/uploads/articles/Ho%C3%A0i%20Thu%20mkt/%E1%BA%A2nh%20b%C3%A0i%20vi%E1%BA%BFt%20ch%E1%BB%A7%20%C4%91%E1%BB%81%20dinh%20d%C6%B0%E1%BB%A1ng/cac-mon-ngon-voi-thit-lon/mon-ngon-voi-thit-lon-thit-kho-tieu.jpg',
+    time: '45 phút',
+    servings: '5 người',
+    author: 'Bồn Bồn',
+  },
+  {
+    id: 6,
+    title: 'Khoai Tay Xào Thịt Nac',
+    description:
+      'Thịt nac xay - Khoai tay - Đậu an - Hành tim - Hat nêm - Nước mắm - Muối - Tiêu',
+    image:
+      'https://i.ytimg.com/vi/9IxeBx67Wvg/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLD28R7_DLn6ggpWytGlVukpidpPsw',
+    time: '30 phút',
+    servings: '2 phan an',
+    author: 'Đậu Đậu',
+  },
+  {
+    id: 7,
+    title: 'Cá Kho Tộ',
+    description:
+      'Cá basa cắt khúc - nước màu - nước mắm - tiêu - hành tím - ớt - đường - dầu ăn',
+    image:
+      'https://img-global.cpcdn.com/recipes/3b1054eb857b0e2d/1200x630cq80/photo.jpg',
+    time: '60 phút',
+    servings: '4 người',
+    author: 'Mắm Mắm',
+  },
+  {
+    id: 8,
+    title: 'Trứng Chiên Thịt Bằm',
+    description: 'Trứng gà - thịt heo bằm - hành lá - nước mắm - tiêu - dầu ăn',
+    image:
+      'https://store.longphuong.vn/wp-content/uploads/2024/10/thit-de-lam-mon-gi-ngon-11.webp',
+    time: '20 phút',
+    servings: '3 người',
+    author: 'Trứng Trứng',
+  },
+  {
+    id: 9,
+    title: 'Canh Chua Cá Lóc',
+    description:
+      'Cá lóc - cà chua - thơm - bạc hà - đậu bắp - me chua - rau ngò - nước mắm - đường - muối',
+    image: 'https://i.ytimg.com/vi/bZ7IFrZ3-hI/maxresdefault.jpg',
+    time: '40 phút',
+    servings: '4 người',
+    author: 'Chua Chua',
+  },
+  {
+    id: 10,
+    title: 'Thịt Heo Kho Trứng',
+    description:
+      'Thịt ba chỉ - trứng vịt - nước dừa - nước mắm - đường - tiêu - hành tím',
+    image:
+      'https://vinhhanhfood.com/wp-content/uploads/2021/01/thit-de-hap-toi.jpg',
+    time: '90 phút',
+    servings: '5 người',
+    author: 'Kho Kho',
+  },
+  {
+    id: 11,
+    title: 'Thịt Bò Xào Bông Cải',
+    description:
+      'Thịt bò - bông cải xanh - tỏi - dầu hào - nước tương - tiêu - dầu ăn',
+    image:
+      'https://cellphones.com.vn/sforum/wp-content/uploads/2023/08/mon-ngon-tu-thit-lon-13.jpg',
+    time: '25 phút',
+    servings: '3 người',
+    author: 'Bò Bò',
+  },
+  {
+    id: 12,
+    title: 'Gà Rang Gừng',
+    description: 'Thịt gà - gừng - nước mắm - đường - tiêu - hành tím - dầu ăn',
+    image:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQu_p9selxWn3Slv7hjD0Gjj5NvtTswEH5h5Q&s',
+    time: '35 phút',
+    servings: '4 người',
+    author: 'Gừng Gừng',
+  },
+  {
+    id: 13,
+    title: 'Thịt Heo Quay Giòn Bì',
+    description: 'Thịt ba chỉ - muối - giấm - tiêu - ngũ vị hương - dầu ăn',
+    image:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoumumwlIH6xk_Ipu2kdjYDJjl1a5UD9NpnA&s',
+    time: '120 phút',
+    servings: '6 người',
+    author: 'Giòn Giòn',
+  },
+  {
+    id: 14,
+    title: 'Thịt Bò Kho',
+    description:
+      'Thịt bò - cà rốt - nước dừa - ngũ vị hương - nước mắm - tiêu - hành tím',
+    image:
+      'https://pos.nvncdn.com/867afd-52643/art/artCT/20221006_H6Q8gwIb1HnFhAkz71dPgd0S.jpg',
+    time: '75 phút',
+    servings: '5 người',
+    author: 'Kho Kho',
+  },
+  {
+    id: 15,
+    title: 'Gà Nướng Mật Ong',
+    description:
+      'Thịt gà - mật ong - tỏi - nước mắm - tiêu - dầu ăn - ngũ vị hương',
+    image:
+      'https://cdn.pastaxi-manager.onepas.vn/content/uploads/articles/vuvu/1-1-vietnam-938/blog/7-mon-ngon-tu-thit-ba-chi/mach-ban-7-mon-ngon-tu-thit-ba-chi-vua-de-lam-lai-vua-hao-com-3.jpg',
+    time: '60 phút',
+    servings: '4 người',
+    author: 'Mật Mật',
+  },
+];
+
+const mockSuggestions = [
+  'thịt nướng',
+  'thịt kho',
+  'thịt chiên',
+  'món thịt bò ngon',
+  'món thịt gà ngon',
+];
 
 export default function SearchDetail() {
-  const { query } = useParams();
+  const { query } = useParams(); // Lấy query từ URL, ví dụ /search/thit
   const navigate = useNavigate();
-  const [recipes, setRecipes] = useState([]);
-  const [rankedRecipes, setRankedRecipes] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("mới nhất");
-  const [sort, setSort] = useState("mới nhất");
-  const [filterInclude, setFilterInclude] = useState("");
-  const [filterExclude, setFilterExclude] = useState("");
-  const [totalCount, setTotalCount] = useState(0);
-  const [error, setError] = useState(null);
-
-  const [tempIncludeInput, setTempIncludeInput] = useState("");
-  const [tempExcludeInput, setTempExcludeInput] = useState("");
-
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const observer = useRef();
-
-  const { savedRecipeIds, refreshCounts } = useRecipeCounts();
-
-  const [suggestions, setSuggestions] = useState([]);
-
-  useEffect(() => {
-    const fetchTrendingTags = async () => {
-      try {
-        const res = await getTrendingTags({ limit: 8 });
-        setSuggestions(res.data.tags || []); // API trả về { tags: [...] }
-      } catch (err) {
-        console.error("Failed to fetch trending tags:", err);
-        setSuggestions([]); // Gặp lỗi thì trả về mảng rỗng
-      }
-    };
-    fetchTrendingTags();
-  }, []); // [] nghĩa là chỉ chạy 1 lần khi trang tải
-
-  // (useEffect cho activeTab giữ nguyên)
-  useEffect(() => {
-    setSort(activeTab);
-  }, [activeTab]);
-
-  // (Hàm fetchRecipes giữ nguyên)
-  const fetchRecipes = useCallback(
-    async (pageNum = 1, append = false) => {
-      if (!query) return;
-      setLoading(true);
-      setError(null);
-
-      try {
-        const params = {
-          q: query,
-          sortBy: sort.toLowerCase().includes("phổ biến") ? "views" : "newest",
-          page: pageNum,
-          limit: 10,
-        };
-        if (filterInclude) params.include = filterInclude;
-        if (filterExclude) params.exclude = filterExclude;
-
-        const recipesRes = await searchRecipes(params);
-        const newRecipes = recipesRes.data.rows || [];
-
-        setRecipes((prev) => (append ? [...prev, ...newRecipes] : newRecipes));
-        setTotalCount(recipesRes.data.count || 0);
-        setHasMore(newRecipes.length > 0);
-      } catch (error) {
-        console.error("Search failed:", error.response?.data || error);
-        setError(error.response?.data?.message || "Có lỗi xảy ra khi tìm kiếm");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [query, sort, filterInclude, filterExclude]
-  );
-
-  // (useEffect cho rankedRecipes giữ nguyên)
-  useEffect(() => {
-    const fetchRanked = async () => {
-      try {
-        const rankedRes = await searchRecipes({
-          q: query,
-          sortBy: "views",
-          limit: 3,
-        });
-        setRankedRecipes(rankedRes.data.rows || []);
-      } catch (err) {
-        console.error("Fetch ranked failed:", err);
-      }
-    };
-    fetchRanked();
-  }, [query]);
-
-  // ✅ 4. Lấy danh sách ID các món đã lưu khi tải trang
-  // (Để biết ban đầu nên hiển thị nút Lưu hay Đã Lưu)
-  // useEffect(() => {
-  //   const fetchSavedRecipeIds = async () => {
-  //     try {
-  //       const response = await getSavedRecipes();
-  //       const ids = new Set(response.data.data.rows.map((r) => r.id));
-  //       setSavedRecipeIds(ids);
-  //     } catch (error) {
-  //       // Lỗi (ví dụ: chưa đăng nhập)
-  //       console.warn("Không thể lấy danh sách món đã lưu.");
-  //       setSavedRecipeIds(new Set());
-  //     }
-  //   };
-  //   // Chỉ gọi khi trang tải lần đầu (hoặc khi query thay đổi nếu muốn)
-  //   fetchSavedRecipeIds();
-  // }, []);
-
-  // (useEffect cho fetchRecipes và page giữ nguyên)
-  useEffect(() => {
-    setPage(1);
-    setRecipes([]);
-    fetchRecipes(1, false);
-  }, [query, sort, filterInclude, filterExclude, fetchRecipes]);
-
-  useEffect(() => {
-    if (page > 1) fetchRecipes(page, true);
-  }, [page, fetchRecipes]);
-
-  // (Hàm lastRecipeRef, handleSearch giữ nguyên)
-  const lastRecipeRef = useCallback(
-    (node) => {
-      if (loading) return;
-      if (observer.current) observer.current.disconnect();
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          setPage((prev) => prev + 1);
-        }
-      });
-      if (node) observer.current.observe(node);
-    },
-    [loading, hasMore]
-  );
+  const [activeTab, setActiveTab] = useState('mới nhất');
+  const [sort, setSort] = useState('mới nhất');
+  const [filterInclude, setFilterInclude] = useState('');
+  const [filterExclude, setFilterExclude] = useState('');
 
   const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      const searchValue = e.target.value.trim();
-      if (searchValue) {
-        navigate(`/search/${searchValue}`);
-      }
+    if (e.key === 'Enter') {
+      navigate(`/search/${e.target.value}`);
     }
   };
 
-  // ✅ 5. Hàm xử lý khi bấm nút Lưu/Bỏ lưu
-  const handleSaveToggle = async (recipeId) => {
-    try {
-      // 1. Gọi API
-      await saveRecipe(recipeId);
-      // 2. Yêu cầu Context cập nhật lại
-      await refreshCounts();
-    } catch (error) {
-      console.error("Lỗi khi lưu món:", error);
-      alert("Đã xảy ra lỗi. Bạn vui lòng đăng nhập để thực hiện thao tác này.");
-    }
-  };
+  const RankedRecipe = ({ rank, image }) => (
+    <div className="relative">
+      <img
+        src={image}
+        alt={`Rank ${rank}`}
+        className="w-full h-24 object-cover rounded-md"
+      />
+      <span className="absolute top-0 left-0 bg-white p-1 rounded text-xs font-bold">
+        {rank}
+      </span>
+    </div>
+  );
 
-  // (Các hàm handleAddInclude/Remove/Exclude giữ nguyên)
-  const handleAddInclude = (e) => {
-    if (e.key === "Enter" && tempIncludeInput.trim()) {
-      const currentKeywords = stringToArray(filterInclude);
-      const newKeywords = stringToArray(tempIncludeInput);
-      const uniqueKeywords = [...new Set([...currentKeywords, ...newKeywords])];
-      setFilterInclude(arrayToString(uniqueKeywords));
-      setTempIncludeInput("");
-    }
-  };
-  const handleRemoveInclude = (keywordToRemove) => {
-    const currentKeywords = stringToArray(filterInclude);
-    const newKeywords = currentKeywords.filter(
-      (k) => k.toLowerCase() !== keywordToRemove.toLowerCase()
-    );
-    setFilterInclude(arrayToString(newKeywords));
-  };
-  const handleAddExclude = (e) => {
-    if (e.key === "Enter" && tempExcludeInput.trim()) {
-      const currentKeywords = stringToArray(filterExclude);
-      const newKeywords = stringToArray(tempExcludeInput);
-      const uniqueKeywords = [...new Set([...currentKeywords, ...newKeywords])];
-      setFilterExclude(arrayToString(uniqueKeywords));
-      setTempExcludeInput("");
-    }
-  };
-  const handleRemoveExclude = (keywordToRemove) => {
-    const currentKeywords = stringToArray(filterExclude);
-    const newKeywords = currentKeywords.filter(
-      (k) => k.toLowerCase() !== keywordToRemove.toLowerCase()
-    );
-    setFilterExclude(arrayToString(newKeywords));
-  };
-
-  if (error) {
-    return <div className="text-center py-10 text-red-600">{error}</div>;
-  }
-
-  // --- (Render JSX) ---
   return (
     <div className="min-h-screen bg-gray-50 py-6">
       <div className="max-w-7xl mx-auto px-4">
-        {/* (Thanh tìm kiếm, Tabs, Tiêu đề, Top công thức... giữ nguyên) */}
+        {/* Search Bar */}
         <div className="relative mb-6">
           <input
             type="text"
-            defaultValue={query || ""}
+            defaultValue={query || 'thit'}
             onKeyDown={handleSearch}
             className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cookpad-orange text-lg"
-            placeholder="Tìm kiếm công thức..."
           />
           <button className="absolute right-3 top-1/2 -translate-y-1/2 text-cookpad-orange">
             <Search size={20} />
           </button>
         </div>
+
+        {/* Tabs */}
         <div className="flex space-x-4 mb-4">
           <button
             className={`text-sm font-medium pb-2 border-b-2 ${
-              activeTab === "mới nhất"
-                ? "border-cookpad-orange text-cookpad-orange"
-                : "border-transparent text-gray-600"
+              activeTab === 'mới nhất'
+                ? 'border-cookpad-orange text-cookpad-orange'
+                : 'border-transparent text-gray-600'
             }`}
-            onClick={() => setActiveTab("mới nhất")}
+            onClick={() => setActiveTab('mới nhất')}
           >
             Mới Nhất
           </button>
           <button
             className={`text-sm font-medium pb-2 border-b-2 ${
-              activeTab === "phổ biến"
-                ? "border-cookpad-orange text-cookpad-orange"
-                : "border-transparent text-gray-600"
+              activeTab === 'phổ biến'
+                ? 'border-cookpad-orange text-cookpad-orange'
+                : 'border-transparent text-gray-600'
             }`}
-            onClick={() => setActiveTab("phổ biến")}
+            onClick={() => setActiveTab('phổ biến')}
           >
             Phổ Biến
           </button>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          {query} ({totalCount})
-        </h1>
-        {rankedRecipes.length > 0 && (
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-4">Công thức phổ biến</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {rankedRecipes.map((recipe, index) => {
-                const imgs =
-                  Array.isArray(recipe.images) && recipe.images.length
-                    ? recipe.images
-                    : recipe.image_url
-                      ? [recipe.image_url]
-                      : [];
-                const mainSrc =
-                  (imgs[0] && (imgs[0].url || imgs[0])) ||
-                  "/placeholder-recipe.jpg";
 
-                return (
-                  <div
-                    key={recipe.id}
-                    onClick={() => navigate(`/recipes/${recipe.id}`)}
-                    className="bg-white rounded-lg shadow p-0 overflow-hidden cursor-pointer hover:shadow-md transition"
-                  >
-                    <div className="relative">
-                      <img
-                        src={mainSrc}
-                        alt={recipe.title}
-                        className="w-full h-40 object-cover"
-                        loading="lazy"
-                      />
-                      <div className="absolute top-2 left-2 flex items-center gap-2 bg-white/80 rounded-full px-2 py-1">
-                        <Crown className="text-yellow-500" />
-                        <span className="text-sm font-medium">
-                          #{index + 1}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="p-3">
-                      <h4 className="font-medium text-sm line-clamp-2">
-                        {recipe.title}
-                      </h4>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {recipe.short_description ||
-                          (recipe.description || "").slice(0, 80)}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+        {/* Title */}
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Thit (23.807)</h1>
+        <p className="text-sm text-gray-600 mb-4">
+          Món 'thit' đã được kiểm chứng
+        </p>
 
-        {/* Kết quả */}
+        {/* Ranked Recipes */}
+        <div className="grid grid-cols-4 gap-4 mb-6">
+          {mockRankedRecipes.map((recipe) => (
+            <RankedRecipe
+              key={recipe.id}
+              rank={recipe.rank}
+              image={recipe.image}
+            />
+          ))}
+        </div>
+
+        {/* Main Content - Responsive Grid */}
         <div className="flex flex-col lg:flex-row gap-6">
+          {/* Recipes List */}
           <div className="flex-1 space-y-6">
-            {recipes.length === 0 && !loading && (
-              <div className="text-center py-10 text-gray-500">
-                Không tìm thấy món ăn nào phù hợp.
-              </div>
-            )}
-
-            {/* ✅ 6. CHỈNH SỬA VÒNG LẶP KẾT QUẢ */}
-            {recipes.map((recipe, index) => {
-              const isLast = index === recipes.length - 1;
-              // Kiểm tra xem món này có trong Set đã lưu không
-              const isSaved = savedRecipeIds.has(recipe.id);
-
-              return (
-                <div
-                  ref={isLast ? lastRecipeRef : null}
-                  key={recipe.id}
-                  className="flex items-start space-x-4 bg-white p-4 rounded-md shadow-sm hover:shadow-md transition-shadow"
-                  // Bỏ onClick ở thẻ div cha
-                >
-                  {(() => {
-                    const imgs =
-                      Array.isArray(recipe.images) && recipe.images.length
-                        ? recipe.images
-                        : recipe.image_url
-                          ? [recipe.image_url]
-                          : [];
-                    const mainSrc =
-                      (imgs[0] && (imgs[0].url || imgs[0])) ||
-                      "/placeholder-recipe.jpg";
-
-                    return (
-                      // Thêm onClick vào ảnh
-                      <div
-                        className="w-32 flex-shrink-0 cursor-pointer"
-                        onClick={() => navigate(`/recipes/${recipe.id}`)}
-                      >
-                        <img
-                          src={mainSrc}
-                          alt={recipe.title}
-                          loading="lazy"
-                          className="w-32 h-32 object-cover rounded-md"
-                        />
-                        {imgs.length > 1 && (
-                          <div className="mt-2 grid grid-cols-3 gap-1">
-                            {imgs.slice(0, 3).map((it, i) => {
-                              const src = it.url || it;
-                              return (
-                                <img
-                                  key={i}
-                                  src={src}
-                                  alt={`${recipe.title} ${i + 1}`}
-                                  loading="lazy"
-                                  className="w-full h-10 object-cover rounded-sm"
-                                />
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })()}
-
-                  <div className="flex-1">
-                    {/* Thêm flex wrapper cho Tiêu đề và Nút lưu */}
-                    <div className="flex justify-between items-start gap-2">
-                      <h3
-                        className="text-lg font-medium text-gray-900 hover:text-cookpad-orange cursor-pointer"
-                        // Thêm onClick vào tiêu đề
-                        onClick={() => navigate(`/recipes/${recipe.id}`)}
-                      >
-                        {recipe.title}
-                      </h3>
-
-                      {/* NÚT LƯU MỚI */}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation(); // Ngăn click lan ra ngoài (dù không cần thiết)
-                          handleSaveToggle(recipe.id);
-                        }}
-                        className="p-1 text-gray-500 hover:text-cookpad-orange flex-shrink-0 z-10"
-                        title={isSaved ? "Bỏ lưu" : "Lưu món"}
-                      >
-                        <Bookmark
-                          size={20}
-                          className={
-                            isSaved
-                              ? "fill-current text-cookpad-orange" // Icon đầy
-                              : "" // Icon rỗng
-                          }
-                        />
-                      </button>
-                    </div>
-
-                    <p className="text-sm text-gray-600 mb-2">
-                      {recipe.short_description ||
-                        recipe.description?.slice(0, 150) ||
-                        "Không có mô tả."}
-                      ...
-                    </p>
-                    <div className="text-sm text-gray-600 mb-2">
-                      <span className="font-medium">Nguyên liệu: </span>
-                      {Array.isArray(recipe.ingredients)
-                        ? recipe.ingredients.slice(0, 3).join(", ")
-                        : recipe.ingredients}
-                    </div>
-
-                    <div className="flex items-center mt-2 space-x-4 text-sm text-gray-500">
-                      <span className="flex items-center">
-                        <Clock className="w-4 h-4 mr-1" />
-                        {recipe.total_time || "30"} phút
-                      </span>
-                      <span className="flex items-center">
-                        <Users className="w-4 h-4 mr-1" />
-                        {recipe.servings || "2"} người
-                      </span>
-                      <span className="flex items-center">
-                        <User className="w-4 h-4 mr-1" />
-                        {recipe.User?.username || "Anonymous"}
-                      </span>
-                    </div>
+            {mockRecipes.map((recipe) => (
+              <div
+                key={recipe.id}
+                className="flex items-start space-x-4 bg-white p-4 rounded-md shadow-sm"
+              >
+                <img
+                  src={recipe.image}
+                  alt={recipe.title}
+                  className="w-32 h-32 object-cover rounded-md"
+                />
+                <div className="flex-1">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    {recipe.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {recipe.description}
+                  </p>
+                  <div className="flex space-x-4 text-sm text-gray-500">
+                    <span>
+                      <Clock size={16} className="inline mr-1" /> {recipe.time}
+                    </span>
+                    <span>
+                      <Users size={16} className="inline mr-1" />{' '}
+                      {recipe.servings}
+                    </span>
+                  </div>
+                  <div className="flex items-center mt-2 text-sm text-gray-500">
+                    <img
+                      src="https://via.placeholder.com/20"
+                      alt="Author"
+                      className="w-5 h-5 rounded-full mr-2"
+                    />
+                    {recipe.author}
                   </div>
                 </div>
-              );
-            })}
-
-            {loading && (
-              <div className="text-center py-6 text-gray-500">
-                Đang tải thêm...
               </div>
-            )}
+            ))}
           </div>
 
-          {/* (Sidebar giữ nguyên) */}
+          {/* Sidebar Filters */}
           <aside className="space-y-4 lg:w-64 lg:sticky lg:top-6 lg:h-fit">
+            {/* Tim kiệm tương tự */}
             <div className="bg-white rounded-md p-4 shadow-sm">
               <h3 className="text-sm font-bold text-gray-900 mb-2">
-                Tìm kiếm tương tự
+                Tim kiệm tương tự
               </h3>
               <div className="flex flex-wrap gap-2">
-                {suggestions.map((sug) => (
+                {mockSuggestions.map((sug) => (
                   <button
                     key={sug}
                     className="px-3 py-1 bg-gray-100 rounded-md text-xs hover:bg-gray-200"
-                    onClick={() => navigate(`/search/${sug}`)}
                   >
                     {sug}
                   </button>
                 ))}
               </div>
             </div>
+
+            {/* Sắp xếp */}
             <div className="bg-white rounded-md p-4 shadow-sm">
               <h3 className="text-sm font-bold text-gray-900 mb-2">Sắp xếp</h3>
               <select
@@ -473,59 +312,35 @@ export default function SearchDetail() {
                 onChange={(e) => setSort(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-cookpad-orange"
               >
-                <option value="mới nhất">Mới nhất</option>
-                <option value="phổ biến">Phổ biến</option>
+                <option>Hiển thị các món với:</option>
+                <option>Mới nhất</option>
+                <option>Phổ biến</option>
               </select>
             </div>
+
+            {/* Bộ lọc */}
             <div className="bg-white rounded-md p-4 shadow-sm">
               <h3 className="text-sm font-bold text-gray-900 mb-2">Bộ lọc</h3>
-              <p className="text-xs font-medium text-gray-500 mb-2">
-                Hiển thị các món với:
-              </p>
               <input
                 type="text"
-                value={tempIncludeInput}
-                onChange={(e) => setTempIncludeInput(e.target.value)}
-                onKeyDown={handleAddInclude}
-                placeholder="Gõ vào tên các nguyên liệu..."
+                value={filterInclude}
+                onChange={(e) => setFilterInclude(e.target.value)}
+                placeholder="Gõ vào tên nguyên liệu..."
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-cookpad-orange mb-2"
               />
-              <div className="flex flex-wrap gap-2 mb-4">
-                {stringToArray(filterInclude).map((keyword) => (
-                  <span
-                    key={keyword}
-                    className="flex items-center bg-cookpad-orange text-white text-xs px-3 py-1 rounded-full cursor-pointer"
-                    onClick={() => handleRemoveInclude(keyword)}
-                  >
-                    {keyword}
-                    <span className="ml-1 font-bold">×</span>
-                  </span>
-                ))}
-              </div>
-              <p className="text-xs font-medium text-gray-500 mb-2">
+              <p className="text-xs text-gray-500 mb-2">
                 Hiển thị các món không có:
               </p>
               <input
                 type="text"
-                value={tempExcludeInput}
-                onChange={(e) => setTempExcludeInput(e.target.value)}
-                onKeyDown={handleAddExclude}
-                placeholder="Gõ vào tên các nguyên liệu..."
+                value={filterExclude}
+                onChange={(e) => setFilterExclude(e.target.value)}
+                placeholder="Gõ vào tên nguyên liệu..."
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-cookpad-orange"
               />
-              <div className="flex flex-wrap gap-2 mt-2">
-                {stringToArray(filterExclude).map((keyword) => (
-                  <span
-                    key={keyword}
-                    className="flex items-center bg-gray-400 text-white text-xs px-3 py-1 rounded-full cursor-pointer"
-                    onClick={() => handleRemoveExclude(keyword)}
-                  >
-                    {keyword}
-                    <span className="ml-1 font-bold">×</span>
-                  </span>
-                ))}
-              </div>
             </div>
+
+            {/* Premium Filter */}
             <div className="bg-yellow-50 rounded-md p-4 shadow-sm text-center">
               <p className="text-sm font-bold text-yellow-800 mb-2">
                 Bộ lọc Premium

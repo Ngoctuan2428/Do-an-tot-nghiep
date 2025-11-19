@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react"; // 1. Thêm useEffect
-import { Plus, GripVertical, MoreHorizontal } from "lucide-react";
+import React, { useState } from 'react';
+import { Plus, GripVertical, MoreHorizontal } from 'lucide-react';
 
 /**
  * IngredientList - manage sections (phần) and items (nguyên liệu)
@@ -14,43 +14,25 @@ import { Plus, GripVertical, MoreHorizontal } from "lucide-react";
 const uid = () =>
   `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 
-export default function IngredientList({ ingredientsData, onChange }) {
-  // 3. Sửa useState:
-  // Nếu có 'ingredientsData' (chế độ edit), dùng nó.
-  // Nếu không, dùng state mặc định (chế độ create).
-  const [sections, setSections] = useState(() => {
-    if (ingredientsData && ingredientsData.length > 0) {
-      // Chuyển đổi mảng string (từ CSDL) sang cấu trúc 'sections'
-      return [
-        {
-          id: uid(),
-          title: "Phần 1",
-          items: ingredientsData.map((text) => ({ id: uid(), text })),
-        },
-      ];
-    }
-    // State mặc định khi tạo mới
-    return [
-      {
-        id: uid(),
-        title: "Phần 1",
-        items: [{ id: uid(), text: "" }],
-      },
-    ];
-  });
-
-  const [serving, setServing] = useState("2 người");
-  const [menuOpen, setMenuOpen] = useState(null);
-  const [dragData, setDragData] = useState(null);
-
-  useEffect(() => {
-    onChange?.(sections);
-  }, [sections, onChange]);
+export default function IngredientList({ onChange }) {
+  const [sections, setSections] = useState(() => [
+    {
+      id: uid(),
+      title: 'Phần 1',
+      items: [
+        { id: uid(), text: '250g bột' },
+        { id: uid(), text: '100ml nước' },
+      ],
+    },
+  ]);
+  const [serving, setServing] = useState('2 người');
+  const [menuOpen, setMenuOpen] = useState(null); // id of item/section menu open
+  const [dragData, setDragData] = useState(null); // { itemId, fromSectionId }
 
   // Call onChange if provided
   const publish = (next) => {
     setSections(next);
-    //onChange?.(next);
+    onChange?.(next);
   };
 
   const addSection = () => {
@@ -66,7 +48,7 @@ export default function IngredientList({ ingredientsData, onChange }) {
   const addIngredient = (sectionId) => {
     const next = sections.map((s) =>
       s.id === sectionId
-        ? { ...s, items: [...s.items, { id: uid(), text: "" }] }
+        ? { ...s, items: [...s.items, { id: uid(), text: '' }] }
         : s
     );
     publish(next);
@@ -98,20 +80,20 @@ export default function IngredientList({ ingredientsData, onChange }) {
   const onDragStart = (e, { itemId, fromSectionId }) => {
     setDragData({ itemId, fromSectionId });
     e.dataTransfer.setData(
-      "text/plain",
+      'text/plain',
       JSON.stringify({ itemId, fromSectionId })
     );
-    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.effectAllowed = 'move';
   };
 
   const onDragOverItem = (e) => {
     e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
+    e.dataTransfer.dropEffect = 'move';
   };
 
-  const onDropOnItem = (e, { toSectionId, toItemId, position = "after" }) => {
+  const onDropOnItem = (e, { toSectionId, toItemId, position = 'after' }) => {
     e.preventDefault();
-    const raw = e.dataTransfer.getData("text/plain");
+    const raw = e.dataTransfer.getData('text/plain');
     if (!raw) return;
     const { itemId, fromSectionId } = JSON.parse(raw);
 
@@ -141,7 +123,7 @@ export default function IngredientList({ ingredientsData, onChange }) {
       if (s.id !== toSectionId) return s;
       const idx = s.items.findIndex((it) => it.id === toItemId);
       const arr = [...s.items];
-      const insertIndex = idx + (position === "after" ? 1 : 0);
+      const insertIndex = idx + (position === 'after' ? 1 : 0);
       arr.splice(insertIndex, 0, movingItem);
       return { ...s, items: arr };
     });
@@ -153,7 +135,7 @@ export default function IngredientList({ ingredientsData, onChange }) {
   // Drop into empty section area (append)
   const onDropOnSection = (e, toSectionId) => {
     e.preventDefault();
-    const raw = e.dataTransfer.getData("text/plain");
+    const raw = e.dataTransfer.getData('text/plain');
     if (!raw) return;
     const { itemId, fromSectionId } = JSON.parse(raw);
 
@@ -265,7 +247,7 @@ export default function IngredientList({ ingredientsData, onChange }) {
                     onDropOnItem(e, {
                       toSectionId: section.id,
                       toItemId: it.id,
-                      position: "before",
+                      position: 'before',
                     })
                   }
                   className="flex items-center gap-3 bg-orange-50 rounded px-3 py-2"

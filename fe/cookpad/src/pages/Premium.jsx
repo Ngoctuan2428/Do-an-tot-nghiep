@@ -26,7 +26,7 @@ const PricingCard = () => (
       <p className="text-sm text-gray-500">/tháng</p>
     </div>
     <p className="text-sm text-gray-700 text-center mb-6">
-      Phí lý tính tháng, bạn sẽ được hưởng lợi ích từ gói cao cấp của Cookpad.
+      Phí lý tính tháng, bạn sẽ được hưởng lợi ích từ gói cao cấp của PCook.
     </p>
   </div>
 );
@@ -174,7 +174,7 @@ export default function Premium() {
         {/* Description */}
         <p className="text-sm text-gray-600 mb-6 text-center">
           Bằng cách đăng ký Gold Premium, bạn sẽ có trải nghiệm tốt hơn với
-          Cookpad.
+          PCook.
         </p>
 
         {/* Payment */}
@@ -191,7 +191,7 @@ export default function Premium() {
           <button className="text-cookpad-orange underline hover:no-underline">
             Điều khoản Dịch vụ
           </button>{' '}
-          của Cookpad.
+          của PCook.
         </p>
       </div>
     </div>

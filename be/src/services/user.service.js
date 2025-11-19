@@ -164,9 +164,9 @@ module.exports = {
   getAllUsers,
   updateUserById,
   deleteUserById,
-  toggleFollowUser, // Mới
-  getFollowingList, // Mới
-  getFollowersList, // Mới
-  updateUserProfile, // ✅ Export mới
-  getUserStats, // ✅ Export mới (thay cho getUserFollowStats)
+  toggleFollowUser, 
+  getFollowingList, 
+  getFollowersList, 
+  updateUserProfile,  
+  getUserStats,
 };

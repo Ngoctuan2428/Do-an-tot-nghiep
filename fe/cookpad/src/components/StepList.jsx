@@ -1,86 +1,96 @@
-// src/components/StepList.jsx
-import React, { useState } from "react";
-import {
-  Camera,
-  Plus,
-  MoreHorizontal,
-  GripVertical,
-  Loader2,
-} from "lucide-react";
-import { uploadMedia } from "../services/uploadApi";
+import React, { useState } from 'react';
+import { Camera, Plus, MoreHorizontal, GripVertical } from 'lucide-react';
+
+/**
+ * StepList - manage steps:
+ * - add step
+ * - delete step via 3-dot menu
+ * - reorder steps via drag & drop
+ */
 
 const uid = () =>
   `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 
-export default function StepList({ stepsData = [], onChange }) {
-  const [cookTime, setCookTime] = useState("1 tiếng 30 phút");
+export default function StepList({ onChange }) {
+  const [cookTime, setCookTime] = useState('1 tiếng 30 phút');
+  const [steps, setSteps] = useState(() => [
+    { id: uid(), text: 'Trộn bột và nước đến khi đặc lại', image: null },
+    {
+      id: uid(),
+      text: 'Đậy kín hỗn hợp lại và để ở nhiệt độ phòng trong 24-36 tiếng',
+      image: null,
+    },
+  ]);
   const [menuOpen, setMenuOpen] = useState(null);
   const [dragId, setDragId] = useState(null);
-  const [uploadingId, setUploadingId] = useState(null);
 
   const publish = (next) => {
+    setSteps(next);
     onChange?.(next);
   };
 
   const addStep = () => {
-    const next = [...stepsData, { id: uid(), text: "", image: null }];
+    const next = [...steps, { id: uid(), text: '', image: null }];
     publish(next);
   };
 
   const updateStepText = (id, text) =>
-    publish(stepsData.map((s) => (s.id === id ? { ...s, text } : s)));
+    publish(steps.map((s) => (s.id === id ? { ...s, text } : s)));
 
-  const deleteStep = (id) => publish(stepsData.filter((s) => s.id !== id));
+  const deleteStep = (id) => publish(steps.filter((s) => s.id !== id));
 
+  // Drag & drop handlers for steps (reorder)
   const handleDragStart = (e, id) => {
     setDragId(id);
-    e.dataTransfer.setData("text/plain", id);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', id);
   };
+
   const handleDragOver = (e) => {
     e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
   };
+
   const handleDrop = (e, targetId) => {
     e.preventDefault();
-    const sourceId = e.dataTransfer.getData("text/plain") || dragId;
-    if (!sourceId || sourceId === targetId) return;
-    const srcIndex = stepsData.findIndex((s) => s.id === sourceId);
-    const tgtIndex = stepsData.findIndex((s) => s.id === targetId);
+    const sourceId = e.dataTransfer.getData('text/plain') || dragId;
+    if (!sourceId) return;
+    if (sourceId === targetId) return;
+
+    const srcIndex = steps.findIndex((s) => s.id === sourceId);
+    const tgtIndex = steps.findIndex((s) => s.id === targetId);
     if (srcIndex === -1 || tgtIndex === -1) return;
-    const arr = [...stepsData];
+
+    const arr = [...steps];
     const [moved] = arr.splice(srcIndex, 1);
     arr.splice(tgtIndex, 0, moved);
     publish(arr);
     setDragId(null);
   };
 
-  const handleImageChange = async (e, stepId) => {
+  const handleImageChange = (e, stepId) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    setUploadingId(stepId);
-
-    try {
-      const uploadRes = await uploadMedia(file);
-      const serverUrl = uploadRes.data.url;
-      publish(
-        stepsData.map((s) => (s.id === stepId ? { ...s, image: serverUrl } : s))
-      );
-    } catch (error) {
-      console.error("Lỗi upload ảnh bước:", error);
-      alert("Upload ảnh thất bại!");
-    } finally {
-      setUploadingId(null);
-    }
+    const url = URL.createObjectURL(file);
+    publish(steps.map((s) => (s.id === stepId ? { ...s, image: url } : s)));
   };
 
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-lg font-semibold">Các bước</h3>
+        <div className="flex items-center gap-3">
+          <span className="text-gray-600 text-sm">Thời gian nấu</span>
+          <input
+            value={cookTime}
+            onChange={(e) => setCookTime(e.target.value)}
+            className="border rounded px-3 py-1 text-sm w-40"
+          />
+        </div>
       </div>
 
       <div className="space-y-6">
-        {stepsData.map((s, index) => (
+        {steps.map((s, index) => (
           <div key={s.id} className="bg-white border rounded-md p-3">
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-800 text-white font-medium">
@@ -128,16 +138,13 @@ export default function StepList({ stepsData = [], onChange }) {
                   className="mt-3 flex gap-4 items-center"
                 >
                   <div className="w-36 h-24 border rounded-md bg-orange-50 flex items-center justify-center">
-                    {uploadingId === s.id ? (
-                      <Loader2 className="w-6 h-6 text-gray-500 animate-spin" />
-                    ) : s.image ? (
+                    {s.image ? (
                       <img
                         src={s.image}
                         alt={`step-${index + 1}`}
                         className="w-full h-full object-cover rounded-md"
                       />
                     ) : (
-                      // ✅ 3. SỬA LỖI: 'Ca' thành 'Camera'
                       <label className="flex flex-col items-center justify-center cursor-pointer text-gray-500">
                         <Camera className="w-6 h-6 mb-1" />
                         <span className="text-xs">Thêm hình</span>
