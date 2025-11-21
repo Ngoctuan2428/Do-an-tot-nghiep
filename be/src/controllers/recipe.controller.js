@@ -111,6 +111,16 @@ const getMyRecipes = async (req, res, next) => {
   }
 };
 
+const calculateNutrition = async (req, res, next) => {
+  try {
+    // Chỉ cần chuyển req.body cho service xử lý
+    const result = await recipeService.calculateNutrition(req.body);
+    res.status(200).json({ status: "success", data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createRecipe,
   getAllRecipes,
@@ -120,4 +130,5 @@ module.exports = {
   saveRecipe,
   getRecipeCounts,
   getMyRecipes,
+  calculateNutrition,
 };

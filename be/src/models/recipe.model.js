@@ -25,7 +25,8 @@ const Recipe = sequelize.define(
       type: DataTypes.TEXT,
     },
     ingredients: {
-      type: DataTypes.TEXT,
+      type: DataTypes.JSON, 
+      allowNull: true,    
     },
     steps: {
       type: DataTypes.JSON,

@@ -27,4 +27,8 @@ router
 
 router.route("/:id/save").post(protect, recipeController.saveRecipe);
 
+router
+  .route("/internal/calculate-nutrition")
+  .post(recipeController.calculateNutrition);
+
 module.exports = router;

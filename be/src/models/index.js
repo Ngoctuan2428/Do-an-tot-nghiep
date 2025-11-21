@@ -11,6 +11,7 @@ const Favorite = require('./favorite.model');
 const Tag = require('./tag.model');
 const Media = require('./media.model');
 const Challenge = require('./challenge.model'); 
+const IngredientsMaster = require('./ingredientsMaster.model');
 
 const db = {};
 
@@ -24,6 +25,7 @@ db.Favorite = Favorite;
 db.Tag = Tag;
 db.Media = Media;
 db.Challenge = Challenge; // <-- THÊM MỚI
+db.IngredientsMaster = IngredientsMaster; // <-- THÊM MỚI
 
 // === ĐỊNH NGHĨA QUAN HỆ SỬ DỤNG CÁC MODEL TỪ `db` ===
 

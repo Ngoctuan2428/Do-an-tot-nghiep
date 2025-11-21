@@ -1,21 +1,34 @@
-// src/services/recipe.service.js
+// File: services/recipe.service.js
 
-// 1. ❗️ SỬA LỖI: Gộp 2 dòng import models thành 1
-const { Recipe, User, Category, Tag, Favorite } = require("../models");
-const { Op } = require("sequelize"); // Import Op
+const fs = require('fs'); // <-- SỬA LỖI 1: Thêm 'fs'
+const path = require('path'); // <-- SỬA LỖI 2: Thêm 'path'
+
+// 1. Import tất cả models, bao gồm 'IngredientsMaster'
+const {
+  Recipe,
+  User,
+  Category,
+  Tag,
+  Favorite,
+} = require("../models");
+
+const IngredientsMaster = require("../models/ingredientsMaster.model");
+
+const { Op } = require("sequelize");
 const ApiError = require("../utils/ApiError");
 const generateSlug = require("../utils/slugify");
 
-// 2. HÀM GỐC
+// 2. HÀM GỐC (createRecipe)
 const createRecipe = async (userId, recipeData) => {
   const { title, categoryIds, tags, ...rest } = recipeData;
   const slug = generateSlug(title) + "-" + Date.now();
 
-  // Fix (từ lỗi trước): Chuyển 'ingredients' (TEXT) thành chuỗi JSON
+  // (Code này của bạn rất TỐT - tự động chuyển mảng 'ingredients' thành JSON)
   if (Array.isArray(rest.ingredients)) {
+    // Sửa Model Recipe từ TEXT -> JSON sẽ không cần dòng này nữa
+    // nhưng để tạm vẫn chạy
     rest.ingredients = JSON.stringify(rest.ingredients);
   }
-  // (steps là JSON trong model, không cần chuyển)
 
   const newRecipe = await Recipe.create({
     user_id: userId,
@@ -35,7 +48,7 @@ const createRecipe = async (userId, recipeData) => {
   return getRecipeById(newRecipe.id);
 };
 
-// 3. HÀM GỐC
+// 3. HÀM GỐC (getRecipeById)
 const getRecipeById = async (recipeId) => {
   const recipe = await Recipe.findByPk(recipeId, {
     include: [
@@ -48,7 +61,7 @@ const getRecipeById = async (recipeId) => {
   return recipe;
 };
 
-// 4. HÀM GỐC
+// 4. HÀM GỐC (getAllRecipes)
 const getAllRecipes = async (queryOptions) => {
   const { page = 1, limit = 10 } = queryOptions;
   const offset = (page - 1) * limit;
@@ -60,7 +73,7 @@ const getAllRecipes = async (queryOptions) => {
   });
 };
 
-// 5. HÀM GỐC
+// 5. HÀM GỐC (updateRecipe)
 const updateRecipe = async (recipeId, userId, userRole, updateData) => {
   const recipe = await getRecipeById(recipeId);
 
@@ -82,7 +95,7 @@ const updateRecipe = async (recipeId, userId, userRole, updateData) => {
   return getRecipeById(recipeId);
 };
 
-// 6. HÀM GỐC
+// 6. HÀM GỐC (deleteRecipe)
 const deleteRecipe = async (recipeId, userId, userRole) => {
   const recipe = await getRecipeById(recipeId);
   if (userRole !== "admin" && recipe.user_id !== userId) {
@@ -92,7 +105,7 @@ const deleteRecipe = async (recipeId, userId, userRole) => {
   return { message: "Recipe deleted successfully" };
 };
 
-// 7. HÀM MỚI (Cho "Lưu món")
+// 7. HÀM GỐC (toggleFavoriteRecipe)
 const toggleFavoriteRecipe = async (userId, recipeId) => {
   const existingFavorite = await Favorite.findOne({
     where: {
@@ -113,7 +126,7 @@ const toggleFavoriteRecipe = async (userId, recipeId) => {
   }
 };
 
-// 8. HÀM MỚI (Cho Sidebar count)
+// 8. HÀM GỐC (getRecipeCounts)
 const getRecipeCounts = async (userId) => {
   const [all, saved, mine, published, drafts] = await Promise.all([
     Recipe.count({ where: { user_id: userId } }),
@@ -129,14 +142,11 @@ const getRecipeCounts = async (userId) => {
     mine,
     published,
     drafts,
-    cooked: 0, // Tạm thời
+    cooked: 0,
   };
 };
 
-/**
- * @desc    Lấy tất cả công thức của user đang đăng nhập
- * @param {string} userId
- */
+// 9. HÀM GỐC (getMyRecipes)
 const getMyRecipes = async (userId) => {
   return await Recipe.findAndCountAll({
     where: { user_id: userId },
@@ -145,6 +155,96 @@ const getMyRecipes = async (userId) => {
   });
 };
 
+// ============ BẮT ĐẦU CODE MỚI CHO TÍNH CALO ============
+
+// 1. Đọc "Từ điển Đơn vị"
+const conversionDBPath = path.join(__dirname, '..', '..', 'conversion_db.json');
+const conversionDB = JSON.parse(fs.readFileSync(conversionDBPath, 'utf8'));
+
+// 2. Hàm "Đoán" Tên Chuẩn (Helper function)
+function findMasterKey(ingredientName) {
+  const name = ingredientName.toLowerCase();
+  
+  if (name.includes('bột mì')) return 'bot_mi';
+  if (name.includes('trứng gà') || name.includes('trứng')) return 'trung_ga';
+  if (name.includes('đường')) return 'duong';
+  if (name.includes('nước mắm')) return 'nuoc_mam';
+  if (name.includes('hành lá')) return 'hanh_la';
+  if (name.includes('khoai tây')) return 'khoai_tay';
+  if (name.includes('cà rốt')) return 'ca_rot';
+  if (name.includes('cá ngừ')) return 'ca_ngu_hop';
+  if (name.includes('mayonnaise')) return 'mayonnaise';
+  if (name.includes('thịt bò')) return 'thit_bo';
+  if (name.includes('thịt heo')) return 'thit_heo';
+  if (name.includes('thịt gà')) return 'thit_ga';
+  if (name.includes('dầu ăn')) return 'dau_an';
+  
+  return null;
+}
+
+// 3. Hàm Service "Lõi Tính Toán"
+const calculateNutrition = async (body) => {
+  const { ingredients } = body; 
+
+  if (!ingredients || !Array.isArray(ingredients)) {
+    throw new ApiError(400, "Input không hợp lệ.");
+  }
+
+  // 1. Lấy "Từ điển Calo" từ Database
+  // --- SỬA LỖI 3: Dùng 'IngredientsMaster', không phải 'prisma' ---
+  const allMasterData = await IngredientsMaster.findAll();
+
+  // 2. Chuyển nó thành object để tra cứu
+  const masterDataMap = allMasterData.reduce((acc, item) => {
+    acc[item.name_key] = item;
+    return acc;
+  }, {});
+
+  let totalCalories = 0;
+  let calculationDetails = [];
+
+  // 3. Lặp và tính toán
+  for (const item of ingredients) {
+    const unitKey = item.unit.toLowerCase().trim();
+    const conversionRate = conversionDB[unitKey];
+    const masterKey = findMasterKey(item.name);
+    
+    if (!conversionRate || !masterKey || !masterDataMap[masterKey]) {
+      calculationDetails.push({ name: item.name, status: "error", message: "Không có dữ liệu dinh dưỡng hoặc đơn vị" });
+      continue;
+    }
+
+    const nutritionInfo = masterDataMap[masterKey];
+    const quantity = parseFloat(item.quantity);
+
+    if (isNaN(quantity) || quantity === 0) {
+      // Bỏ qua nếu số lượng không hợp lệ hoặc = 0 (ví dụ: "ít", "vừa đủ")
+      calculationDetails.push({ name: item.name, status: "skipped", message: "Số lượng không xác định" });
+      continue;
+    }
+
+    // 5. PHÉP TÍNH
+    const quantityInGrams = quantity * conversionRate;
+    const calories = (quantityInGrams / 100) * nutritionInfo.calories_per_100g;
+
+    totalCalories += calories;
+    calculationDetails.push({
+      name: nutritionInfo.display_name,
+      quantity_g: parseFloat(quantityInGrams.toFixed(2)),
+      calories: parseFloat(calories.toFixed(2)),
+      status: "success"
+    });
+  }
+
+  // 6. Trả kết quả
+  return {
+    total_calories: parseFloat(totalCalories.toFixed(2)),
+    details: calculationDetails
+  };
+};
+
+// ============ KẾT THÚC CODE MỚI ============
+
 // 9. CẬP NHẬT EXPORTS
 module.exports = {
   createRecipe,
@@ -152,7 +252,8 @@ module.exports = {
   getAllRecipes,
   updateRecipe,
   deleteRecipe,
-  toggleFavoriteRecipe, // Thêm
-  getRecipeCounts, // Thêm
+  toggleFavoriteRecipe,
+  getRecipeCounts,
   getMyRecipes,
+  calculateNutrition, // (Đã export)
 };
