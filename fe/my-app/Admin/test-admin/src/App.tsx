@@ -57,12 +57,12 @@ export const App = () => {
         create={RecipeCreate}
         />
         <Resource
-        icon={EmojiEventsIcon}
-        name="challenges"
-        list={ChallengeList}
-        create={ChallengeCreate}
-        edit={ChallengeEdit}
-        />
+         icon={EmojiEventsIcon}
+         name="challenges"
+         list={ChallengeList}
+        create={ChallengeCreate}
+        edit={ChallengeEdit}
+        />
     </Admin>
   );
 }

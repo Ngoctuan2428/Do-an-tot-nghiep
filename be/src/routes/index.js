@@ -7,6 +7,8 @@ const adminRoutes = require("./admin.routes");
 const chatbotRoutes = require("./chatbot.routes");
 const searchRoutes = require("./search.routes");
 const mediaRoutes = require("./media.routes");
+const challengeRoutes = require("./challenge.routes");
+const interactionRoutes = require("./interaction.routes"); // ✅ Import
 
 const router = express.Router();
 
@@ -19,5 +21,7 @@ router.use("/admin", adminRoutes);
 router.use("/chatbot", chatbotRoutes);
 router.use("/search", searchRoutes);
 router.use("/media", mediaRoutes);
+router.use("/challenges", challengeRoutes);
+router.use("/interactions", interactionRoutes);
 
 module.exports = router;

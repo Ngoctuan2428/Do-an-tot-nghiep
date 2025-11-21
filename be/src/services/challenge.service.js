@@ -1,151 +1,50 @@
 // src/services/challenge.service.js
+const { Challenge, Recipe, User } = require("../models");
+const { Op } = require("sequelize");
+const ApiError = require("../utils/ApiError");
 
-// ⚡ SỬA LỖI IMPORT TẠI ĐÂY
-// 1. Import models VÀ sequelize instance từ file index
-const { Challenge, Recipe, User, sequelize } = require('../models');
-// 2. Import Op (Operators) từ chính thư viện 'sequelize'
-const { Op } = require('sequelize'); 
-
-const ApiError = require('../utils/ApiError');
-
-// ===================================
-// ⚡ HÀM CHO ADMIN (CRUD)
-// ===================================
-
-/**
- * [Admin] Tạo thử thách mới
- */
-const createChallenge = async (challengeData) => {
-  // Slug sẽ được tự động tạo bởi hook trong model
-  const newChallenge = await Challenge.create(challengeData);
-  return newChallenge;
-};
-
-/**
- * [Admin] Cập nhật thử thách
- */
-const updateChallenge = async (challengeId, updateData) => {
-  const challenge = await Challenge.findByPk(challengeId);
-  if (!challenge) {
-    throw new ApiError(404, 'Challenge not found');
+// (Admin) Tạo thử thách mới
+const createChallenge = async (data) => {
+  // Đảm bảo hashtag luôn bắt đầu bằng dấu #
+  if (data.hashtag && !data.hashtag.startsWith("#")) {
+    data.hashtag = `#${data.hashtag}`;
   }
-  
-  await challenge.update(updateData);
-  return challenge;
+  return await Challenge.create(data);
 };
 
-/**
- * [Admin] Xóa thử thách
- */
-const deleteChallenge = async (challengeId) => {
-  const challenge = await Challenge.findByPk(challengeId);
-  if (!challenge) {
-    throw new ApiError(404, 'Challenge not found');
-  }
-  
-  // Bảng ChallengeRecipe sẽ tự động xóa theo (nhờ 'ON DELETE CASCADE' trong CSDL)
-  await challenge.destroy();
-  return { message: 'Challenge deleted successfully' };
-};
-
-// ===================================
-// ⚡ HÀM CÔNG KHAI (PUBLIC)
-// ===================================
-
-/**
- * Lấy tất cả thử thách, phân loại theo trạng thái
- */
+// (Public) Lấy tất cả thử thách
 const getAllChallenges = async () => {
-  const now = new Date();
-
-  // 1. Lấy thử thách đang diễn ra
-  // Code này bây giờ sẽ chạy đúng vì 'Op' đã được định nghĩa
-  const ongoing = await Challenge.findAll({
-    where: {
-      start_date: { [Op.lte]: now }, 
-      end_date: { [Op.gte]: now } 
-    },
-    order: [['end_date', 'ASC']] 
-  });
-
-  // 2. Lấy thử thách sắp diễn ra
-  const upcoming = await Challenge.findAll({
-    where: {
-      start_date: { [Op.gt]: now } 
-    },
-    order: [['start_date', 'ASC']]
-  });
-
-  // 3. (Tùy chọn) Lấy thử thách đã kết thúc
-  const ended = await Challenge.findAll({
-    where: {
-      end_date: { [Op.lt]: now } 
-    },
-    order: [['end_date', 'DESC']],
-    limit: 5 
-  });
-
-  return { ongoing, upcoming, ended };
+  return await Challenge.findAll({ order: [["created_at", "DESC"]] });
 };
 
-/**
- * Lấy chi tiết 1 thử thách (và đếm số món ăn)
- */
-const getChallengeDetails = async (challengeId) => {
-  const challenge = await Challenge.findByPk(challengeId, {
-    attributes: {
-      include: [
-        [
-      	// Sửa cú pháp SQL cho MySQL (dùng backtick ``)
-          sequelize.literal(`(
-            SELECT COUNT(*)
-            FROM \`ChallengeRecipe\` AS cr
-            WHERE cr.challenge_id = \`Challenge\`.\`id\`
-          )`),
-          'recipeCount'
-        ]
-      ]
-    }
+// (Public) Lấy chi tiết 1 thử thách bằng hashtag
+const getChallengeByHashtag = async (hashtag) => {
+  const challenge = await Challenge.findOne({
+    where: { hashtag: `#${hashtag}` }, // Đảm bảo tìm đúng hashtag
   });
-  if (!challenge) {
-    throw new ApiError(404, 'Challenge not found');
-  }
+  if (!challenge) throw new ApiError(404, "Không tìm thấy thử thách");
   return challenge;
 };
 
-/**
- * Lấy các món ăn của 1 thử thách (phân trang)
- */
-const getRecipesForChallenge = async (challengeId, queryOptions) => {
-  const { page = 1, limit = 10 } = queryOptions;
-  const offset = (page - 1) * limit;
+// (Public) Lấy các món đã tham gia thử thách (Tìm theo hashtag)
+const getChallengeParticipants = async (hashtag) => {
+  const tag = `#${hashtag}`;
 
-  const challenge = await Challenge.findByPk(challengeId);
-  if (!challenge) {
-    throw new ApiError(404, 'Challenge not found');
-  }
-
-  // Dùng hàm getRecipes() mà Sequelize tự tạo
-  const recipes = await challenge.getRecipes({
-    limit: parseInt(limit),
-    offset: parseInt(offset),
-    joinTableAttributes: [], // Không lấy thông tin bảng trung gian
-    // Thêm include để lấy thông tin tác giả món ăn
-    include: [
-      { model: User, attributes: ['id', 'username'] }
-    ]
+  const recipes = await Recipe.findAndCountAll({
+    where: {
+      status: "public", // Chỉ món đã lên sóng
+      description: { [Op.like]: `%${tag}%` }, // Có hashtag trong mô tả
+    },
+    include: [{ model: User, attributes: ["id", "username", "avatar_url"] }],
+    order: [["created_at", "DESC"]],
+    limit: 50, // Giới hạn 50 món mới nhất
   });
-  
   return recipes;
 };
 
 module.exports = {
-  // Hàm cho Admin
   createChallenge,
-  updateChallenge,
-  deleteChallenge,
-  // Hàm công khai
   getAllChallenges,
-  getChallengeDetails,
-  getRecipesForChallenge,
+  getChallengeByHashtag,
+  getChallengeParticipants,
 };

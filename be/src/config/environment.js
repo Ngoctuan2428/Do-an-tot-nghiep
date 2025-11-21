@@ -4,7 +4,8 @@ require("dotenv").config();
 // Tạo một object config để quản lý các biến môi trường
 const config = {
   // Cấu hình server
-  port: process.env.PORT || 8080,
+  // Đảm bảo PORT=8000 trong file .env của bạn
+  port: process.env.PORT || 8000,
 
   // Cấu hình database
   db: {
@@ -25,13 +26,15 @@ const config = {
   google: {
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "/api/auth/google/callback",
+    // ✅ SỬA LỖI: Dùng URL tuyệt đối
+    callbackURL: "http://localhost:8000/api/auth/google/callback",
   },
   facebook: {
     clientID: process.env.FACEBOOK_APP_ID || "YOUR_FACEBOOK_APP_ID_HERE",
     clientSecret:
       process.env.FACEBOOK_APP_SECRET || "YOUR_FACEBOOK_APP_SECRET_HERE",
-    callbackURL: "/api/auth/facebook/callback",
+    // ✅ SỬA LỖI: Dùng URL tuyệt đối
+    callbackURL: "http://localhost:8000/api/auth/facebook/callback",
   },
 };
 

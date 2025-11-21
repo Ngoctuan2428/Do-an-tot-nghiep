@@ -1,35 +1,20 @@
 // src/routes/challenge.routes.js
-const express = require('express');
-const challengeController = require('../controllers/challenge.controller');
-const { protect, restrictTo } = require('../middlewares/auth.middleware');
+const express = require("express");
+const challengeController = require("../controllers/challenge.controller");
+const { protect, isAdmin } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
 
-// === Route công khai cho người dùng ===
+// GET /api/challenges/ (Public) - Lấy danh sách
+router.get("/", challengeController.getAllChallenges);
 
-// GET /api/challenges
-// Lấy danh sách tất cả thử thách (đang diễn ra, sắp diễn ra)
-router.get('/', challengeController.getAllChallenges);
+// POST /api/challenges/ (Admin) - Tạo mới
+router.post("/", protect, isAdmin, challengeController.createChallenge);
 
-// GET /api/challenges/:id
-// Lấy chi tiết 1 thử thách
-router.get('/:id', challengeController.getChallengeDetails);
+// GET /api/challenges/monchay7ngay (Public) - Lấy chi tiết
+router.get("/:hashtag", challengeController.getChallengeDetail);
 
-// GET /api/challenges/:id/recipes
-// Lấy danh sách món ăn đã tham gia thử thách này (có phân trang)
-router.get('/:id/recipes', challengeController.getRecipesForChallenge);
-
-
-// === Route cho Admin (tạo/sửa/xóa thử thách) ===
-router.use(protect, restrictTo('admin'));
-
-// POST /api/challenges
-router.post('/', challengeController.createChallenge);
-
-// PATCH /api/challenges/:id
-router.patch('/:id', challengeController.updateChallenge);
-
-// DELETE /api/challenges/:id
-router.delete('/:id', challengeController.deleteChallenge);
+// GET /api/challenges/monchay7ngay/participants (Public) - Lấy danh sách món tham gia
+router.get("/:hashtag/participants", challengeController.getParticipants);
 
 module.exports = router;

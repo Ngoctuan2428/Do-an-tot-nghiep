@@ -111,11 +111,118 @@ const getMyRecipes = async (req, res, next) => {
   }
 };
 
-const calculateNutrition = async (req, res, next) => {
+/**
+ * @desc    Lấy món ăn đã lưu
+ * @route   GET /api/recipes/saved
+ * @access  Private
+ */
+const getSavedRecipes = async (req, res, next) => {
   try {
-    // Chỉ cần chuyển req.body cho service xử lý
-    const result = await recipeService.calculateNutrition(req.body);
+    const userId = req.user.id;
+    const recipes = await recipeService.getSavedRecipes(userId);
+    res.status(200).json({ status: "success", data: recipes });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Lấy món ăn đã đăng
+ * @route   GET /api/recipes/published
+ * @access  Private
+ */
+const getPublishedRecipes = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const recipes = await recipeService.getPublishedRecipes(userId);
+    res.status(200).json({ status: "success", data: recipes });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Lấy món ăn nháp
+ * @route   GET /api/recipes/drafts
+ * @access  Private
+ */
+const getDraftRecipes = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const recipes = await recipeService.getDraftRecipes(userId);
+    res.status(200).json({ status: "success", data: recipes });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const likeRecipe = async (req, res, next) => {
+  try {
+    const userId = req.user.id; // Lấy ID user từ token
+    const recipeId = req.params.id;
+    const result = await recipeService.toggleLike(userId, recipeId);
     res.status(200).json({ status: "success", data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getLikedRecipesIds = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const ids = await recipeService.getLikedRecipesIds(userId);
+    res.status(200).json({ status: "success", data: ids });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getRecipeReacters = async (req, res, next) => {
+  try {
+    const { id } = req.params; // recipeId
+    const result = await recipeService.getRecipeReacters(id, req.query);
+    res.status(200).json({ status: "success", data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ✅ CONTROLLER MỚI: Xử lý gửi Cooksnap
+const sendCooksnap = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const recipeId = req.params.id;
+    // Frontend sẽ gửi imageUrl lên trong body sau khi upload xong
+    const { imageUrl, comment } = req.body;
+
+    const result = await recipeService.markRecipeAsCooked(
+      userId,
+      recipeId,
+      imageUrl,
+      comment
+    );
+    res.status(201).json({ status: "success", data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ✅ CONTROLLER MỚI: Lấy danh sách đã nấu
+const getCookedRecipes = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const recipes = await recipeService.getCookedRecipesList(userId);
+    res.status(200).json({ status: "success", data: recipes });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getPublicRecipesByUserId = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const recipes = await recipeService.getPublicRecipesByUserId(userId);
+    res.status(200).json({ status: "success", data: recipes });
   } catch (error) {
     next(error);
   }
@@ -130,5 +237,13 @@ module.exports = {
   saveRecipe,
   getRecipeCounts,
   getMyRecipes,
-  calculateNutrition,
+  getSavedRecipes,
+  getPublishedRecipes,
+  getDraftRecipes,
+  likeRecipe,
+  getLikedRecipesIds,
+  getRecipeReacters,
+  sendCooksnap, // ✅ Export
+  getCookedRecipes, // ✅ Export (ghi đè nếu bạn đã có placeholder cũ)
+  getPublicRecipesByUserId,
 };

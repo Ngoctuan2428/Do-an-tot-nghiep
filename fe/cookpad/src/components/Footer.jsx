@@ -7,10 +7,10 @@ export default function Footer() {
         {/* Phần mô tả app */}
         <div className="text-center mb-6">
           <p className="text-sm text-gray-700 leading-relaxed mb-4 max-w-2xl mx-auto">
-            Về Cookpad: Làm cho việc nấu ăn trở nên dễ dàng và thú vị hơn với
-            hàng triệu công thức từ cộng đồng. Tìm kiếm và lưu công thức yêu
-            thích, chia sẻ với bạn bè, và khám phá nguyên liệu mới mỗi ngày.
-            Chúng tôi có hơn 100 triệu người dùng trên toàn thế giới!
+            Về PCook: Làm cho việc nấu ăn trở nên dễ dàng và thú vị hơn với hàng
+            triệu công thức từ cộng đồng. Tìm kiếm và lưu công thức yêu thích,
+            chia sẻ với bạn bè, và khám phá nguyên liệu mới mỗi ngày. Chúng tôi
+            có hơn 100 triệu người dùng trên toàn thế giới!
           </p>
           <a
             href="/premium"
@@ -53,7 +53,7 @@ export default function Footer() {
             Giới thiệu Premium
           </a>
           <a href="#" className="hover:text-cookpad-orange transition-colors">
-            Sử dụng Cookpad
+            Sử dụng PCook
           </a>
           <a href="#" className="hover:text-cookpad-orange transition-colors">
             Góp ý
@@ -70,7 +70,7 @@ export default function Footer() {
         </div>
 
         {/* Buttons tải app */}
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-6">
+        {/* <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-6">
           <a
             href="#"
             className="flex items-center px-4 py-2 bg-black text-white rounded-md text-sm hover:bg-gray-800 transition-colors"
@@ -93,11 +93,11 @@ export default function Footer() {
             />
             Tải trên App Store
           </a>
-        </div>
+        </div> */}
 
         {/* Copyright */}
         <div className="text-center text-xs text-gray-500 mb-4">
-          Bản quyền © Cookpad Inc. All Rights Reserved
+          Bản quyền © PCook Inc. All Rights Reserved
         </div>
       </div>
       {/* Minh họa rau củ ở dưới (dùng background SVG cho đơn giản, hoặc thêm image) */}

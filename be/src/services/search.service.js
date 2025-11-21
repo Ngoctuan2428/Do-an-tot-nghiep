@@ -135,8 +135,30 @@ async function getTrending(limit = 10) {
   return rows;
 }
 
+/**
+ * Lấy danh sách các Tag được dùng nhiều nhất (Trending)
+ */
+async function getTrendingTags(limit = 8) {
+  try {
+    // Dùng câu lệnh SQL thuần để đếm từ bảng trung gian 'recipe_tags'
+    const [results] = await db.sequelize.query(`
+        SELECT tag, COUNT(recipe_id) AS recipe_count
+        FROM recipe_tags
+        GROUP BY tag
+        ORDER BY recipe_count DESC
+        LIMIT ${parseInt(limit)}
+    `);
+    // results là một mảng object, ví dụ: [{ tag: 'thịt', recipe_count: 50 }]
+    return results.map((row) => row.tag); // Chỉ trả về mảng các tên tag
+  } catch (error) {
+    console.error("Lỗi khi lấy trending tags:", error);
+    return []; // Trả về mảng rỗng nếu lỗi
+  }
+}
+
 module.exports = {
   searchRecipes,
   getSuggestions,
   getTrending,
+  getTrendingTags,
 };

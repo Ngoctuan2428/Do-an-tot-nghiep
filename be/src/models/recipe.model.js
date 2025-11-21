@@ -34,7 +34,7 @@ const Recipe = sequelize.define(
     // ---- BỔ SUNG CÁC TRƯỜNG CÒN THIẾU ----
     servings: {
       // Khẩu phần ăn
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(100),
     },
     prep_time: {
       // Thời gian chuẩn bị (phút)

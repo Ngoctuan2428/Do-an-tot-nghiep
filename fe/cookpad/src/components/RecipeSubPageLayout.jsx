@@ -1,19 +1,19 @@
-import { useState } from "react";
-import { Search, Plus, Sparkles } from "lucide-react";
-import EmptyState from "./EmptyState";
-import { khoMonItems } from "../data/sidebarData"; // Giả sử bạn export array từ Sidebar hoặc tạo file data riêng
+import { useState } from 'react';
+import { Search, Plus, Sparkles } from 'lucide-react';
+import EmptyState from './EmptyState';
+import { khoMonItems } from '../data/sidebarData'; // Giả sử bạn export array từ Sidebar hoặc tạo file data riêng
 
 export default function RecipeSubPageLayout({
   title,
   count = 0,
   children,
-  descriptionEmpty = "Bạn chưa có món nào ở đây. Hãy thêm món yêu thích để lưu lại!",
+  descriptionEmpty = 'Bạn chưa có món nào ở đây. Hãy thêm món yêu thích để lưu lại!',
 }) {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleAddNew = () => {
     // TODO: Navigate to create recipe page
-    console.log("Thêm mới món:", title);
+    console.log('Thêm mới món:', title);
   };
 
   const currentItem = khoMonItems.find((item) => item.label === title); // Match với sidebar
@@ -57,7 +57,7 @@ export default function RecipeSubPageLayout({
               <Plus size={16} className="inline mr-1" /> Thêm mới
             </button>
             <img
-              src="https://placehold.co/32x32/E88413/FFFFFF?text=A" // ✅ Đã sửa
+              src="https://via.placeholder.com/32"
               alt="Avatar"
               className="w-8 h-8 rounded-full"
             />

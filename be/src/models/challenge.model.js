@@ -1,57 +1,44 @@
 // src/models/challenge.model.js
-const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../config/database').sequelize; // Giả sử bạn có file này
-const generateSlug = require('../utils/slugify'); // Dùng lại slugify
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/database");
 
-class Challenge extends Model {
-    // Có thể thêm các phương thức tùy chỉnh ở đây nếu cần
-}
-
-Challenge.init({
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  slug: {
-    type: DataTypes.STRING,
-    unique: true,
-  },
-  description: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  banner_image_url: {
-    type: DataTypes.STRING(500),
-    allowNull: true,
-  },
-  start_date: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  end_date: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-}, {
-  sequelize,
-  modelName: 'Challenge',
-  tableName: 'challenges',
-  timestamps: true, // Thử thách nên có created_at
-  hooks: {
-    beforeCreate: (challenge) => {
-      challenge.slug = generateSlug(challenge.title) + '-' + Date.now();
+const Challenge = sequelize.define(
+  "Challenge",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
     },
-    beforeUpdate: (challenge) => {
-      if (challenge.changed('title')) {
-        challenge.slug = generateSlug(challenge.title) + '-' + Date.now();
-      }
+    title: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    image_url: {
+      type: DataTypes.STRING(512),
+      allowNull: true,
+    },
+    // Dùng hashtag để user tham gia (ví dụ: #monchay7ngay)
+    hashtag: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      unique: true, // Mỗi thử thách có 1 hashtag duy nhất
+    },
+    end_date: {
+      type: DataTypes.DATE,
+      allowNull: true, // Ngày kết thúc
     },
   },
-});
+  {
+    tableName: "challenges",
+    timestamps: true,
+    createdAt: "created_at",
+    updatedAt: "updated_at",
+  }
+);
 
 module.exports = Challenge;
