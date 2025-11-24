@@ -1,32 +1,52 @@
-// src/pages/LoginCallback.jsx
-import { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import React, { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext'; // ✅ IMPORT CONTEXT
+import { getCurrentUser } from '../services/userApi'; // ✅ IMPORT HÀM LẤY PROFILE
 
-export default function LoginCallback() {
-  const [searchParams] = useSearchParams();
+const LoginCallback = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
 
   useEffect(() => {
-    const token = searchParams.get("token");
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token');
 
     if (token) {
-      // 1. Lưu token vào localStorage
-      localStorage.setItem("token", token);
+      // ✅ [2] LƯU TOKEN VÀ GỌI API PROFILE (SỬ DỤNG TOKEN MỚI)
+      
+      // Bước 2a: Lưu token vào localStorage (Để Context có thể đọc được sau này)
+      localStorage.setItem('accessToken', token); 
+      
+      // Bước 2b: Gọi API để lấy dữ liệu User thực tế
+      const fetchAndLogin = async () => {
+        try {
+          // getCurrentUser sẽ dùng token vừa lưu qua interceptor
+          const response = await getCurrentUser(); 
+          const userData = response.data; 
 
-      // 2. Chuyển hướng về trang chủ và TẢI LẠI TRANG
-      // Dùng window.location.replace để buộc tải lại,
-      // giúp Header và các component khác nhận biết trạng thái đăng nhập mới
-      window.location.replace("/");
+          // ✅ [3] CẬP NHẬT CONTEXT: BƯỚC QUAN TRỌNG NHẤT
+          login(userData, token); 
+
+          // Chuyển hướng thành công
+          navigate('/', { replace: true }); 
+
+        } catch (error) {
+          console.error("Login callback error:", error);
+          localStorage.removeItem('accessToken');
+          navigate('/login', { replace: true });
+        }
+      };
+
+      fetchAndLogin();
+
     } else {
-      // 3. Xử lý lỗi (nếu không có token)
-      console.error("Đăng nhập thất bại, không tìm thấy token.");
-      navigate("/?login=failed"); // Chuyển về trang chủ báo lỗi
+      console.error('Login failed: Token not found in URL.');
+      navigate('/login', { replace: true });
     }
-  }, [searchParams, navigate]);
+  }, [location, navigate, login]); // Đã thêm login vào dependency
 
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <p className="text-lg">Đang xử lý đăng nhập, vui lòng chờ...</p>
-    </div>
-  );
-}
+  return <div>Đang hoàn tất đăng nhập...</div>; 
+};
+
+export default LoginCallback;

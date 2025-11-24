@@ -1,74 +1,4 @@
-// import RecipeCard from '../components/RecipeCard';
 
-// const recipes = [
-//   {
-//     id: 1,
-//     title: 'Thịt',
-//     image: 'https://via.placeholder.com/300x200?text=Thịt+Kho+Tàu',
-//     premium: false,
-//     views: 1200,
-//     likes: 250,
-//   },
-//   {
-//     id: 2,
-//     title: 'Bánh mì',
-//     image: 'https://via.placeholder.com/300x200?text=Bánh+Mì',
-//     premium: true,
-//     views: 800,
-//     likes: 180,
-//   },
-//   {
-//     id: 3,
-//     title: 'Cá',
-//     image: 'https://via.placeholder.com/300x200?text=Bánh+Mì',
-//     premium: true,
-//     views: 1800,
-//     likes: 120,
-//   },
-//   {
-//     id: 4,
-//     title: 'Đậu hũ',
-//     image: 'https://via.placeholder.com/300x200?text=Bánh+Mì',
-//     premium: true,
-//     views: 80,
-//     likes: 10,
-//   },
-//   {
-//     id: 5,
-//     title: 'Cá tầm',
-//     image: 'https://via.placeholder.com/300x200?text=Bánh+Mì',
-//     premium: true,
-//     views: 2570,
-//     likes: 102,
-//   },
-//   {
-//     id: 6,
-//     title: 'Trứng',
-//     image: 'https://via.placeholder.com/300x200?text=Bánh+Mì',
-//     premium: true,
-//     views: 1450,
-//     likes: 450,
-//   },
-//   {
-//     id: 7,
-//     title: 'Món ngon mỗi ngày',
-//     image: 'https://via.placeholder.com/300x200?text=Bánh+Mì',
-//     premium: true,
-//     views: 3500,
-//     likes: 3000,
-//   },
-//   {
-//     id: 8,
-//     title: 'Spaghetti',
-//     image: 'https://via.placeholder.com/300x200?text=Bánh+Mì',
-//     premium: true,
-//     views: 2090,
-//     likes: 235,
-//   },
-// ];
-
-// export default function Home() {
-//   return (
 //     <main className="max-w-7xl mx-auto p-6">
 //       {/* Banner */}
 //       <div className="bg-gradient-to-r from-cookpad-orange to-cookpad-yellow text-white p-6 rounded-lg mb-6 text-center">
@@ -118,7 +48,7 @@ export default function Home() {
     {
       id: 2,
       title:
-        'Tải ứng dụng Cookpad để tạo công thức nấu ăn của bạn trong vài phút với trợ lý AI',
+        'Sử dụng PCook để tạo công thức nấu ăn của bạn trong vài phút với trợ lý AI',
       desc: 'Chỉ cần mở trình chỉnh sửa công thức, trả lời các câu hỏi mà trợ lý của chúng tôi hỏi về công thức bạn muốn tạo, và ngay cả khi bạn không nhớ hết mọi chi tiết, trợ lý của chúng tôi sẽ tạo công thức cho bạn – bao gồm cả phần nguyên liệu và hướng dẫn từng bước. Thật nhanh chóng và dễ dàng để chia sẻ các món ăn yêu thích của bạn!',
       subdesc:
         'Nếu bạn muốn tự tạo chi tiết, chỉ cần bấm “Bỏ qua” để chuyển đến trình chỉnh sửa công thức thông thường không dùng AI. Tuỳ bạn chọn nhé!',
@@ -158,20 +88,6 @@ export default function Home() {
               </p>
               {section.subdesc && (
                 <p className="text-gray-600 text-sm mb-4">{section.subdesc}</p>
-              )}
-              {section.id === 2 && (
-                <a
-                  href="https://play.google.com/store/apps"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block mt-2"
-                >
-                  <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
-                    alt="Google Play"
-                    className="w-40"
-                  />
-                </a>
               )}
             </div>
 

@@ -7,17 +7,11 @@ export default function Footer() {
         {/* Phần mô tả app */}
         <div className="text-center mb-6">
           <p className="text-sm text-gray-700 leading-relaxed mb-4 max-w-2xl mx-auto">
-            Về Cookpad: Làm cho việc nấu ăn trở nên dễ dàng và thú vị hơn với
+            Về Pcook: Làm cho việc nấu ăn trở nên dễ dàng và thú vị hơn với
             hàng triệu công thức từ cộng đồng. Tìm kiếm và lưu công thức yêu
             thích, chia sẻ với bạn bè, và khám phá nguyên liệu mới mỗi ngày.
             Chúng tôi có hơn 100 triệu người dùng trên toàn thế giới!
           </p>
-          <a
-            href="/premium"
-            className="text-sm text-cookpad-orange font-semibold underline hover:no-underline"
-          >
-            Đăng ký Gold Premium để truy cập công thức độc quyền và ưu đãn khác!
-          </a>
         </div>
 
         {/* Danh sách quốc gia */}
@@ -50,9 +44,6 @@ export default function Footer() {
         {/* Phần Tìm Hiểu Thêm */}
         <div className="flex flex-wrap justify-center gap-4 mb-6 text-xs text-gray-600">
           <a href="#" className="hover:text-cookpad-orange transition-colors">
-            Giới thiệu Premium
-          </a>
-          <a href="#" className="hover:text-cookpad-orange transition-colors">
             Sử dụng Cookpad
           </a>
           <a href="#" className="hover:text-cookpad-orange transition-colors">
@@ -68,32 +59,7 @@ export default function Footer() {
             Liên hệ
           </a>
         </div>
-
-        {/* Buttons tải app */}
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-6">
-          <a
-            href="#"
-            className="flex items-center px-4 py-2 bg-black text-white rounded-md text-sm hover:bg-gray-800 transition-colors"
-          >
-            <img
-              src="https://developer.android.com/studio/images/android-studio-logo.png"
-              alt="Google Play"
-              className="w-5 h-5 mr-2"
-            />
-            Tải trên Google Play
-          </a>
-          <a
-            href="#"
-            className="flex items-center px-4 py-2 bg-black text-white rounded-md text-sm hover:bg-gray-800 transition-colors"
-          >
-            <img
-              src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
-              alt="App Store"
-              className="w-5 h-5 mr-2"
-            />
-            Tải trên App Store
-          </a>
-        </div>
+  
 
         {/* Copyright */}
         <div className="text-center text-xs text-gray-500 mb-4">

@@ -16,7 +16,7 @@ import axiosInstance from "./axiosClient";
  * @returns {Promise<AxiosResponse>}
  */
 export const getCurrentUser = () => {
-  return axiosInstance.get("/users/me"); // ⬅️ Sửa thành /users/me
+  return axiosInstance.get("/users/me");
 };
 
 /**

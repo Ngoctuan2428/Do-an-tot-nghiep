@@ -3,42 +3,30 @@ import { useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import {
   Search,
-  Crown,
+  BookOpen,
   BarChart3,
   Award,
-  BookOpen, // Thay thế cho Search trong kho món
   GraduationCap,
-  Refrigerator,
-  ShoppingBag,
   ChevronDown,
   ChevronRight,
-  ChevronLeft,
-  Plus,
-  Bookmark,
-  CheckCircle,
-  User,
-  FileText,
-  Edit3,
-  Clock,
-  Globe,
-  Lock,
   ChevronsLeft,
   ChevronsRight,
   ArrowDownToLine,
+  Plus,
 } from "lucide-react";
-import { khoMonItems } from "../data/sidebarData"; // Vẫn dùng để lấy (path, label, icon)
-import pCook from "../../public/pCook.png";
-
-// 1. Import Hook
+import { khoMonItems } from "../data/sidebarData"; 
 import { useRecipeCounts } from "../contexts/RecipeCountContext";
+import { useAuth } from '../contexts/AuthContext'; // ✅ ĐÃ IMPORT useAuth
 
 export default function Sidebar() {
   const location = useLocation();
+  const { user } = useAuth(); // 👈 LẤY TRẠNG THÁI ĐĂNG NHẬP
+  
   const [isKhoMonOpen, setIsKhoMonOpen] = useState(true);
-  const [isCollapsed, setIsCollapsed] = useState(false); // Mặc định mở rộng; toggle chỉ trên lg+
+  const [isCollapsed, setIsCollapsed] = useState(false); 
 
-  // 2. Lấy 'counts' động từ Context
-  const { counts } = useRecipeCounts();
+  // Lấy 'counts' động từ Context (sẽ là rỗng nếu chưa đăng nhập)
+  const { counts } = useRecipeCounts(); 
 
   const handleDownloadApp = () => {
     console.log("Tải ứng dụng");
@@ -48,67 +36,27 @@ export default function Sidebar() {
   };
 
   const mainMenu = [
-    {
-      path: "/search",
-      label: "Tìm kiếm",
-      icon: Search, // Đổi icon cho phù hợp
-      active: location.pathname === "/search",
-    },
-    {
-      path: "/premium",
-      label: "Premium",
-      icon: Crown,
-      active: location.pathname === "/premium",
-    },
-    {
-      path: "/stats",
-      label: "Thống kê bếp",
-      icon: BarChart3,
-      active: location.pathname === "/stats",
-    },
-    {
-      path: "/challenges",
-      label: "Thử thách",
-      icon: Award,
-      active: location.pathname === "/challenges",
-    },
-    {
-      path: "/interactions",
-      label: "Tương tác",
-      icon: GraduationCap,
-      active: location.pathname === "/interactions",
-    },
+    { path: "/search", label: "Tìm kiếm", icon: Search, active: location.pathname === "/search" },
+    { path: "/stats", label: "Thống kê bếp", icon: BarChart3, active: location.pathname === "/stats" },
+    { path: "/challenges", label: "Thử thách", icon: Award, active: location.pathname === "/challenges" },
+    { path: "/interactions", label: "Tương tác", icon: GraduationCap, active: location.pathname === "/interactions" },
   ];
 
-  // 3. Tạo mảng động: Kết hợp dữ liệu tĩnh (label, icon) với 'counts' từ Context
-  const dynamicKhoMonItems = khoMonItems.map((item) => {
-    // Lấy key từ path (vd: '/recipes/all' -> 'all')
-    const key = item.path.split("/").pop();
-
-    // Lấy count từ context, nếu không có (undefined) thì dùng count tĩnh (là 0)
-    const count = counts[key] !== undefined ? counts[key] : item.count;
-
-    return {
-      ...item,
-      count: count, // Ghi đè count
-    };
-  });
-
-  // Logic collapsed: Tự động true trên <lg, false trên lg+
   const effectiveCollapsed = isCollapsed || window.innerWidth < 1024;
-
-  // 3 icons chính cho bottom bar (<md)
-  const bottomBarIcons = mainMenu.slice(0, 3); // Tìm kiếm, Premium, Thống kê bếp
+  const bottomBarIcons = mainMenu.slice(0, 3); 
 
   return (
     <>
-      {/* Top bar cho md (768-1023px): Giữ nguyên như trước */}
+      {/* Top bar (md) và Bottom bar (sm) giữ nguyên, không cần sửa */}
+      {/* ... (Đã lược bỏ phần JSX không cần sửa) ... */}
+      
+      {/* Top bar cho md (768-1023px) */}
       <div className="md:block lg:hidden sticky top-0 z-40">
         <aside className="w-full h-auto bg-white border-b border-gray-200 flex flex-row justify-between items-center px-4 py-2 overflow-x-auto">
           {/* Logo + Download */}
           <div className="flex-shrink-0 flex items-center space-x-2">
             <Link to="/" className="flex items-center space-x-1">
-              <img src={pCook} className="w-8 h-8" alt="logo" />
+              <img src="/pCook.png" className="w-8 h-8" alt="logo" />
             </Link>
             <button
               onClick={handleDownloadApp}
@@ -152,7 +100,7 @@ export default function Sidebar() {
           {/* Logo trái */}
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center">
-              <img src={pCook} className="w-8 h-8" alt="logo" />
+              <img src="/pCook.png" className="w-8 h-8" alt="logo" />
             </Link>
           </div>
           {/* 3 icons chính giữa/phải (không labels, chỉ icons để gọn) */}
@@ -168,7 +116,7 @@ export default function Sidebar() {
                       ? "bg-cookpad-orange text-white"
                       : "text-gray-700 hover:bg-gray-100"
                   }`}
-                  title={item.label} // Tooltip cho accessibility
+                  title={item.label}
                 >
                   <Icon
                     size={20}
@@ -179,13 +127,13 @@ export default function Sidebar() {
             })}
           </nav>
           {/* Spacer phải (nếu cần align) */}
-          <div className="w-8" /> {/* Để cân bằng với logo */}
+          <div className="w-8" /> 
         </aside>
       </div>
-
-      {/* Desktop vertical sidebar - Giữ nguyên */}
+      
+      {/* Desktop vertical sidebar */}
       <aside
-        className={`hidden lg:block sticky top-0 z-40 h-screen bg-white border-r border-gray-200 flex flex-col justify-between items-center overflow-y-auto transition-all duration-300 ${
+        className={` lg:block sticky top-0 z-40 h-screen bg-white border-r border-gray-200 flex flex-col justify-between items-center overflow-y-auto transition-all duration-300 ${
           effectiveCollapsed ? "w-16" : "w-64"
         }`}
       >
@@ -203,7 +151,7 @@ export default function Sidebar() {
               effectiveCollapsed ? "space-x-0" : "space-x-2"
             }`}
           >
-            <img src={pCook} className="w-10" alt="logo" />
+            <img src="/pCook.png" className="w-10" alt="logo" />
             {!effectiveCollapsed && (
               <span className="text-lg ml-2 font-bold text-gray-900">
                 PCook
@@ -255,91 +203,103 @@ export default function Sidebar() {
             );
           })}
 
-          {/* Phần Kho Món Ngon - Chỉ hiện khi không collapsed */}
+          {/* 👈 [3] PHẦN KHO MÓN NGON - LOGIC CHÍNH ĐÃ SỬA */}
           {!effectiveCollapsed && (
-            <div className="mt-4">
-              <button
-                onClick={() => setIsKhoMonOpen(!isKhoMonOpen)}
-                className="w-full flex items-center justify-between px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-100"
-              >
-                <div className="flex items-center">
-                  <BookOpen size={18} className="mr-3 text-gray-500" />
-                  <span className="truncate">Kho món ngon của bạn</span>
-                </div>
-                {isKhoMonOpen ? (
-                  <ChevronDown size={18} />
-                ) : (
-                  <ChevronRight size={18} />
-                )}
-              </button>
+            <div className="mt-4 p-2">
+              <h3 className="flex items-center text-sm font-semibold text-gray-800 mb-3">
+                <BookOpen size={18} className="mr-3 text-gray-500" />
+                Kho Món Ngon Của Bạn
+              </h3>
+              
+              {user ? (
+                // ----------------------------------------------------
+                // HIỂN THỊ NỘI DUNG KHO MÓN KHI ĐÃ ĐĂNG NHẬP
+                // ----------------------------------------------------
+                <div>
+                  <button
+                    onClick={() => setIsKhoMonOpen(!isKhoMonOpen)}
+                    className="w-full flex items-center justify-between px-1 py-1 rounded-md text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <div className="flex items-center">
+                      <Search size={16} className="mr-3 text-gray-500" />
+                      <span className="truncate">Tìm trong kho món</span>
+                    </div>
+                    {isKhoMonOpen ? (
+                      <ChevronDown size={18} />
+                    ) : (
+                      <ChevronRight size={18} />
+                    )}
+                  </button>
 
-              {isKhoMonOpen && (
-                <div className="ml-6 space-y-1 mt-1">
-                  <input
-                    type="text"
-                    placeholder="Tìm trong kho món"
-                    className="w-full px-3 py-1 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-cookpad-orange"
-                  />
+                  {isKhoMonOpen && (
+                    <div className="ml-6 space-y-1 mt-1">
+                      <input
+                        type="text"
+                        placeholder="Tìm trong kho món"
+                        className="w-full px-3 py-1 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-cookpad-orange"
+                      />
 
-                  {/* 4. SỬ DỤNG MẢNG ĐỘNG Ở ĐÂY */}
-                  {dynamicKhoMonItems.map((subItem) => {
-                    const Icon = subItem.icon;
-                    const isActive = location.pathname === subItem.path;
-                    return (
-                      <Link
-                        key={subItem.path}
-                        to={subItem.path}
-                        className={`flex items-center px-2 py-1 rounded text-xs transition-colors ${
-                          isActive
-                            ? "bg-cookpad-orange text-white"
-                            : "text-gray-600 hover:bg-gray-100"
-                        }`}
-                      >
-                        <Icon
-                          size={14}
-                          className={`mr-2 flex-shrink-0 ${
-                            isActive ? "text-white" : "text-gray-500"
-                          }`}
-                        />
-                        <span className="truncate flex-1">{subItem.label}</span>
-                        <span
-                          className={`ml-auto text-xs ${
-                            isActive ? "text-white" : "text-gray-400"
-                          }`}
-                        >
-                          {/* Sử dụng count động */}
-                          {subItem.count} món
-                        </span>
-                      </Link>
-                    );
-                  })}
+                      {/* Lặp qua kho món và hiển thị count động */}
+                      {khoMonItems.map((item) => {
+                        const Icon = item.icon;
+                        const isActive = location.pathname === item.path;
+                        const key = item.path.split("/").pop();
+                        const count = counts[key] !== undefined ? counts[key] : item.count; 
+
+                        return (
+                          <Link
+                            key={item.path}
+                            to={item.path}
+                            className={`flex items-center px-2 py-1 rounded text-xs transition-colors ${
+                              isActive
+                                ? "bg-cookpad-orange text-white"
+                                : "text-gray-600 hover:bg-gray-100"
+                            }`}
+                          >
+                            <Icon
+                              size={14}
+                              className={`mr-2 flex-shrink-0 ${
+                                isActive ? "text-white" : "text-gray-500"
+                              }`}
+                            />
+                            <span className="truncate flex-1">{item.label}</span>
+                            <span
+                              className={`ml-auto text-xs ${
+                                isActive ? "text-white" : "text-gray-400"
+                              }`}
+                            >
+                              {count} món
+                            </span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
+              ) : (
+                // ----------------------------------------------------
+                // HIỂN THỊ THÔNG BÁO ĐĂNG NHẬP KHI CHƯA ĐĂNG NHẬP
+                // ----------------------------------------------------
+                <p className="text-sm text-gray-600 px-2">
+                    Để bắt đầu tạo kho lưu trữ món ngon của riêng bạn, vui lòng 
+                    <Link to="/register" className="text-cookpad-orange hover:underline mx-1 font-medium">đăng ký</Link>
+                    hoặc 
+                    <Link to="/login" className="text-cookpad-orange hover:underline ml-1 font-medium">đăng nhập</Link>.
+                </p>
               )}
             </div>
           )}
         </nav>
 
-        {/* Gợi ý dưới cùng - Chỉ khi không collapsed */}
-        {/* {!effectiveCollapsed && (
-          <div className="p-4 border-t border-gray-200 bg-gray-50">
-            <p className="text-xs text-gray-500 mb-2">
-              Gợi ý dựa trên tủ lạnh của bạn
-            </p>
-            <button className="w-full text-xs text-cookpad-orange hover:underline">
-              Bỏ qua
-            </button>
-          </div>
-        )} */}
+        {/* Floating + button (Giữ nguyên) */}
+        <button
+          onClick={handleAddRecipe}
+          className="md:hidden fixed bottom-4 right-4 z-50 w-14 h-14 bg-cookpad-orange text-white rounded-full shadow-lg flex items-center justify-center hover:bg-orange-500 transition-colors"
+          title="Thêm món"
+        >
+          <Plus size={24} />
+        </button>
       </aside>
-
-      {/* Floating + button - Chỉ hiện trên <md (sm-), fixed không scroll */}
-      <button
-        onClick={handleAddRecipe}
-        className="block md:hidden fixed bottom-4 right-4 z-50 w-14 h-14 bg-cookpad-orange text-white rounded-full shadow-lg flex items-center justify-center hover:bg-orange-500 transition-colors"
-        title="Thêm món"
-      >
-        <Plus size={24} />
-      </button>
     </>
   );
 }

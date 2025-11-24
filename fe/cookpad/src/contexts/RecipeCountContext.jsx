@@ -1,4 +1,5 @@
 // src/contexts/RecipeCountContext.jsx
+
 import {
   createContext,
   useContext,
@@ -6,7 +7,7 @@ import {
   useEffect,
   useCallback,
 } from "react";
-// ✅ Import thêm getLikedRecipesIds
+import { useAuth } from './AuthContext'; // 👈 [1] IMPORT useAuth
 import {
   getRecipeCounts,
   getSavedRecipes,
@@ -16,24 +17,28 @@ import {
 const RecipeCountContext = createContext();
 
 export function RecipeCountProvider({ children }) {
+  const { user } = useAuth(); // 👈 [2] LẤY USER TỪ CONTEXT
+  
   const [counts, setCounts] = useState({});
   const [savedRecipeIds, setSavedRecipeIds] = useState(new Set());
-  // ✅ THÊM STATE CHO LIKE
   const [likedRecipeIds, setLikedRecipeIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
 
+  // ✅ [SỬA ĐỔI] THÊM user VÀO DEPENDENCY ARRAY CỦA useCallback
   const refreshCounts = useCallback(async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    // Nếu user là null hoặc loading, reset state
+    if (!user) {
       setCounts({});
       setSavedRecipeIds(new Set());
-      setLikedRecipeIds(new Set()); // ✅ Reset
+      setLikedRecipeIds(new Set()); 
       setLoading(false);
       return;
     }
+    
+    // Logic fetch API
     try {
       setLoading(true);
-      // ✅ Gọi song song 3 API
+      // Giả định token đã được xử lý trong interceptor/axiosClient và user đã có
       const [countsRes, savedRes, likedRes] = await Promise.all([
         getRecipeCounts(),
         getSavedRecipes(),
@@ -41,25 +46,25 @@ export function RecipeCountProvider({ children }) {
       ]);
 
       setCounts(countsRes.data.data || {});
+      // Giả định savedRes.data.data.rows là mảng các đối tượng recipe có trường id
       setSavedRecipeIds(new Set(savedRes.data.data.rows.map((r) => r.id)));
-      // ✅ Lưu danh sách ID đã like
-      setLikedRecipeIds(new Set(likedRes.data.data));
+      // Giả định likedRes.data.data là mảng các ID
+      setLikedRecipeIds(new Set(likedRes.data.data)); 
     } catch (error) {
       console.error("Failed to fetch recipe data:", error);
-      // Reset nếu lỗi (ví dụ token hết hạn)
+      // Xóa token nếu lỗi 401 xảy ra trong interceptor
       setCounts({});
       setSavedRecipeIds(new Set());
       setLikedRecipeIds(new Set());
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]); // 👈 [3] CHỈ CHẠY LẠI KHI TRẠNG THÁI user THAY ĐỔI (LOGIN/LOGOUT)
 
   useEffect(() => {
     refreshCounts();
-  }, [refreshCounts]);
+  }, [refreshCounts]); 
 
-  // ✅ Thêm likedRecipeIds vào value
   const value = {
     counts,
     loading,

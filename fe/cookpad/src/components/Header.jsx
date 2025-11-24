@@ -1,15 +1,14 @@
-// src/components/Header.jsx
-import { useState, useMemo, useEffect } from "react"; // ⬅️ Thêm useEffect
-import { useLocation, useNavigate, Link } from "react-router-dom"; // ✅ Thêm Link vào đây
-import LoginModal from "./LoginModal";
-import { ChevronLeft, ArrowDownToLine, Plus } from "lucide-react";
-// import { getCurrentUser } from '../services/userApi'; // (Tùy chọn)
+import { useState, useMemo } from "react"; 
+import { useLocation, useNavigate, Link } from "react-router-dom"; 
+import { ChevronLeft, Plus, LogOut, Settings } from "lucide-react"; 
+// ✅ BẮT BUỘC: Import Context API
+import { useAuth } from '../contexts/AuthContext'; 
 
 const backPathMap = {
-  "/challenge/": "/challenges", // Quay về trang ds challenges
-  "/recipe/": "/", // Quay về trang chủ (hoặc /search)
-  "/profile": "/", // Đây là trang tĩnh, nên để '/profile'
-  "/create-recipe": "/", // Thêm ví dụ cho trang "Tạo mới"
+  "/challenge/": "/challenges",
+  "/recipe/": "/",
+  "/profile": "/",
+  "/create-recipe": "/",
   "/search/": "/search",
   "/recipes/": "/",
 };
@@ -17,7 +16,13 @@ const backPathMap = {
 export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
-
+  
+  // 👈 [1] LẤY user VÀ logout TỪ GLOBAL CONTEXT
+  const { user, logout } = useAuth(); 
+  
+  // State local chỉ dùng cho menu dropdown
+  const [isMenuOpen, setIsMenuOpen] = useState(false); 
+  
   const backPath = useMemo(() => {
     const matchingPrefix = Object.keys(backPathMap).find(
       (prefix) =>
@@ -26,42 +31,22 @@ export default function Header() {
     return backPathMap[matchingPrefix] || null;
   }, [location.pathname]);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  // const [userInfo, setUserInfo] = useState(null); // (Tùy chọn)
 
-  // ---- ⬇️ THÊM LOGIC KIỂM TRA ĐĂNG NHẬP ----
-  useEffect(() => {
-    // 1. Kiểm tra token trong localStorage khi component mount
-    const token = localStorage.getItem("token");
-
-    if (token) {
-      setIsLoggedIn(true);
-      // (Tùy chọn) Bạn có thể gọi API ở đây để lấy thông tin user thật
-      // const fetchUser = async () => {
-      //   try {
-      //     const res = await getCurrentUser();
-      //     setUserInfo(res.data);
-      //   } catch (error) {
-      //     console.error("Token hỏng, đăng xuất...", error);
-      //     localStorage.removeItem('token');
-      //     setIsLoggedIn(false);
-      //   }
-      // };
-      // fetchUser();
-    } else {
-      setIsLoggedIn(false);
-    }
-  }, []); // Chạy 1 lần khi tải trang
-
-  // ---- ⬇️ THÊM HÀM ĐĂNG XUẤT ----
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    setIsLoggedIn(false);
-    // setUserInfo(null);
-    navigate("/"); // Về trang chủ
+    logout(); // Gọi hàm logout từ Context
+    setIsMenuOpen(false);
+    navigate("/");
   };
-  // ---- ⬆️ KẾT THÚC THÊM LOGIC ----
+
+  const handleEditProfile = () => {
+      setIsMenuOpen(false);
+      navigate('/setting/account'); 
+  };
+  
+  const handleAdd = () => {
+      navigate('/create-recipe'); 
+  };
+
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
@@ -76,7 +61,7 @@ export default function Header() {
               <ChevronLeft size={20} />
             </button>
           ) : (
-            <div className="w-9 h-9" /> // Placeholder để giữ layout
+            <div className="w-9 h-9" /> 
           )}
         </div>
 
@@ -84,49 +69,51 @@ export default function Header() {
 
         {/* Actions */}
         <div className="flex-1 flex items-center justify-end space-x-4">
-          <div className="hidden md:flex items-center space-x-2">
-            <ArrowDownToLine size={20} className="text-gray-600" />
-            <button className="text-sm text-gray-600 hover:text-cookpad-orange">
-              Tải ứng dụng
-            </button>
-          </div>
 
-          {isLoggedIn ? (
-            <div className="flex items-center space-x-3">
-              {/* ✅ BỌC AVATAR TRONG LINK ĐẾN /profile */}
-              <Link to="/profile" className="flex-shrink-0">
-                <img
-                  src="https://placehold.co/32x32/E88413/FFFFFF?text=A"
-                  alt="Avatar"
-                  className="w-8 h-8 rounded-full border border-gray-200 hover:opacity-80 transition-opacity"
-                  onError={(e) => {
-                    e.target.src = "https://placehold.co/32x32";
-                  }}
-                />
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="text-sm text-gray-600 hover:text-cookpad-orange"
-              >
-                Đăng xuất
-              </button>
+          {user ? ( // 👈 [2] KIỂM TRA user TỪ CONTEXT
+            // ----------------------------------------------------
+            // HIỂN THỊ USERNAME VÀ DROPDOWN MENU KHI ĐÃ ĐĂNG NHẬP
+            // ----------------------------------------------------
+            <div className="relative z-50">
+                <button 
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    // ✅ [FIX] Thiết kế nút tinh tế (nền trắng, viền nhẹ)
+                    className="flex items-center space-x-2 px-3 py-1 rounded-full border border-gray-300 bg-white shadow-sm hover:bg-gray-100 transition focus:outline-none text-gray-800"
+                >
+                    <img 
+                        src={user.avatar_url} // Lấy avatar từ Context
+                        alt="Avatar"
+                        className="w-8 h-8 rounded-full object-cover"
+                    />
+                    {/* Username text */}
+                    <span className="text-sm font-medium hidden sm:block truncate max-w-[80px]">{user.username}</span> 
+                </button>
+                
+                {isMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-xl py-1 transform transition-all duration-150 origin-top-right z-50">
+                        
+                        <button onClick={handleEditProfile} className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            <Settings size={16} className="mr-3 text-cookpad-orange" /> Sửa thông tin cá nhân
+                        </button>
+                        
+                        <button onClick={handleLogout} className="w-full text-left flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition border-t mt-1 pt-1 border-gray-100">
+                            <LogOut size={16} className="mr-3" /> Đăng xuất
+                        </button>
+                    </div>
+                )}
             </div>
           ) : (
+            // HIỂN THỊ NÚT ĐĂNG NHẬP KHI CHƯA ĐĂNG NHẬP
             <button
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => navigate('/login')}
               className="px-4 py-2 bg-cookpad-orange text-white text-sm font-medium rounded-md hover:bg-orange-500 transition-colors"
             >
               Đăng nhập
             </button>
           )}
-          {/* ---- ⬆️ KẾT THÚC SỬA LOGIC ---- */}
 
-          <LoginModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-          />
           <button
-            onClick={() => navigate("/create-recipe")}
+            onClick={handleAdd}
             className="flex items-center px-4 py-2 bg-cookpad-orange text-white rounded-md hover:bg-orange-500 text-sm font-medium transition-colors"
           >
             <Plus size={16} className="inline mr-1" /> Thêm mới

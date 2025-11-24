@@ -10,9 +10,10 @@ const axiosClient = axios.create({
 // Add request interceptor
 axiosClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // ✅ Dùng 'accessToken'
+    const accessToken = localStorage.getItem("accessToken"); 
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
     return config;
   },
@@ -31,10 +32,10 @@ axiosClient.interceptors.response.use(
       !error.config.url.includes("/auth/")
     ) {
       // Handle unauthorized access
-      localStorage.removeItem("token");
+      // ✅ Dùng 'accessToken'
+      localStorage.removeItem("accessToken"); 
 
-      // ✅ SỬA: Chuyển hướng về trang Home (route gốc)
-      // Nếu không có token, trang Home sẽ mở LoginModal
+      // Chuyển hướng về trang Home (route gốc) để kích hoạt đăng nhập lại
       window.location.href = "/";
     }
     return Promise.reject(error);

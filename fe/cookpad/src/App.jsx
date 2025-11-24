@@ -25,7 +25,8 @@ import ChallengeDetail from "./components/ChallengeDetail";
 import Chatbox from "./components/Chatbox";
 import LoginCallback from "./pages/LoginCallback";
 import { RecipeCountProvider } from "./contexts/RecipeCountContext";
-
+import Login from "./pages/Login"; 
+import Register from "./pages/Register";
 function App() {
   return (
     <RecipeCountProvider>
@@ -41,7 +42,8 @@ function App() {
               <Route path="/stats" element={<Statistics />} />
               <Route path="/challenges" element={<Challenges />} />
               <Route path="/challenge/:hashtag" element={<ChallengeDetail />} />
-
+              <Route path="/login" element={<Login />} /> 
+              <Route path="/register" element={<Register />} />
               <Route path="/premium" element={<Premium />} />
               <Route path="/interactions" element={<Interactions />} />
               <Route path="/user/:id" element={<User />} />

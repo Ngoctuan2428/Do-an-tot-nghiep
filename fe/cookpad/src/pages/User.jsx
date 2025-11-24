@@ -11,7 +11,6 @@ import {
   Check,
   Camera,
 } from "lucide-react";
-// Import API
 import { getUserById, getUserStats, followUser } from "../services/userApi";
 import { getPublicRecipesByUserId } from "../services/recipeApi";
 
