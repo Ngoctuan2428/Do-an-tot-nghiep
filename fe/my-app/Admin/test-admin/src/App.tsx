@@ -1,37 +1,68 @@
 import { Admin, Resource } from "react-admin";
-import { Layout } from "./Layout";
-import { dataProvider } from "./dataProvider";
-import PostList from "./pages/posts/post-list";
-import PostEdit from "./pages/posts/post-edit";
-import PostCreate from "./pages/posts/post-create";
-import PostShow from "./pages/posts/post-show";
-import TodoList from "./pages/todos/todo-list";
-import TodoShow from "./pages/todos/todo-show";
-import UserShow from "./pages/users/user-show";
-import UserList from "./pages/users/user-list";
-import ArticleIcon from "@mui/icons-material/Article";
+import { Layout } from "./components/Layout";
+import { dataProvider } from "../services/dataProvider";
 import PersonIcon from "@mui/icons-material/Person";
-import { HomePage } from "./homepage";
-import { authProvider } from "./authProvider";
+import InventoryTwoToneIcon from '@mui/icons-material/InventoryTwoTone';
+import { HomePage } from "./pages/HomePage";
+import { authProvider } from "../services/authProvider";
+import { RecipeList } from "./pages/recipes/RecipesList";
+import { RecipeShow } from "./pages/recipes/RecipeShow";
+import { RecipeEdit } from "./pages/recipes/RecipeEdit";
+import { UserList } from "./pages/users/UserList";
+import { QueryClient } from "@tanstack/react-query";
 import "./mylogout.css";
+import { UserEdit } from "./pages/users/UserEdit";
+import { UserShow } from "./pages/users/UserShow";
+import { RecipeCreate } from "./pages/recipes/RecipeCreate";
+import { ChallengeList } from "./pages/challenges/ChallengeList";
+import { ChallengeCreate } from "./pages/challenges/ChallengeCreate";
+import { ChallengeEdit } from "./pages/challenges/ChalengeEdit";
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
+const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: (failureCount, error: any) => {
+          if (error.status === 401 || error.status === 403) {
+            return false; 
+          }
+          return failureCount < 2; 
+        },
+      },
+    },
+  });
 export const App = () => {
+  
   return (
     <Admin
       layout={Layout}
       dataProvider={dataProvider}
       dashboard={HomePage}
       authProvider={authProvider}
+      queryClient={queryClient}
     >
       <Resource
         icon={PersonIcon}
         name="users"
         list={UserList}
-        show={UserShow} />
+        show={UserShow} 
+        edit={UserEdit}
+        />
       <Resource
+        icon={InventoryTwoToneIcon}
         name="recipes"
-        list={TodoList}
-        show={TodoShow} />
+        list={RecipeList}
+        show={RecipeShow} 
+        edit={RecipeEdit}
+        create={RecipeCreate}
+        />
+        <Resource
+         icon={EmojiEventsIcon}
+         name="challenges"
+         list={ChallengeList}
+        create={ChallengeCreate}
+        edit={ChallengeEdit}
+        />
     </Admin>
   );
 }
