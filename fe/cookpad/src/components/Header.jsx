@@ -1,8 +1,9 @@
-import { useState, useMemo } from "react"; 
-import { useLocation, useNavigate, Link } from "react-router-dom"; 
-import { ChevronLeft, Plus, LogOut, Settings } from "lucide-react"; 
+import { useState, useMemo } from "react";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import { ChevronLeft, Plus, LogOut, Settings } from "lucide-react";
+import { ShieldCheck } from "lucide-react"; // Icon khiên cho admin
 // ✅ BẮT BUỘC: Import Context API
-import { useAuth } from '../contexts/AuthContext'; 
+import { useAuth } from "../contexts/AuthContext";
 
 const backPathMap = {
   "/challenge/": "/challenges",
@@ -16,13 +17,25 @@ const backPathMap = {
 export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // 👈 [1] LẤY user VÀ logout TỪ GLOBAL CONTEXT
-  const { user, logout } = useAuth(); 
-  
+  const { user, logout } = useAuth();
+
+  // 1. Cấu hình URL của trang Admin (Thay port cho đúng với máy bạn)
+  const ADMIN_URL = "http://localhost:3001"; // Ví dụ Admin chạy port 3000
+
+  const handleGoToAdmin = () => {
+    // Lấy token hiện tại
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+
+    // Chuyển hướng sang trang Admin kèm token trên URL
+    window.location.href = `${ADMIN_URL}/login-sso?token=${token}`;
+  };
+
   // State local chỉ dùng cho menu dropdown
-  const [isMenuOpen, setIsMenuOpen] = useState(false); 
-  
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const backPath = useMemo(() => {
     const matchingPrefix = Object.keys(backPathMap).find(
       (prefix) =>
@@ -31,7 +44,6 @@ export default function Header() {
     return backPathMap[matchingPrefix] || null;
   }, [location.pathname]);
 
-
   const handleLogout = () => {
     logout(); // Gọi hàm logout từ Context
     setIsMenuOpen(false);
@@ -39,14 +51,13 @@ export default function Header() {
   };
 
   const handleEditProfile = () => {
-      setIsMenuOpen(false);
-      navigate('/setting/account'); 
-  };
-  
-  const handleAdd = () => {
-      navigate('/create-recipe'); 
+    setIsMenuOpen(false);
+    navigate("/setting/account");
   };
 
+  const handleAdd = () => {
+    navigate("/create-recipe");
+  };
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
@@ -61,7 +72,7 @@ export default function Header() {
               <ChevronLeft size={20} />
             </button>
           ) : (
-            <div className="w-9 h-9" /> 
+            <div className="w-9 h-9" />
           )}
         </div>
 
@@ -69,43 +80,65 @@ export default function Header() {
 
         {/* Actions */}
         <div className="flex-1 flex items-center justify-end space-x-4">
+          {/* CHỈ HIỆN NÚT NÀY NẾU LÀ ADMIN */}
+          {user && user.role === "admin" && (
+            <button
+              onClick={handleGoToAdmin}
+              className="flex items-center gap-2 px-3 py-1 bg-gray-800 text-white rounded-full text-sm hover:bg-gray-700 transition"
+            >
+              <ShieldCheck size={16} />
+              Trang Quản Trị
+            </button>
+          )}
 
           {user ? ( // 👈 [2] KIỂM TRA user TỪ CONTEXT
             // ----------------------------------------------------
             // HIỂN THỊ USERNAME VÀ DROPDOWN MENU KHI ĐÃ ĐĂNG NHẬP
             // ----------------------------------------------------
             <div className="relative z-50">
-                <button 
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    // ✅ [FIX] Thiết kế nút tinh tế (nền trắng, viền nhẹ)
-                    className="flex items-center space-x-2 px-3 py-1 rounded-full border border-gray-300 bg-white shadow-sm hover:bg-gray-100 transition focus:outline-none text-gray-800"
-                >
-                    <img 
-                        src={user.avatar_url} // Lấy avatar từ Context
-                        alt="Avatar"
-                        className="w-8 h-8 rounded-full object-cover"
-                    />
-                    {/* Username text */}
-                    <span className="text-sm font-medium hidden sm:block truncate max-w-[80px]">{user.username}</span> 
-                </button>
-                
-                {isMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-xl py-1 transform transition-all duration-150 origin-top-right z-50">
-                        
-                        <button onClick={handleEditProfile} className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                            <Settings size={16} className="mr-3 text-cookpad-orange" /> Sửa thông tin cá nhân
-                        </button>
-                        
-                        <button onClick={handleLogout} className="w-full text-left flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition border-t mt-1 pt-1 border-gray-100">
-                            <LogOut size={16} className="mr-3" /> Đăng xuất
-                        </button>
-                    </div>
-                )}
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                // ✅ [FIX] Thiết kế nút tinh tế (nền trắng, viền nhẹ)
+                className="flex items-center space-x-2 px-3 py-1 rounded-full border border-gray-300 bg-white shadow-sm hover:bg-gray-100 transition focus:outline-none text-gray-800"
+              >
+                <img
+                  src={user.avatar_url || "https://placehold.co/100x100?text=U"}
+                  alt={user.username}
+                  className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "https://placehold.co/100x100?text=U";
+                  }}
+                />
+                {/* Username text */}
+                {/* <span className="text-sm font-medium hidden sm:block truncate max-w-[80px]">
+                  {user.username}
+                </span> */}
+              </button>
+
+              {isMenuOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-xl py-1 transform transition-all duration-150 origin-top-right z-50">
+                  <button
+                    onClick={handleEditProfile}
+                    className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <Settings size={16} className="mr-3 text-cookpad-orange" />{" "}
+                    Sửa thông tin cá nhân
+                  </button>
+
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition border-t mt-1 pt-1 border-gray-100"
+                  >
+                    <LogOut size={16} className="mr-3" /> Đăng xuất
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             // HIỂN THỊ NÚT ĐĂNG NHẬP KHI CHƯA ĐĂNG NHẬP
             <button
-              onClick={() => navigate('/login')}
+              onClick={() => navigate("/login")}
               className="px-4 py-2 bg-cookpad-orange text-white text-sm font-medium rounded-md hover:bg-orange-500 transition-colors"
             >
               Đăng nhập

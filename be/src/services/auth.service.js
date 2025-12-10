@@ -1,7 +1,20 @@
+const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 const bcrypt = require("bcryptjs");
 const { User } = require("../models");
 const ApiError = require("../utils/ApiError");
 const { generateToken } = require("../utils/jwt.helper");
+
+// Cấu hình transporter để gửi mail
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: process.env.EMAIL_PORT,
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 const registerUser = async (userData) => {
   const { username, email, password } = userData;
@@ -102,8 +115,67 @@ const findOrCreateUser = async (profile) => {
   }
 };
 
+// ✅ 1. HÀM MỚI: Yêu cầu quên mật khẩu
+const forgotPassword = async (email) => {
+  const user = await User.findOne({ where: { email } });
+  if (!user) {
+    throw new ApiError(404, "Email không tồn tại trong hệ thống.");
+  }
+
+  // Tạo token reset password (hết hạn sau 15 phút)
+  // Dùng mật khẩu hiện tại làm secret để khi đổi pass xong token cũ sẽ vô hiệu hóa ngay
+  const secret = process.env.JWT_SECRET + user.password_hash;
+  const token = jwt.sign({ id: user.id, email: user.email }, secret, {
+    expiresIn: "15m",
+  });
+
+  // Link reset password gửi về email
+  const resetLink = `${process.env.FRONTEND_URL}/reset-password/${user.id}/${token}`;
+
+  // Gửi email
+  await transporter.sendMail({
+    from: '"PCook Support" <noreply@pcook.com>',
+    to: user.email,
+    subject: "Yêu cầu đặt lại mật khẩu PCook",
+    html: `
+            <h3>Xin chào ${user.username},</h3>
+            <p>Bạn vừa yêu cầu đặt lại mật khẩu. Vui lòng bấm vào link dưới đây để tiếp tục:</p>
+            <a href="${resetLink}" target="_blank">Đặt lại mật khẩu</a>
+            <p>Link này sẽ hết hạn sau 15 phút.</p>
+            <p>Nếu không phải bạn yêu cầu, hãy bỏ qua email này.</p>
+        `,
+  });
+
+  return { message: "Email đặt lại mật khẩu đã được gửi." };
+};
+
+// ✅ 2. HÀM MỚI: Đặt lại mật khẩu mới
+const resetPassword = async (id, token, newPassword) => {
+  const user = await User.findByPk(id);
+  if (!user) throw new ApiError(404, "User not found.");
+
+  // Verify token
+  const secret = process.env.JWT_SECRET + user.password_hash;
+  try {
+    jwt.verify(token, secret);
+  } catch (error) {
+    throw new ApiError(400, "Link không hợp lệ hoặc đã hết hạn.");
+  }
+
+  // Hash mật khẩu mới
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+  // Cập nhật vào DB
+  await user.update({ password_hash: hashedPassword });
+
+  return { message: "Mật khẩu đã được thay đổi thành công." };
+};
+
 module.exports = {
   registerUser,
   loginUser,
   findOrCreateUser,
+  forgotPassword,
+  resetPassword,
 };

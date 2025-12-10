@@ -25,8 +25,14 @@ import ChallengeDetail from "./components/ChallengeDetail";
 import Chatbox from "./components/Chatbox";
 import LoginCallback from "./pages/LoginCallback";
 import { RecipeCountProvider } from "./contexts/RecipeCountContext";
-import Login from "./pages/Login"; 
+import Login from "./pages/Login";
 import Register from "./pages/Register";
+import CooksnapList from "./pages/CooksnapList";
+import CooksnapDetail from "./pages/CooksnapDetail"; // ✅ Import trang mới
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import RecipeStatistics from "./pages/RecipeStatistics"; // Import
+
 function App() {
   return (
     <RecipeCountProvider>
@@ -42,13 +48,16 @@ function App() {
               <Route path="/stats" element={<Statistics />} />
               <Route path="/challenges" element={<Challenges />} />
               <Route path="/challenge/:hashtag" element={<ChallengeDetail />} />
-              <Route path="/login" element={<Login />} /> 
+              <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/premium" element={<Premium />} />
               <Route path="/interactions" element={<Interactions />} />
               <Route path="/user/:id" element={<User />} />
               <Route path="/profile" element={<UserProfile />} />
+              <Route path="/setting/account" element={<UserProfile />} />
               <Route path="/recipes/:id" element={<RecipeDetail />} />
+              <Route path="/recipes/:id/cooksnaps" element={<CooksnapList />} />
+              <Route path="/cooksnaps/:id" element={<CooksnapDetail />} />
               <Route path="/create-recipe" element={<CreateRecipe />} />
               <Route path="/login-success" element={<LoginCallback />} />
               <Route path="/recipes" element={<RecipesLayout />}>
@@ -59,6 +68,16 @@ function App() {
                 <Route path="published" element={<PublishedRecipes />} />
                 <Route path="drafts" element={<DraftRecipes />} />
               </Route>
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route
+                path="/reset-password/:id/:token"
+                element={<ResetPassword />}
+              />
+              <Route path="/statistics" element={<Statistics />} />
+              <Route
+                path="/statistics/recipes/:id"
+                element={<RecipeStatistics />}
+              />
             </Routes>
             <Footer />
           </div>

@@ -13,7 +13,7 @@ export default function Challenges() {
     const fetchChallenges = async () => {
       try {
         const res = await getAllChallenges();
-        setChallenges(res.data.data);
+        setChallenges(res.data.data.rows || []); // ✅ Thêm .rows
       } catch (error) {
         console.error("Lỗi tải thử thách:", error);
       } finally {

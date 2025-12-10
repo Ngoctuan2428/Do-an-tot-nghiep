@@ -33,6 +33,12 @@ router.get("/user/:userId/public", recipeController.getPublicRecipesByUserId);
 
 router.get("/:id/reacters", recipeController.getRecipeReacters);
 
+router.get("/premium", recipeController.getPremiumRecipes);
+
+router.get("/cooksnaps/:id", recipeController.getCooksnap);
+router.put("/cooksnaps/:id", protect, recipeController.updateCooksnap);
+router.delete("/cooksnaps/:id", protect, recipeController.deleteCooksnap);
+
 router
   .route("/:id")
   .get(recipeController.getRecipeById) // Xem chi tiết công thức
@@ -44,5 +50,9 @@ router.route("/:id/save").post(protect, recipeController.saveRecipe);
 router.post("/:id/like", protect, recipeController.likeRecipe);
 
 router.post("/:id/cooksnap", protect, recipeController.sendCooksnap);
+
+router.get("/:id/cooksnaps", recipeController.getRecipeCooksnaps);
+
+router.get("/:id/related", recipeController.getRelatedRecipes);
 
 module.exports = router;

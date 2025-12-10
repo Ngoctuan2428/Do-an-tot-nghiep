@@ -12,9 +12,15 @@ const createChallenge = async (data) => {
   return await Challenge.create(data);
 };
 
-// (Public) Lấy tất cả thử thách
-const getAllChallenges = async () => {
-  return await Challenge.findAll({ order: [["created_at", "DESC"]] });
+const getAllChallenges = async (queryOptions = {}) => {
+  const { page = 1, limit = 10 } = queryOptions;
+  const offset = (page - 1) * limit;
+
+  return await Challenge.findAndCountAll({
+    limit: parseInt(limit),
+    offset: parseInt(offset),
+    order: [["created_at", "DESC"]],
+  });
 };
 
 // (Public) Lấy chi tiết 1 thử thách bằng hashtag
@@ -42,9 +48,36 @@ const getChallengeParticipants = async (hashtag) => {
   return recipes;
 };
 
+const getChallengeById = async (id) => {
+  const challenge = await Challenge.findByPk(id);
+  if (!challenge) throw new ApiError(404, "Challenge not found");
+  return challenge;
+};
+
+const updateChallenge = async (id, data) => {
+  const challenge = await getChallengeById(id);
+
+  // Đảm bảo hashtag có dấu #
+  if (data.hashtag && !data.hashtag.startsWith("#")) {
+    data.hashtag = `#${data.hashtag}`;
+  }
+
+  await challenge.update(data);
+  return challenge;
+};
+
+const deleteChallenge = async (id) => {
+  const challenge = await getChallengeById(id);
+  await challenge.destroy();
+  return { message: "Challenge deleted successfully" };
+};
+
 module.exports = {
   createChallenge,
   getAllChallenges,
   getChallengeByHashtag,
   getChallengeParticipants,
+  getChallengeById,
+  updateChallenge, // Export thêm
+  deleteChallenge, // Export thêm
 };

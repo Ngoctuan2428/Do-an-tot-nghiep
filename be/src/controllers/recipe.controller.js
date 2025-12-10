@@ -1,5 +1,8 @@
 const recipeService = require("../services/recipe.service");
 
+const { Recipe, User, Category, sequelize } = require("../models");
+const { Op } = require("sequelize");
+
 const createRecipe = async (req, res, next) => {
   try {
     const newRecipe = await recipeService.createRecipe(req.user.id, req.body);
@@ -218,6 +221,101 @@ const getPublicRecipesByUserId = async (req, res, next) => {
   }
 };
 
+const getRecipeCooksnaps = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const cooksnaps = await recipeService.getRecipeCooksnaps(id);
+    res.status(200).json({ status: "success", data: cooksnaps });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ✅ Controller cho Cooksnap
+const getCooksnap = async (req, res, next) => {
+  try {
+    const cooksnap = await recipeService.getCooksnapById(req.params.id);
+    res.status(200).json({ status: "success", data: cooksnap });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateCooksnap = async (req, res, next) => {
+  try {
+    // req.user.id lấy từ token (middleware protect)
+    const updated = await recipeService.updateCooksnap(
+      req.params.id,
+      req.user.id,
+      req.body
+    );
+    res.status(200).json({ status: "success", data: updated });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteCooksnap = async (req, res, next) => {
+  try {
+    const result = await recipeService.deleteCooksnap(
+      req.params.id,
+      req.user.id
+    );
+    res.status(200).json({ status: "success", data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ✅ HÀM MỚI: Lấy các món tương tự (cùng danh mục)
+const getRelatedRecipes = async (req, res, next) => {
+  try {
+    const { id } = req.params; // ID của món hiện tại
+
+    // 1. Lấy thông tin món hiện tại để biết category_id
+    const currentRecipe = await Recipe.findByPk(id);
+    if (!currentRecipe) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+
+    // 2. Tìm các món khác cùng category (Random hoặc mới nhất)
+    // Nếu món không có category thì tìm món ngẫu nhiên hoặc cùng tác giả
+    const whereClause = {
+      id: { [Op.ne]: id }, // Không lấy chính món này
+      status: "public", // Chỉ lấy món công khai
+    };
+
+    // Nếu có category thì lọc theo category
+    /* Lưu ý: Bạn cần đảm bảo Model Recipe có cột category_id hoặc bảng liên kết. 
+           Nếu bạn dùng bảng trung gian recipe_categories, query sẽ phức tạp hơn chút. 
+           Ở đây giả sử bạn có cột category_id trong recipes hoặc logic tương tự. 
+           Nếu chưa có, ta có thể lấy random các món khác.
+        */
+
+    // Tạm thời lấy random 3 món khác để hiển thị
+    const relatedRecipes = await Recipe.findAll({
+      where: whereClause,
+      limit: 3,
+      order: sequelize.random(), // Lấy ngẫu nhiên
+      include: [{ model: User, attributes: ["id", "username", "avatar_url"] }],
+    });
+
+    res.status(200).json({ status: "success", data: relatedRecipes });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ✅ Controller mới
+const getPremiumRecipes = async (req, res, next) => {
+  try {
+    const recipes = await recipeService.getPremiumRecipes();
+    res.status(200).json({ status: "success", data: recipes });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createRecipe,
   getAllRecipes,
@@ -236,4 +334,10 @@ module.exports = {
   sendCooksnap, // ✅ Export
   getCookedRecipes, // ✅ Export (ghi đè nếu bạn đã có placeholder cũ)
   getPublicRecipesByUserId,
+  getRecipeCooksnaps,
+  getCooksnap,
+  updateCooksnap,
+  deleteCooksnap,
+  getRelatedRecipes,
+  getPremiumRecipes,
 };

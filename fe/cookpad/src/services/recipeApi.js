@@ -96,3 +96,27 @@ export const getLikedRecipesIds = () => {
 export const getRecipeReacters = (recipeId, params = {}) => {
   return axiosInstance.get(`/recipes/${recipeId}/reacters`, { params });
 };
+
+export const getRecipeCooksnaps = (recipeId) => {
+  return axiosInstance.get(`/recipes/${recipeId}/cooksnaps`);
+};
+
+export const getCooksnapById = (id) => {
+  return axiosInstance.get(`/recipes/cooksnaps/${id}`);
+};
+
+export const updateCooksnap = (id, data) => {
+  return axiosInstance.put(`/recipes/cooksnaps/${id}`, data);
+};
+
+export const deleteCooksnap = (id) => {
+  return axiosInstance.delete(`/recipes/cooksnaps/${id}`);
+};
+
+export const getRelatedRecipes = (id) => {
+  return axiosInstance.get(`/recipes/${id}/related`);
+};
+
+export const getPremiumRecipes = () => {
+  return axiosInstance.get("/recipes/premium");
+};

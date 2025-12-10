@@ -291,26 +291,36 @@ const markRecipeAsCooked = async (userId, recipeId, imageUrl, comment = "") => {
 
 // ✅ 4. CẬP NHẬT HÀM MỚI: Lấy danh sách món đã nấu cho trang CookedRecipes
 const getCookedRecipesList = async (userId) => {
-  // Lấy danh sách Cooked kèm theo thông tin Recipe
+  // 1. Lấy tất cả lịch sử nấu (Cooksnap), sắp xếp mới nhất lên đầu
   const cookedItems = await Cooked.findAll({
     where: { user_id: userId },
     include: [
       {
         model: Recipe,
-        include: [{ model: User, attributes: ["id", "username"] }],
+        include: [{ model: User, attributes: ["id", "username"] }], // Lấy thông tin tác giả món ăn
+      },
+      {
+        model: User, // Lấy thông tin người nấu (chính là userId này)
+        attributes: ["id", "username", "avatar_url"],
       },
     ],
     order: [["created_at", "DESC"]],
   });
 
-  // Trích xuất Recipe ra để trả về format giống các API khác
-  // Lưu ý: Một món có thể nấu nhiều lần, tùy bạn muốn hiển thị trùng hay không.
-  // Dưới đây là hiển thị tất cả lần nấu.
+  // 2. Map dữ liệu để Frontend dễ dùng
+  // Chúng ta KHÔNG lọc trùng lặp nữa, để hiển thị hết các lần nấu
   const recipes = cookedItems.map((item) => {
     const recipe = item.Recipe.toJSON();
-    // Gắn thêm ảnh cooksnap vào recipe để hiển thị nếu muốn
-    recipe.cooksnap_image = item.image_url;
-    recipe.cooked_id = item.id; // <--- THÊM DÒNG NÀY (ID duy nhất của lần nấu)
+
+    // Gắn thông tin Cooksnap đè lên hoặc thêm vào object recipe
+    recipe.cooksnap_id = item.id; // ID của cooksnap
+    recipe.cooksnap_image = item.image_url; // Ảnh cooksnap
+    recipe.cooksnap_comment = item.comment; // Bình luận
+    recipe.created_at = item.created_at; // Ngày nấu
+
+    // Thông tin người nấu (để hiển thị avatar người dùng)
+    recipe.cooker = item.User;
+
     return recipe;
   });
 
@@ -329,6 +339,74 @@ const getPublicRecipesByUserId = async (userId) => {
     include: [{ model: User, attributes: ["id", "username", "avatar_url"] }],
     order: [["created_at", "DESC"]],
   });
+};
+
+const getRecipeCooksnaps = async (recipeId) => {
+  return await Cooked.findAll({
+    where: { recipe_id: recipeId },
+    include: [
+      {
+        model: User,
+        attributes: ["id", "username", "avatar_url"],
+      },
+    ],
+    order: [["created_at", "DESC"]],
+  });
+};
+
+// ✅ 1. Lấy chi tiết Cooksnap
+const getCooksnapById = async (id) => {
+  const cooksnap = await Cooked.findByPk(id, {
+    include: [
+      { model: User, attributes: ["id", "username", "avatar_url"] },
+      { model: Recipe, attributes: ["id", "title", "image_url"] },
+    ],
+  });
+  if (!cooksnap) throw new ApiError(404, "Cooksnap not found");
+  return cooksnap;
+};
+
+// ✅ 2. Cập nhật Cooksnap (Chỉ chủ sở hữu mới được sửa)
+const updateCooksnap = async (id, userId, data) => {
+  const cooksnap = await Cooked.findByPk(id);
+  if (!cooksnap) throw new ApiError(404, "Cooksnap not found");
+
+  if (cooksnap.user_id !== userId) {
+    throw new ApiError(403, "Bạn không có quyền sửa cooksnap này");
+  }
+
+  // Cho phép sửa comment (và image_url nếu muốn)
+  await cooksnap.update(data);
+  return cooksnap;
+};
+
+// ✅ 3. Xóa Cooksnap (Chỉ chủ sở hữu mới được xóa)
+const deleteCooksnap = async (id, userId) => {
+  const cooksnap = await Cooked.findByPk(id);
+  if (!cooksnap) throw new ApiError(404, "Cooksnap not found");
+
+  if (cooksnap.user_id !== userId) {
+    throw new ApiError(403, "Bạn không có quyền xóa cooksnap này");
+  }
+
+  await cooksnap.destroy();
+  return { message: "Đã xóa thành công" };
+};
+
+// ✅ HÀM MỚI: Lấy danh sách món Premium (Top 5 nhiều like nhất)
+const getPremiumRecipes = async () => {
+  const recipes = await Recipe.findAll({
+    where: { status: "public" }, // Chỉ lấy món công khai
+    order: [["likes", "DESC"]], // Sắp xếp giảm dần theo lượt thích
+    limit: 5, // Lấy 5 món
+    include: [
+      {
+        model: User,
+        attributes: ["id", "username", "avatar_url"],
+      },
+    ],
+  });
+  return recipes;
 };
 
 // 10. CẬP NHẬT EXPORTS
@@ -350,4 +428,9 @@ module.exports = {
   markRecipeAsCooked, // ✅ Export mới
   getCookedRecipesList, // ✅ Export mới
   getPublicRecipesByUserId,
+  getRecipeCooksnaps,
+  getCooksnapById,
+  updateCooksnap,
+  deleteCooksnap,
+  getPremiumRecipes,
 };

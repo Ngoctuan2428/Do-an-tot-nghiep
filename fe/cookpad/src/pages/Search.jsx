@@ -1,9 +1,16 @@
-import RecipeCard from "../components/RecipeCard";
-import KeywordCard from "../components/KeywordCard";
-import SearchBar from "../components/SearchBar";
-import pCook from "../../public/pCook.png";
-import { useNavigate } from "react-router-dom";
+// src/pages/Search.jsx
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Loader2, Crown, ArrowRight, Flame } from "lucide-react";
+import pCook from "../../public/pCook.png"; // Giữ nguyên logo của bạn
 
+// Import API và Component
+import { getPremiumRecipes } from "../services/recipeApi"; // API lấy top like
+import SearchBar from "../components/SearchBar";
+import KeywordCard from "../components/KeywordCard";
+import RecipeCard from "../components/RecipeCard"; // Dùng lại RecipeCard của bạn
+
+// Danh sách từ khóa (Giữ nguyên như code cũ của bạn)
 const keywords = [
   {
     id: 1,
@@ -56,68 +63,126 @@ const keywords = [
 ];
 
 export default function Search() {
-  // Add useNavigate hook
   const navigate = useNavigate();
+  const [premiumRecipes, setPremiumRecipes] = useState([]); // State lưu danh sách món Premium
+  const [loadingPremium, setLoadingPremium] = useState(true);
 
-  // Optional: Handle search submission from SearchBar
+  // Load dữ liệu Premium ngay khi vào trang
+  useEffect(() => {
+    const fetchPremium = async () => {
+      try {
+        const res = await getPremiumRecipes();
+        setPremiumRecipes(res.data.data || []);
+      } catch (error) {
+        console.error("Lỗi tải món premium:", error);
+      } finally {
+        setLoadingPremium(false);
+      }
+    };
+    fetchPremium();
+  }, []);
+
+  // Xử lý khi user nhập từ khóa vào SearchBar
   const handleSearchSubmit = (searchTerm) => {
     if (searchTerm.trim()) {
+      // Chuyển hướng sang trang chi tiết tìm kiếm (SearchDetail)
+      // Giả sử route của bạn là /search/:query
       navigate(`/search/${encodeURIComponent(searchTerm.toLowerCase())}`);
     }
   };
 
   return (
-    <main className="max-w-7xl mx-auto p-6">
-      {/* Banner */}
-      <div className="flex justify-center mb-6">
-        <img src={pCook} className="w-1/6" alt="logo" />
+    <main className="max-w-7xl mx-auto p-6 min-h-screen bg-gray-50">
+      {/* Banner Logo */}
+      <div className="flex justify-center mb-8">
+        <img
+          src={pCook}
+          className="w-40 md:w-56 object-contain"
+          alt="pCook Logo"
+        />
       </div>
 
-      {/* Search Bar - Pass the submit handler */}
-      <div className="flex flex-row justify-center mb-8">
-        <SearchBar onSearch={handleSearchSubmit} />
-      </div>
-
-      {/* Grid Keywords - Each keyword is clickable */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {keywords.map((keyword) => (
-          <KeywordCard key={keyword.id} {...keyword} />
-        ))}
-      </div>
-
-      {/* Premium Section */}
-      <section className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <h3 className="text-lg font-bold mb-4 flex items-center">
-          <span className="bg-yellow-400 text-black px-2 py-1 rounded mr-2 text-sm">
-            Premium
-          </span>
-          Top Món Ăn Premium
-        </h3>
-        <div className="grid grid-cols-3 gap-4">
-          {/* Thêm 3 cards premium */}
-          <RecipeCard
-            title="Cá kho tộ"
-            image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTz9zkfWHKnT-Lij3GJTl1mXfWebB9Ennk2jA&s"
-            premium
-            views={500}
-            likes={100}
-          />
-          <RecipeCard
-            title="Thịt chuột nướng"
-            image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWvrEUp-CuFJwKEA4Iswu4ZJKPkdloGyya9w&s"
-            premium
-            views={500}
-            likes={100}
-          />
-          <RecipeCard
-            title="Hàu nướng mỡ hành"
-            image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRk9XYzXEHeSxYLdB6vPOLb-DPC0kUoH5i0rg&s"
-            premium
-            views={500}
-            likes={100}
-          />
+      {/* Search Bar */}
+      <div className="flex flex-row justify-center mb-10">
+        <div className="w-full max-w-2xl">
+          <SearchBar onSearch={handleSearchSubmit} />
         </div>
+      </div>
+
+      {/* Grid Keywords (Danh mục nhanh) */}
+      <div className="mb-10">
+        <h3 className="text-xl font-bold text-gray-800 mb-4 ml-1">
+          Khám phá nhanh
+        </h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {keywords.map((keyword) => (
+            <KeywordCard key={keyword.id} {...keyword} />
+          ))}
+        </div>
+      </div>
+
+      {/* Premium Section (Dữ liệu thật từ API) */}
+      <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-bold flex items-center gap-2">
+            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-lg text-sm shadow-sm flex items-center gap-1">
+              <Crown size={16} fill="currentColor" /> Premium
+            </span>
+            <span className="text-gray-900">Top Món Ăn Yêu Thích</span>
+          </h3>
+        </div>
+
+        {loadingPremium ? (
+          <div className="flex justify-center py-10">
+            <Loader2 className="animate-spin text-orange-500 w-8 h-8" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {premiumRecipes.length > 0 ? (
+              premiumRecipes.map((recipe, index) => (
+                <div key={recipe.id} className="relative group">
+                  {/* Badge Top 1, 2, 3 */}
+                  {index < 3 && (
+                    <div className="absolute top-3 left-3 z-10 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded shadow-md flex items-center gap-1">
+                      <Flame size={12} fill="currentColor" /> Top {index + 1}
+                    </div>
+                  )}
+
+                  {/* Sử dụng lại RecipeCard của bạn, truyền đúng props */}
+                  <RecipeCard
+                    id={recipe.id} // Quan trọng để Link hoạt động
+                    title={recipe.title}
+                    image={recipe.image_url}
+                    premium={true} // Prop để hiển thị style premium (nếu component hỗ trợ)
+                    views={recipe.view_count || 0}
+                    likes={recipe.likes || 0}
+                    user={recipe.User} // Truyền thông tin người đăng nếu cần
+                  />
+                </div>
+              ))
+            ) : (
+              <p className="col-span-3 text-center text-gray-500 py-10">
+                Chưa có dữ liệu nổi bật.
+              </p>
+            )}
+          </div>
+        )}
       </section>
+
+      {/* Banner Quảng cáo Premium (Optional - Trang trí thêm cho đẹp) */}
+      <div className="mt-8 bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-6 md:p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg">
+        <div>
+          <h3 className="text-xl md:text-2xl font-bold mb-2 flex items-center gap-2">
+            <Crown className="text-yellow-400" /> Trải nghiệm PCook Premium
+          </h3>
+          <p className="text-gray-300 text-sm md:text-base">
+            Mở khóa công thức độc quyền và loại bỏ quảng cáo ngay hôm nay.
+          </p>
+        </div>
+        <button className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg hover:scale-105 transition transform text-sm md:text-base whitespace-nowrap">
+          Dùng thử miễn phí
+        </button>
+      </div>
     </main>
   );
 }

@@ -12,6 +12,7 @@ const Like = require("./like.model");
 const Follow = require("./follow.model");
 const Cooked = require("./cooked.model");
 const Challenge = require("./challenge.model");
+const RecipeView = require("./recipe_view.model");
 
 const db = {};
 
@@ -28,7 +29,7 @@ db.Tag = Tag;
 db.Media = Media;
 db.Cooked = Cooked;
 db.Challenge = Challenge;
-
+db.RecipeView = RecipeView;
 // === ĐỊNH NGHĨA QUAN HỆ SỬ DỤNG CÁC MODEL TỪ `db` ===
 
 // User relationships

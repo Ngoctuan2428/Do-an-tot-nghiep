@@ -55,7 +55,7 @@ export default function RecipeDetail() {
       <RecipeHeader recipe={recipe} />
       <RecipeContent recipe={recipe} />
       <CooksnapSection recipe={recipe} />
-      <RelatedRecipes recipes={recipe.related || []} />
+      <RelatedRecipes currentRecipeId={id} />{" "}
     </div>
   );
 }

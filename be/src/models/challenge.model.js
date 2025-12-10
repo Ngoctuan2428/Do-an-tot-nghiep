@@ -28,6 +28,10 @@ const Challenge = sequelize.define(
       allowNull: false,
       unique: true, // Mỗi thử thách có 1 hashtag duy nhất
     },
+    start_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
     end_date: {
       type: DataTypes.DATE,
       allowNull: true, // Ngày kết thúc

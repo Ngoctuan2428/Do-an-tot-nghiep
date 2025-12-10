@@ -1,6 +1,6 @@
 // src/pages/User.jsx
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom"; // ✅ THÊM 'Link' VÀO ĐÂY
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   MapPin,
   MoreHorizontal,
@@ -11,14 +11,25 @@ import {
   Check,
   Camera,
 } from "lucide-react";
-import { getUserById, getUserStats, followUser } from "../services/userApi";
+// Import API
+import {
+  getUserById,
+  getUserStats,
+  followUser,
+  getFollowers,
+  getFollowing,
+  getCurrentUser, // ✅ Import thêm
+} from "../services/userApi";
 import { getPublicRecipesByUserId } from "../services/recipeApi";
+import UserListItem from "../components/UserListItem"; // ✅ Import component
 
 export default function User() {
-  const { id: userId } = useParams(); // Lấy ID user từ URL
+  const { id: userId } = useParams();
   const navigate = useNavigate();
 
+  // activeTab có thể là: 'recipes', 'cooksnaps', 'following', 'followers'
   const [activeTab, setActiveTab] = useState("recipes");
+
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState({
     recipes: 0,
@@ -30,9 +41,14 @@ export default function User() {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // State cho nút Follow
+  // State cho nút Follow chính
   const [isFollowing, setIsFollowing] = useState(false);
   const [isFollowLoading, setIsFollowLoading] = useState(false);
+
+  // ✅ State cho danh sách bạn bè
+  const [userList, setUserList] = useState([]);
+  const [listLoading, setListLoading] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   // Hàm tải dữ liệu
   useEffect(() => {
@@ -41,32 +57,37 @@ export default function User() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Gọi song song API lấy thông tin và thống kê
+        // 1. Lấy thông tin user, thống kê, và danh sách món ăn
         const [userRes, statsRes, recipesRes] = await Promise.all([
-          getUserById(userId), // Lấy thông tin user (đã có is_following)
-          getUserStats(userId), // Lấy thống kê (số món, follow...)
-          getPublicRecipesByUserId(userId), // Lấy các món public
+          getUserById(userId),
+          getUserStats(userId),
+          getPublicRecipesByUserId(userId),
         ]);
 
         setUser(userRes.data.data);
         setStats(statsRes.data.data);
         setRecipes(recipesRes.data.data.rows || []);
         setFilteredRecipes(recipesRes.data.data.rows || []);
-
-        // Cập nhật trạng thái follow ban đầu
         setIsFollowing(userRes.data.data.is_following || false);
+
+        // 2. Lấy ID người dùng hiện tại (nếu đã đăng nhập) để xử lý nút kết bạn trong list
+        try {
+          const currentUserRes = await getCurrentUser();
+          setCurrentUserId(currentUserRes.data.data.id);
+        } catch (e) {
+          // Không sao nếu chưa đăng nhập
+        }
       } catch (error) {
         console.error("Lỗi tải trang cá nhân:", error);
-        // Có thể redirect về 404 nếu user ko tồn tại
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [userId]); // Tải lại nếu ID trên URL thay đổi
+  }, [userId]);
 
-  // Hàm xử lý tìm kiếm (phía client)
+  // Hàm xử lý tìm kiếm món ăn
   useEffect(() => {
     if (searchTerm === "") {
       setFilteredRecipes(recipes);
@@ -79,13 +100,12 @@ export default function User() {
     }
   }, [searchTerm, recipes]);
 
-  // Hàm xử lý nút Kết Bạn Bếp (Follow)
+  // Toggle follow user này
   const handleFollowToggle = async () => {
     setIsFollowLoading(true);
     try {
       const res = await followUser(userId);
       setIsFollowing(res.data.data.is_following);
-      // Tải lại thống kê để cập nhật số người quan tâm
       const statsRes = await getUserStats(userId);
       setStats(statsRes.data.data);
     } catch (error) {
@@ -93,6 +113,30 @@ export default function User() {
       alert("Vui lòng đăng nhập để thực hiện.");
     } finally {
       setIsFollowLoading(false);
+    }
+  };
+
+  // ✅ Xử lý khi click vào số lượng Bạn bếp/Người quan tâm
+  const handleStatClick = async (tabName) => {
+    setActiveTab(tabName);
+    setListLoading(true);
+    setUserList([]);
+
+    try {
+      let res;
+      if (tabName === "following") {
+        res = await getFollowing(userId);
+      } else if (tabName === "followers") {
+        res = await getFollowers(userId);
+      }
+
+      if (res) {
+        setUserList(res.data.data || []);
+      }
+    } catch (error) {
+      console.error(`Lỗi tải danh sách ${tabName}:`, error);
+    } finally {
+      setListLoading(false);
     }
   };
 
@@ -110,6 +154,9 @@ export default function User() {
     );
   }
 
+  const isMe =
+    currentUserId && userId && currentUserId.toString() === userId.toString();
+
   return (
     <div className="max-w-4xl mx-auto p-4 md:p-8">
       {/* Header thông tin đầu bếp */}
@@ -117,10 +164,11 @@ export default function User() {
         <img
           src={user.avatar_url || "https://placehold.co/112x112?text=U"}
           alt={user.username}
-          className="w-28 h-28 rounded-full border-4 border-white shadow-md"
-          onError={(e) =>
-            (e.target.src = "https://placehold.co/112x112?text=U")
-          }
+          className="w-28 h-28 rounded-full border-4 border-white shadow-md object-cover" // Thêm object-cover để ảnh không bị méo
+          onError={(e) => {
+            e.target.onerror = null; // ✅ QUAN TRỌNG: Ngắt vòng lặp nếu ảnh thay thế cũng lỗi
+            e.target.src = "https://placehold.co/112x112?text=U";
+          }}
         />
         <div className="flex-1 text-center sm:text-left">
           <h1 className="text-2xl font-bold text-gray-900">{user.username}</h1>
@@ -135,35 +183,50 @@ export default function User() {
               {user.bio}
             </p>
           )}
+
+          {/* ✅ THỐNG KÊ (CLICKABLE) */}
           <div className="flex gap-6 mt-4 text-gray-600 justify-center sm:justify-start text-sm">
-            <span>
-              <strong className="text-gray-900">{stats.following || 0}</strong>{" "}
+            <button
+              onClick={() => handleStatClick("following")}
+              className={`hover:text-orange-600 transition-colors ${activeTab === "following" ? "text-orange-600 font-bold" : ""}`}
+            >
+              <strong className="text-gray-900 text-lg">
+                {stats.following || 0}
+              </strong>{" "}
               Bạn Bếp
-            </span>
-            <span>
-              <strong className="text-gray-900">{stats.followers || 0}</strong>{" "}
+            </button>
+            <button
+              onClick={() => handleStatClick("followers")}
+              className={`hover:text-orange-600 transition-colors ${activeTab === "followers" ? "text-orange-600 font-bold" : ""}`}
+            >
+              <strong className="text-gray-900 text-lg">
+                {stats.followers || 0}
+              </strong>{" "}
               Người quan tâm
-            </span>
+            </button>
           </div>
-          <button
-            onClick={handleFollowToggle}
-            disabled={isFollowLoading}
-            className={`mt-4 px-5 py-2 rounded-lg font-medium transition-colors ${
-              isFollowing
-                ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                : "bg-orange-500 text-white hover:bg-orange-600"
-            } ${isFollowLoading ? "opacity-70 cursor-not-allowed" : ""}`}
-          >
-            {isFollowLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : isFollowing ? (
-              <>
-                <Check className="w-5 h-5 inline mr-1" /> Bạn Bếp
-              </>
-            ) : (
-              "Kết Bạn Bếp"
-            )}
-          </button>
+
+          {!isMe && (
+            <button
+              onClick={handleFollowToggle}
+              disabled={isFollowLoading}
+              className={`mt-4 px-5 py-2 rounded-lg font-medium transition-colors ${
+                isFollowing
+                  ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                  : "bg-orange-500 text-white hover:bg-orange-600"
+              } ${isFollowLoading ? "opacity-70 cursor-not-allowed" : ""}`}
+            >
+              {isFollowLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : isFollowing ? (
+                <>
+                  <Check className="w-5 h-5 inline mr-1" /> Bạn Bếp
+                </>
+              ) : (
+                "Kết Bạn Bếp"
+              )}
+            </button>
+          )}
         </div>
         <div className="absolute top-2 right-2">
           <button className="border rounded-lg p-2 hover:bg-gray-50">
@@ -172,46 +235,68 @@ export default function User() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="border-b flex items-center justify-center gap-8 mb-6 sticky top-[64px] bg-gray-50/90 z-10 backdrop-blur-sm">
-        <button
-          onClick={() => setActiveTab("recipes")}
-          className={`py-3 font-medium ${
-            activeTab === "recipes"
-              ? "text-orange-600 border-b-2 border-orange-600"
-              : "text-gray-600 hover:text-gray-800"
-          }`}
-        >
-          Món ăn ({stats.recipes || 0})
-        </button>
-        <button
-          onClick={() => setActiveTab("cooksnaps")}
-          className={`py-3 font-medium ${
-            activeTab === "cooksnaps"
-              ? "text-orange-600 border-b-2 border-orange-600"
-              : "text-gray-600 hover:text-gray-800"
-          }`}
-        >
-          Cooksnaps (0)
-        </button>
-      </div>
-
-      {/* Ô tìm kiếm */}
-      <div className="flex items-center gap-2 mb-6 max-w-sm">
-        <div className="flex items-center border rounded-lg w-full px-3 bg-white shadow-sm">
-          <Search className="w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder={`Tìm trong món ăn của ${user.username}...`}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-2 py-2.5 outline-none text-sm bg-transparent"
-          />
+      {/* ✅ NAVIGATION / TABS */}
+      {activeTab === "recipes" || activeTab === "cooksnaps" ? (
+        <div className="border-b flex items-center justify-center gap-8 mb-6 sticky top-[64px] bg-gray-50/90 z-10 backdrop-blur-sm">
+          <button
+            onClick={() => setActiveTab("recipes")}
+            className={`py-3 font-medium ${
+              activeTab === "recipes"
+                ? "text-orange-600 border-b-2 border-orange-600"
+                : "text-gray-600 hover:text-gray-800"
+            }`}
+          >
+            Món ăn ({stats.recipes || 0})
+          </button>
+          <button
+            onClick={() => setActiveTab("cooksnaps")}
+            className={`py-3 font-medium ${
+              activeTab === "cooksnaps"
+                ? "text-orange-600 border-b-2 border-orange-600"
+                : "text-gray-600 hover:text-gray-800"
+            }`}
+          >
+            Cooksnaps (0)
+          </button>
         </div>
-      </div>
+      ) : (
+        // Header khi xem danh sách
+        <div className="border-b border-gray-200 mb-6 pb-2">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setActiveTab("recipes")}
+              className="text-sm text-gray-500 hover:text-orange-500 flex items-center gap-1"
+            >
+              ← Quay lại món ăn
+            </button>
+            <h3 className="text-lg font-bold text-gray-800">
+              {activeTab === "following"
+                ? `Bạn Bếp của ${user.username}`
+                : `Người quan tâm ${user.username}`}
+            </h3>
+          </div>
+        </div>
+      )}
 
-      {/* Danh sách */}
+      {/* ✅ CONTENT */}
+      {/* Ô tìm kiếm chỉ hiện khi ở tab Recipes */}
+      {activeTab === "recipes" && (
+        <div className="flex items-center gap-2 mb-6 max-w-sm">
+          <div className="flex items-center border rounded-lg w-full px-3 bg-white shadow-sm">
+            <Search className="w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder={`Tìm trong món ăn của ${user.username}...`}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-2 py-2.5 outline-none text-sm bg-transparent"
+            />
+          </div>
+        </div>
+      )}
+
       <div className="space-y-4">
+        {/* Tab Món ăn */}
         {activeTab === "recipes" && (
           <>
             {filteredRecipes.length > 0 ? (
@@ -224,10 +309,41 @@ export default function User() {
           </>
         )}
 
+        {/* Tab Cooksnaps */}
         {activeTab === "cooksnaps" && (
           <div className="text-center py-16 text-gray-500 bg-white rounded-xl border border-gray-100">
             <Camera className="w-16 h-16 mx-auto mb-4 text-gray-300" />
             <p className="text-lg">{user.username} chưa có Cooksnap nào.</p>
+          </div>
+        )}
+
+        {/* ✅ Tab Danh sách User */}
+        {(activeTab === "following" || activeTab === "followers") && (
+          <div>
+            {listLoading ? (
+              <div className="flex justify-center py-10">
+                <Loader2 className="animate-spin text-orange-500" />
+              </div>
+            ) : userList.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {userList.map((u) => (
+                  <UserListItem
+                    key={u.id}
+                    user={u}
+                    currentUserId={currentUserId}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16 text-gray-500 bg-white rounded-xl border border-gray-100">
+                <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                <p className="text-lg">
+                  {activeTab === "following"
+                    ? "Người dùng này chưa theo dõi ai."
+                    : "Chưa có ai quan tâm người dùng này."}
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -235,7 +351,7 @@ export default function User() {
   );
 }
 
-// Component thẻ Recipe (giữ nguyên như trong file User.jsx gốc của bạn)
+// Component thẻ Recipe
 function RecipeCard({ recipe }) {
   return (
     <div className="flex items-start gap-4 border-b pb-4 last:border-b-0">

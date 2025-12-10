@@ -9,6 +9,7 @@ const searchRoutes = require("./search.routes");
 const mediaRoutes = require("./media.routes");
 const challengeRoutes = require("./challenge.routes");
 const interactionRoutes = require("./interaction.routes"); // ✅ Import
+const statsRoutes = require("./stats.routes");
 
 const router = express.Router();
 
@@ -23,5 +24,6 @@ router.use("/search", searchRoutes);
 router.use("/media", mediaRoutes);
 router.use("/challenges", challengeRoutes);
 router.use("/interactions", interactionRoutes);
+router.use("/stats", statsRoutes);
 
 module.exports = router;

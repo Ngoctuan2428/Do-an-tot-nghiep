@@ -23,6 +23,7 @@ router.get(
   passport.authenticate("google", {
     scope: ["profile", "email"],
     session: false, // Không dùng session
+    prompt: "select_account",
   })
 );
 
@@ -55,5 +56,11 @@ router.get(
   }),
   authController.socialLoginCallback // ⬅️ Dùng chung hàm
 );
+
+// ✅ Route gửi yêu cầu quên mật khẩu
+router.post("/forgot-password", authController.forgotPassword);
+
+// ✅ Route đặt lại mật khẩu (có ID và Token trên URL)
+router.post("/reset-password/:id/:token", authController.resetPassword);
 
 module.exports = router;

@@ -89,8 +89,33 @@ const socialLoginCallback = async (req, res, next) => {
   }
 };
 
+// ✅ Controller Quên mật khẩu
+const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const result = await authService.forgotPassword(email);
+    res.status(200).json({ status: "success", data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ✅ Controller Đặt lại mật khẩu
+const resetPassword = async (req, res, next) => {
+  try {
+    const { id, token } = req.params;
+    const { password } = req.body; // Mật khẩu mới
+    const result = await authService.resetPassword(id, token, password);
+    res.status(200).json({ status: "success", data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
   socialLoginCallback,
+  forgotPassword,
+  resetPassword,
 };
