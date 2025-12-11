@@ -1,5 +1,5 @@
 // Import thư viện dotenv để đọc file .env
-require("dotenv").config();
+require('dotenv').config();
 
 // Tạo một object config để quản lý các biến môi trường
 const config = {
@@ -9,17 +9,17 @@ const config = {
 
   // Cấu hình database
   db: {
-    host: process.env.DB_HOST || "localhost",
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "your_password",
-    database: process.env.DB_NAME || "cooking",
+    host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT || 3307,
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || 'root',
+    database: process.env.DB_NAME || 'pcook',
   },
 
   // Cấu hình JWT (JSON Web Token)
   jwt: {
-    secret: process.env.JWT_SECRET || "a-very-strong-secret-key",
-    expiresIn: process.env.JWT_EXPIRES_IN || "1d", // Ví dụ: 1 ngày
+    secret: process.env.JWT_SECRET || 'a-very-strong-secret-key',
+    expiresIn: process.env.JWT_EXPIRES_IN || '1d', // Ví dụ: 1 ngày
   },
 
   // Cấu hình OAuth cho Google và Facebook
@@ -27,14 +27,14 @@ const config = {
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     // ✅ SỬA LỖI: Dùng URL tuyệt đối
-    callbackURL: "http://localhost:8000/api/auth/google/callback",
+    callbackURL: 'http://localhost:8000/api/auth/google/callback',
   },
   facebook: {
-    clientID: process.env.FACEBOOK_APP_ID || "YOUR_FACEBOOK_APP_ID_HERE",
+    clientID: process.env.FACEBOOK_APP_ID || 'YOUR_FACEBOOK_APP_ID_HERE',
     clientSecret:
-      process.env.FACEBOOK_APP_SECRET || "YOUR_FACEBOOK_APP_SECRET_HERE",
+      process.env.FACEBOOK_APP_SECRET || 'YOUR_FACEBOOK_APP_SECRET_HERE',
     // ✅ SỬA LỖI: Dùng URL tuyệt đối
-    callbackURL: "http://localhost:8000/api/auth/facebook/callback",
+    callbackURL: 'http://localhost:8000/api/auth/facebook/callback',
   },
 };
 

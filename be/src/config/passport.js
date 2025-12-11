@@ -1,10 +1,10 @@
 // src/config/passport.js
-const passport = require("passport");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const FacebookStrategy = require("passport-facebook").Strategy;
-const config = require("./environment");
-const { User } = require("../models");
-const authService = require("../services/auth.service");
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
+const config = require('./environment');
+const { User } = require('../models');
+const authService = require('../services/auth.service');
 
 /**
  * Hàm callback chung cho cả Google và Facebook
@@ -19,27 +19,27 @@ const socialLoginCallback = async (profile, done) => {
   }
 };
 
-// Cấu hình Google Strategy
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: config.google.clientID,
-      clientSecret: config.google.clientSecret,
-      callbackURL: config.google.callbackURL,
-    },
-    (accessToken, refreshToken, profile, done) => {
-      // Chuẩn hóa 'profile' object từ Google
-      const normalizedProfile = {
-        provider: profile.provider,
-        id: profile.id,
-        email: profile.emails[0].value,
-        displayName: profile.displayName,
-        avatar: profile.photos[0].value,
-      };
-      socialLoginCallback(normalizedProfile, done);
-    }
-  )
-);
+// // Cấu hình Google Strategy
+// passport.use(
+//   new GoogleStrategy(
+//     {
+//       clientID: config.google.clientID,
+//       clientSecret: config.google.clientSecret,
+//       callbackURL: config.google.callbackURL,
+//     },
+//     (accessToken, refreshToken, profile, done) => {
+//       // Chuẩn hóa 'profile' object từ Google
+//       const normalizedProfile = {
+//         provider: profile.provider,
+//         id: profile.id,
+//         email: profile.emails[0].value,
+//         displayName: profile.displayName,
+//         avatar: profile.photos[0].value,
+//       };
+//       socialLoginCallback(normalizedProfile, done);
+//     }
+//   )
+// );
 
 // Cấu hình Facebook Strategy
 passport.use(
@@ -48,7 +48,7 @@ passport.use(
       clientID: config.facebook.clientID,
       clientSecret: config.facebook.clientSecret,
       callbackURL: config.facebook.callbackURL,
-      profileFields: ["id", "displayName", "emails", "picture.type(large)"],
+      profileFields: ['id', 'displayName', 'emails', 'picture.type(large)'],
     },
     (accessToken, refreshToken, profile, done) => {
       // Chuẩn hóa 'profile' object từ Facebook
