@@ -1,25 +1,25 @@
 // src/components/Chatbox.jsx
-import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Loader2, Bot, User } from "lucide-react"; // Dùng icon từ lucide-react cho đồng bộ
-import { sendChatbotQuery } from "../services/chatbotApi";
+import { useState, useRef, useEffect } from 'react';
+import { MessageCircle, X, Send, Loader2, Bot, User } from 'lucide-react'; // Dùng icon từ lucide-react cho đồng bộ
+import { sendChatbotQuery } from '../services/chatbotApi';
 
 export default function Chatbox() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "Xin chào! Tôi là trợ lý ảo PCook. Bạn muốn tìm công thức món gì hôm nay?",
-      sender: "bot",
+      text: 'Xin chào! Tôi là trợ lý ảo PCook. Bạn muốn tìm công thức món gì hôm nay?',
+      sender: 'bot',
     },
   ]);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
   const messagesEndRef = useRef(null);
 
   // Tự động cuộn xuống tin nhắn mới nhất
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
@@ -30,13 +30,13 @@ export default function Chatbox() {
     if (!inputValue.trim()) return;
 
     const userMessageText = inputValue.trim();
-    setInputValue(""); // Xóa ô nhập liệu ngay lập tức
+    setInputValue(''); // Xóa ô nhập liệu ngay lập tức
 
     // 1. Thêm tin nhắn của User vào danh sách
     const newUserMsg = {
       id: Date.now(),
       text: userMessageText,
-      sender: "user",
+      sender: 'user',
     };
     setMessages((prev) => [...prev, newUserMsg]);
 
@@ -44,7 +44,7 @@ export default function Chatbox() {
     setIsTyping(true);
     try {
       const response = await sendChatbotQuery(userMessageText);
-      const botReply = response.data.reply || "Xin lỗi, tôi không hiểu ý bạn.";
+      const botReply = response.data.reply || 'Xin lỗi, tôi không hiểu ý bạn.';
 
       // 3. Thêm tin nhắn của Bot vào danh sách
       setMessages((prev) => [
@@ -52,17 +52,17 @@ export default function Chatbox() {
         {
           id: Date.now() + 1,
           text: botReply,
-          sender: "bot",
+          sender: 'bot',
         },
       ]);
     } catch (error) {
-      console.error("Chatbot error:", error);
+      console.error('Chatbot error:', error);
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now() + 1,
-          text: "Xin lỗi, hệ thống đang gặp sự cố. Vui lòng thử lại sau.",
-          sender: "bot",
+          text: 'Xin lỗi, hệ thống đang gặp sự cố. Vui lòng thử lại sau.',
+          sender: 'bot',
         },
       ]);
     } finally {
@@ -71,7 +71,7 @@ export default function Chatbox() {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleSend();
     }
   };
@@ -111,14 +111,14 @@ export default function Chatbox() {
               <div
                 key={msg.id}
                 className={`flex ${
-                  msg.sender === "user" ? "justify-end" : "justify-start"
+                  msg.sender === 'user' ? 'justify-end' : 'justify-start'
                 }`}
               >
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm ${
-                    msg.sender === "user"
-                      ? "bg-cookpad-orange text-white rounded-br-none"
-                      : "bg-white text-gray-800 border border-gray-200 rounded-bl-none"
+                  className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm break-words ${
+                    msg.sender === 'user'
+                      ? 'bg-cookpad-orange text-white rounded-br-none'
+                      : 'bg-white text-gray-800 border border-gray-200 rounded-bl-none'
                   }`}
                 >
                   {msg.text}
@@ -155,8 +155,8 @@ export default function Chatbox() {
               disabled={!inputValue.trim() || isTyping}
               className={`p-2 rounded-full ${
                 inputValue.trim() && !isTyping
-                  ? "bg-cookpad-orange text-white hover:bg-orange-600"
-                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  ? 'bg-cookpad-orange text-white hover:bg-orange-600'
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               } transition-colors`}
             >
               {isTyping ? (

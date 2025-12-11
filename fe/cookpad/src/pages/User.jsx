@@ -1,6 +1,6 @@
 // src/pages/User.jsx
-import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   MapPin,
   MoreHorizontal,
@@ -10,7 +10,7 @@ import {
   Loader2,
   Check,
   Camera,
-} from "lucide-react";
+} from 'lucide-react';
 // Import API
 import {
   getUserById,
@@ -19,16 +19,16 @@ import {
   getFollowers,
   getFollowing,
   getCurrentUser, // ✅ Import thêm
-} from "../services/userApi";
-import { getPublicRecipesByUserId } from "../services/recipeApi";
-import UserListItem from "../components/UserListItem"; // ✅ Import component
+} from '../services/userApi';
+import { getPublicRecipesByUserId } from '../services/recipeApi';
+import UserListItem from '../components/UserListItem'; // ✅ Import component
 
 export default function User() {
   const { id: userId } = useParams();
   const navigate = useNavigate();
 
   // activeTab có thể là: 'recipes', 'cooksnaps', 'following', 'followers'
-  const [activeTab, setActiveTab] = useState("recipes");
+  const [activeTab, setActiveTab] = useState('recipes');
 
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState({
@@ -38,7 +38,7 @@ export default function User() {
   });
   const [recipes, setRecipes] = useState([]);
   const [filteredRecipes, setFilteredRecipes] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
   // State cho nút Follow chính
@@ -49,6 +49,22 @@ export default function User() {
   const [userList, setUserList] = useState([]);
   const [listLoading, setListLoading] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
+
+  // toggle chặn
+  const [openBlock, setOpenBlock] = useState(false);
+  const menuRef = useRef();
+
+  // Đóng menu khi bấm ra ngoài
+  useEffect(() => {
+    const handleClickOutsideBlock = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setOpenBlock(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutsideBlock);
+    return () =>
+      document.removeEventListener('mousedown', handleClickOutsideBlock);
+  }, []);
 
   // Hàm tải dữ liệu
   useEffect(() => {
@@ -78,7 +94,7 @@ export default function User() {
           // Không sao nếu chưa đăng nhập
         }
       } catch (error) {
-        console.error("Lỗi tải trang cá nhân:", error);
+        console.error('Lỗi tải trang cá nhân:', error);
       } finally {
         setLoading(false);
       }
@@ -89,7 +105,7 @@ export default function User() {
 
   // Hàm xử lý tìm kiếm món ăn
   useEffect(() => {
-    if (searchTerm === "") {
+    if (searchTerm === '') {
       setFilteredRecipes(recipes);
     } else {
       setFilteredRecipes(
@@ -109,8 +125,8 @@ export default function User() {
       const statsRes = await getUserStats(userId);
       setStats(statsRes.data.data);
     } catch (error) {
-      console.error("Lỗi khi follow:", error);
-      alert("Vui lòng đăng nhập để thực hiện.");
+      console.error('Lỗi khi follow:', error);
+      alert('Vui lòng đăng nhập để thực hiện.');
     } finally {
       setIsFollowLoading(false);
     }
@@ -124,9 +140,9 @@ export default function User() {
 
     try {
       let res;
-      if (tabName === "following") {
+      if (tabName === 'following') {
         res = await getFollowing(userId);
-      } else if (tabName === "followers") {
+      } else if (tabName === 'followers') {
         res = await getFollowers(userId);
       }
 
@@ -162,12 +178,12 @@ export default function User() {
       {/* Header thông tin đầu bếp */}
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-6 relative">
         <img
-          src={user.avatar_url || "https://placehold.co/112x112?text=U"}
+          src={user.avatar_url || 'https://placehold.co/112x112?text=U'}
           alt={user.username}
           className="w-28 h-28 rounded-full border-4 border-white shadow-md object-cover" // Thêm object-cover để ảnh không bị méo
           onError={(e) => {
             e.target.onerror = null; // ✅ QUAN TRỌNG: Ngắt vòng lặp nếu ảnh thay thế cũng lỗi
-            e.target.src = "https://placehold.co/112x112?text=U";
+            e.target.src = 'https://placehold.co/112x112?text=U';
           }}
         />
         <div className="flex-1 text-center sm:text-left">
@@ -187,21 +203,21 @@ export default function User() {
           {/* ✅ THỐNG KÊ (CLICKABLE) */}
           <div className="flex gap-6 mt-4 text-gray-600 justify-center sm:justify-start text-sm">
             <button
-              onClick={() => handleStatClick("following")}
-              className={`hover:text-orange-600 transition-colors ${activeTab === "following" ? "text-orange-600 font-bold" : ""}`}
+              onClick={() => handleStatClick('following')}
+              className={`hover:text-orange-600 transition-colors ${activeTab === 'following' ? 'text-orange-600 font-bold' : ''}`}
             >
               <strong className="text-gray-900 text-lg">
                 {stats.following || 0}
-              </strong>{" "}
+              </strong>{' '}
               Bạn Bếp
             </button>
             <button
-              onClick={() => handleStatClick("followers")}
-              className={`hover:text-orange-600 transition-colors ${activeTab === "followers" ? "text-orange-600 font-bold" : ""}`}
+              onClick={() => handleStatClick('followers')}
+              className={`hover:text-orange-600 transition-colors ${activeTab === 'followers' ? 'text-orange-600 font-bold' : ''}`}
             >
               <strong className="text-gray-900 text-lg">
                 {stats.followers || 0}
-              </strong>{" "}
+              </strong>{' '}
               Người quan tâm
             </button>
           </div>
@@ -212,9 +228,9 @@ export default function User() {
               disabled={isFollowLoading}
               className={`mt-4 px-5 py-2 rounded-lg font-medium transition-colors ${
                 isFollowing
-                  ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                  : "bg-orange-500 text-white hover:bg-orange-600"
-              } ${isFollowLoading ? "opacity-70 cursor-not-allowed" : ""}`}
+                  ? 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                  : 'bg-orange-500 text-white hover:bg-orange-600'
+              } ${isFollowLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
               {isFollowLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -223,37 +239,59 @@ export default function User() {
                   <Check className="w-5 h-5 inline mr-1" /> Bạn Bếp
                 </>
               ) : (
-                "Kết Bạn Bếp"
+                'Kết Bạn Bếp'
               )}
             </button>
           )}
         </div>
-        <div className="absolute top-2 right-2">
-          <button className="border rounded-lg p-2 hover:bg-gray-50">
+        <div className="absolute top-2 right-2" ref={menuRef}>
+          <button
+            className="border rounded-lg p-2 hover:bg-gray-50"
+            onClick={() => setOpenBlock((prev) => !prev)}
+          >
             <MoreHorizontal className="w-5 h-5 text-gray-600" />
           </button>
+          {openBlock && (
+            <div
+              className="
+            absolute top-10 right-0 
+            bg-white shadow-lg border border-gray-200 
+            rounded-lg w-28 py-1
+            animate-fade-in
+          "
+            >
+              <button
+                className="
+              w-full text-left px-3 py-2 text-sm text-gray-700
+              hover:bg-gray-100 rounded-md
+            "
+              >
+                Chặn
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
       {/* ✅ NAVIGATION / TABS */}
-      {activeTab === "recipes" || activeTab === "cooksnaps" ? (
+      {activeTab === 'recipes' || activeTab === 'cooksnaps' ? (
         <div className="border-b flex items-center justify-center gap-8 mb-6 sticky top-[64px] bg-gray-50/90 z-10 backdrop-blur-sm">
           <button
-            onClick={() => setActiveTab("recipes")}
+            onClick={() => setActiveTab('recipes')}
             className={`py-3 font-medium ${
-              activeTab === "recipes"
-                ? "text-orange-600 border-b-2 border-orange-600"
-                : "text-gray-600 hover:text-gray-800"
+              activeTab === 'recipes'
+                ? 'text-orange-600 border-b-2 border-orange-600'
+                : 'text-gray-600 hover:text-gray-800'
             }`}
           >
             Món ăn ({stats.recipes || 0})
           </button>
           <button
-            onClick={() => setActiveTab("cooksnaps")}
+            onClick={() => setActiveTab('cooksnaps')}
             className={`py-3 font-medium ${
-              activeTab === "cooksnaps"
-                ? "text-orange-600 border-b-2 border-orange-600"
-                : "text-gray-600 hover:text-gray-800"
+              activeTab === 'cooksnaps'
+                ? 'text-orange-600 border-b-2 border-orange-600'
+                : 'text-gray-600 hover:text-gray-800'
             }`}
           >
             Cooksnaps (0)
@@ -264,13 +302,13 @@ export default function User() {
         <div className="border-b border-gray-200 mb-6 pb-2">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => setActiveTab("recipes")}
+              onClick={() => setActiveTab('recipes')}
               className="text-sm text-gray-500 hover:text-orange-500 flex items-center gap-1"
             >
               ← Quay lại món ăn
             </button>
             <h3 className="text-lg font-bold text-gray-800">
-              {activeTab === "following"
+              {activeTab === 'following'
                 ? `Bạn Bếp của ${user.username}`
                 : `Người quan tâm ${user.username}`}
             </h3>
@@ -280,7 +318,7 @@ export default function User() {
 
       {/* ✅ CONTENT */}
       {/* Ô tìm kiếm chỉ hiện khi ở tab Recipes */}
-      {activeTab === "recipes" && (
+      {activeTab === 'recipes' && (
         <div className="flex items-center gap-2 mb-6 max-w-sm">
           <div className="flex items-center border rounded-lg w-full px-3 bg-white shadow-sm">
             <Search className="w-4 h-4 text-gray-400" />
@@ -297,7 +335,7 @@ export default function User() {
 
       <div className="space-y-4">
         {/* Tab Món ăn */}
-        {activeTab === "recipes" && (
+        {activeTab === 'recipes' && (
           <>
             {filteredRecipes.length > 0 ? (
               filteredRecipes.map((r) => <RecipeCard key={r.id} recipe={r} />)
@@ -310,15 +348,15 @@ export default function User() {
         )}
 
         {/* Tab Cooksnaps */}
-        {activeTab === "cooksnaps" && (
-          <div className="text-center py-16 text-gray-500 bg-white rounded-xl border border-gray-100">
+        {activeTab === 'cooksnaps' && (
+          <div className="lg:min-w-[800px] md:min-w-[600px] text-center py-16 text-gray-500 bg-white rounded-xl border border-gray-100">
             <Camera className="w-16 h-16 mx-auto mb-4 text-gray-300" />
             <p className="text-lg">{user.username} chưa có Cooksnap nào.</p>
           </div>
         )}
 
         {/* ✅ Tab Danh sách User */}
-        {(activeTab === "following" || activeTab === "followers") && (
+        {(activeTab === 'following' || activeTab === 'followers') && (
           <div>
             {listLoading ? (
               <div className="flex justify-center py-10">
@@ -338,9 +376,9 @@ export default function User() {
               <div className="text-center py-16 text-gray-500 bg-white rounded-xl border border-gray-100">
                 <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                 <p className="text-lg">
-                  {activeTab === "following"
-                    ? "Người dùng này chưa theo dõi ai."
-                    : "Chưa có ai quan tâm người dùng này."}
+                  {activeTab === 'following'
+                    ? 'Người dùng này chưa theo dõi ai.'
+                    : 'Chưa có ai quan tâm người dùng này.'}
                 </p>
               </div>
             )}
@@ -363,24 +401,24 @@ function RecipeCard({ recipe }) {
           {recipe.title}
         </Link>
         <p className="text-sm text-gray-600 line-clamp-2 mt-1">
-          {recipe.description || "Chưa có mô tả"}
+          {recipe.description || 'Chưa có mô tả'}
         </p>
         <div className="flex items-center gap-4 text-gray-500 text-sm mt-2">
           <span className="flex items-center gap-1">
             <Clock className="w-4 h-4" /> {recipe.total_time || 30} phút
           </span>
           <span className="flex items-center gap-1">
-            <Users className="w-4 h-4" /> {recipe.servings || "2 người"}
+            <Users className="w-4 h-4" /> {recipe.servings || '2 người'}
           </span>
         </div>
       </div>
       <Link to={`/recipes/${recipe.id}`}>
         <img
-          src={recipe.image_url || "https://placehold.co/112x112?text=No+Image"}
+          src={recipe.image_url || 'https://placehold.co/112x112?text=No+Image'}
           alt={recipe.title}
           className="w-28 h-28 object-cover rounded-lg shadow-sm"
           onError={(e) =>
-            (e.target.src = "https://placehold.co/112x112?text=No+Image")
+            (e.target.src = 'https://placehold.co/112x112?text=No+Image')
           }
         />
       </Link>
