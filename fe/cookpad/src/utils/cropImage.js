@@ -3,9 +3,9 @@
 export const createImage = (url) =>
   new Promise((resolve, reject) => {
     const image = new Image();
-    image.addEventListener("load", () => resolve(image));
-    image.addEventListener("error", (error) => reject(error));
-    image.setAttribute("crossOrigin", "anonymous"); // Cần thiết để tránh lỗi CORS
+    image.addEventListener('load', () => resolve(image));
+    image.addEventListener('error', (error) => reject(error));
+    image.setAttribute('crossOrigin', 'anonymous'); // can thiet de tranh loi CORS
     image.src = url;
   });
 
@@ -18,8 +18,8 @@ export function getRadianAngle(degreeValue) {
  */
 export default async function getCroppedImg(imageSrc, pixelCrop, rotation = 0) {
   const image = await createImage(imageSrc);
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
 
   const maxSize = Math.max(image.width, image.height);
   const safeArea = 2 * ((maxSize / 2) * Math.sqrt(2));
@@ -55,6 +55,6 @@ export default async function getCroppedImg(imageSrc, pixelCrop, rotation = 0) {
   return new Promise((resolve) => {
     canvas.toBlob((file) => {
       resolve(file);
-    }, "image/jpeg");
+    }, 'image/jpeg');
   });
 }

@@ -1,17 +1,17 @@
-import { useState, useMemo } from "react";
-import { useLocation, useNavigate, Link } from "react-router-dom";
-import { ChevronLeft, Plus, LogOut, Settings } from "lucide-react";
-import { ShieldCheck } from "lucide-react"; // Icon khiên cho admin
+import { useState, useMemo } from 'react';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { ChevronLeft, Plus, LogOut, Settings } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react'; // Icon khiên cho admin
 // ✅ BẮT BUỘC: Import Context API
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from '../contexts/AuthContext';
 
 const backPathMap = {
-  "/challenge/": "/challenges",
-  "/recipe/": "/",
-  "/profile": "/",
-  "/create-recipe": "/",
-  "/search/": "/search",
-  "/recipes/": "/",
+  '/challenge/': '/challenges',
+  '/recipe/': '/',
+  '/profile': '/',
+  '/create-recipe': '/',
+  '/search/': '/search',
+  '/recipes/': '/',
 };
 
 export default function Header() {
@@ -22,11 +22,11 @@ export default function Header() {
   const { user, logout } = useAuth();
 
   // 1. Cấu hình URL của trang Admin (Thay port cho đúng với máy bạn)
-  const ADMIN_URL = "http://localhost:3001"; // Ví dụ Admin chạy port 3000
+  const ADMIN_URL = 'http://localhost:3001'; // Ví dụ Admin chạy port 3000
 
   const handleGoToAdmin = () => {
     // Lấy token hiện tại
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem('accessToken');
     if (!token) return;
 
     // Chuyển hướng sang trang Admin kèm token trên URL
@@ -47,16 +47,16 @@ export default function Header() {
   const handleLogout = () => {
     logout(); // Gọi hàm logout từ Context
     setIsMenuOpen(false);
-    navigate("/");
+    navigate('/');
   };
 
   const handleEditProfile = () => {
     setIsMenuOpen(false);
-    navigate("/setting/account");
+    navigate('/setting/account');
   };
 
   const handleAdd = () => {
-    navigate("/create-recipe");
+    navigate('/create-recipe');
   };
 
   return (
@@ -81,7 +81,7 @@ export default function Header() {
         {/* Actions */}
         <div className="flex-1 flex items-center justify-end space-x-4">
           {/* CHỈ HIỆN NÚT NÀY NẾU LÀ ADMIN */}
-          {user && user.role === "admin" && (
+          {user && user.role === 'admin' && (
             <button
               onClick={handleGoToAdmin}
               className="flex items-center gap-2 px-3 py-1 bg-gray-800 text-white rounded-full text-sm hover:bg-gray-700 transition"
@@ -102,12 +102,12 @@ export default function Header() {
                 className="flex items-center space-x-2 px-3 py-1 rounded-full border border-gray-300 bg-white shadow-sm hover:bg-gray-100 transition focus:outline-none text-gray-800"
               >
                 <img
-                  src={user.avatar_url || "https://placehold.co/100x100?text=U"}
+                  src={user.avatar_url || 'https://placehold.co/100x100?text=U'}
                   alt={user.username}
                   className="w-8 h-8 rounded-full object-cover border border-gray-200"
                   onError={(e) => {
                     e.target.onerror = null;
-                    e.target.src = "https://placehold.co/100x100?text=U";
+                    e.target.src = 'https://placehold.co/100x100?text=U';
                   }}
                 />
                 {/* Username text */}
@@ -122,7 +122,7 @@ export default function Header() {
                     onClick={handleEditProfile}
                     className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
-                    <Settings size={16} className="mr-3 text-cookpad-orange" />{" "}
+                    <Settings size={16} className="mr-3 text-cookpad-orange" />{' '}
                     Sửa thông tin cá nhân
                   </button>
 
@@ -138,7 +138,7 @@ export default function Header() {
           ) : (
             // HIỂN THỊ NÚT ĐĂNG NHẬP KHI CHƯA ĐĂNG NHẬP
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate('/login')}
               className="px-4 py-2 bg-cookpad-orange text-white text-sm font-medium rounded-md hover:bg-orange-500 transition-colors"
             >
               Đăng nhập

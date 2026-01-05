@@ -294,7 +294,7 @@ export default function User() {
                 : 'text-gray-600 hover:text-gray-800'
             }`}
           >
-            Cooksnaps (0)
+            Psnap (0)
           </button>
         </div>
       ) : (
@@ -347,11 +347,11 @@ export default function User() {
           </>
         )}
 
-        {/* Tab Cooksnaps */}
+        {/* Tab Pcooks */}
         {activeTab === 'cooksnaps' && (
           <div className="lg:min-w-[800px] md:min-w-[600px] text-center py-16 text-gray-500 bg-white rounded-xl border border-gray-100">
             <Camera className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <p className="text-lg">{user.username} chưa có Cooksnap nào.</p>
+            <p className="text-lg">{user.username} chưa có Psnap nào.</p>
           </div>
         )}
 

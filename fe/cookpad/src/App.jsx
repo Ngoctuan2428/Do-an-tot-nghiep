@@ -1,37 +1,37 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import "./index.css";
-import RecipesLayout from "./pages/Recipes/RecipesLayout";
-import AllRecipes from "./pages/Recipes/AllRecipes";
-import SavedRecipes from "./pages/Recipes/SavedRecipes";
-import CookedRecipes from "./pages/Recipes/CookedRecipes";
-import MyRecipes from "./pages/Recipes/MyRecipes";
-import PublishedRecipes from "./pages/Recipes/PublishedRecipes";
-import DraftRecipes from "./pages/Recipes/DraftRecipes";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import Home from "./pages/Home";
-import Search from "./pages/Search";
-import SearchDetail from "./pages/SearchDetail";
-import Statistics from "./pages/Statistics";
-import User from "./pages/User";
-import Interactions from "./pages/Interactions";
-import Premium from "./pages/Premium";
-import Challenges from "./pages/Challenges";
-import RecipeDetail from "./pages/RecipeDetail";
-import UserProfile from "./pages/UserProfile";
-import CreateRecipe from "./pages/CreateRecipe";
-import Sidebar from "./components/Sidebar";
-import ChallengeDetail from "./components/ChallengeDetail";
-import Chatbox from "./components/Chatbox";
-import LoginCallback from "./pages/LoginCallback";
-import { RecipeCountProvider } from "./contexts/RecipeCountContext";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import CooksnapList from "./pages/CooksnapList";
-import CooksnapDetail from "./pages/CooksnapDetail"; // ✅ Import trang mới
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import RecipeStatistics from "./pages/RecipeStatistics"; // Import
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import './index.css';
+import RecipesLayout from './pages/Recipes/RecipesLayout';
+import AllRecipes from './pages/Recipes/AllRecipes';
+import SavedRecipes from './pages/Recipes/SavedRecipes';
+import CookedRecipes from './pages/Recipes/CookedRecipes';
+import MyRecipes from './pages/Recipes/MyRecipes';
+import PublishedRecipes from './pages/Recipes/PublishedRecipes';
+import DraftRecipes from './pages/Recipes/DraftRecipes';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import Home from './pages/Home';
+import Search from './pages/Search';
+import SearchDetail from './pages/SearchDetail';
+import Statistics from './pages/Statistics';
+import User from './pages/User';
+import Interactions from './pages/Interactions';
+import Premium from './pages/Premium';
+import Challenges from './pages/Challenges';
+import RecipeDetail from './pages/RecipeDetail';
+import UserProfile from './pages/UserProfile';
+import CreateRecipe from './pages/CreateRecipe';
+import Sidebar from './components/Sidebar';
+import ChallengeDetail from './components/ChallengeDetail';
+import Chatbox from './components/Chatbox';
+import LoginCallback from './pages/LoginCallback';
+import { RecipeCountProvider } from './contexts/RecipeCountContext';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import CooksnapList from './pages/CooksnapList';
+import CooksnapDetail from './pages/CooksnapDetail'; // ✅ Import trang mới
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import RecipeStatistics from './pages/RecipeStatistics'; // Import
 
 function App() {
   return (

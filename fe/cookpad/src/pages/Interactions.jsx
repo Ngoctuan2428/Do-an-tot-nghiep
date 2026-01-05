@@ -1,6 +1,6 @@
 // src/pages/Interactions.jsx
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Heart,
   MessageCircle,
@@ -10,10 +10,10 @@ import {
   Loader2,
   Bell,
   Utensils,
-} from "lucide-react";
-import { getInteractions } from "../services/interactionApi"; // Đảm bảo bạn đã có API này
-import { formatDistanceToNow } from "date-fns";
-import { vi } from "date-fns/locale";
+} from 'lucide-react';
+import { getInteractions } from '../services/interactionApi'; // Đảm bảo bạn đã có API này
+import { formatDistanceToNow } from 'date-fns';
+import { vi } from 'date-fns/locale';
 
 export default function Interactions() {
   const [interactions, setInteractions] = useState([]);
@@ -25,7 +25,7 @@ export default function Interactions() {
         const response = await getInteractions();
         setInteractions(response.data.data);
       } catch (error) {
-        console.error("Lỗi tải thông báo:", error);
+        console.error('Lỗi tải thông báo:', error);
       } finally {
         setLoading(false);
       }
@@ -71,20 +71,20 @@ function NotificationItem({ item }) {
   // Cấu hình nội dung dựa trên loại thông báo (type)
   let config = {
     icon: <Bell size={20} />,
-    color: "bg-gray-100 text-gray-600",
-    content: "Thông báo mới",
-    link: "#",
+    color: 'bg-gray-100 text-gray-600',
+    content: 'Thông báo mới',
+    link: '#',
   };
 
   const { type, Sender, Recipe, Comment } = item;
-  const senderName = Sender?.username || "Ai đó";
+  const senderName = Sender?.username || 'Ai đó';
 
   switch (type) {
     // 1. Đăng món ăn thành công
-    case "RECIPE_PUBLISHED":
+    case 'RECIPE_PUBLISHED':
       config = {
         icon: <CheckCircle size={20} />,
-        color: "bg-green-100 text-green-600",
+        color: 'bg-green-100 text-green-600',
         content: (
           <span>
             Chúc mừng! Món <strong>{Recipe?.title}</strong> của bạn đã được xuất
@@ -96,13 +96,13 @@ function NotificationItem({ item }) {
       break;
 
     // 2. Gửi Cooksnap thành công
-    case "COOKSNAP_SENT":
+    case 'COOKSNAP_SENT':
       config = {
         icon: <Camera size={20} />,
-        color: "bg-blue-100 text-blue-600",
+        color: 'bg-blue-100 text-blue-600',
         content: (
           <span>
-            Bạn đã gửi Cooksnap cho món <strong>{Recipe?.title}</strong>.
+            Bạn đã gửi Psnap cho món <strong>{Recipe?.title}</strong>.
           </span>
         ),
         link: `/recipes/${Recipe?.id}`,
@@ -110,13 +110,13 @@ function NotificationItem({ item }) {
       break;
 
     // 3. Có người phản hồi bình luận
-    case "COMMENT_REPLY":
+    case 'COMMENT_REPLY':
       config = {
         icon: <MessageCircle size={20} />,
-        color: "bg-purple-100 text-purple-600",
+        color: 'bg-purple-100 text-purple-600',
         content: (
           <span>
-            <strong>{senderName}</strong> đã trả lời bình luận của bạn trong món{" "}
+            <strong>{senderName}</strong> đã trả lời bình luận của bạn trong món{' '}
             <strong>{Recipe?.title}</strong>.
           </span>
         ),
@@ -125,13 +125,13 @@ function NotificationItem({ item }) {
       break;
 
     // 4. Có lượt thích
-    case "LIKE":
+    case 'LIKE':
       config = {
         icon: <Heart size={20} />,
-        color: "bg-red-100 text-red-600",
+        color: 'bg-red-100 text-red-600',
         content: (
           <span>
-            <strong>{senderName}</strong> đã thích món{" "}
+            <strong>{senderName}</strong> đã thích món{' '}
             <strong>{Recipe?.title}</strong> của bạn.
           </span>
         ),
@@ -140,10 +140,10 @@ function NotificationItem({ item }) {
       break;
 
     // 5. Có người kết bạn (Follow)
-    case "FOLLOW":
+    case 'FOLLOW':
       config = {
         icon: <UserPlus size={20} />,
-        color: "bg-orange-100 text-orange-600",
+        color: 'bg-orange-100 text-orange-600',
         content: (
           <span>
             <strong>{senderName}</strong> đã bắt đầu theo dõi bạn.
@@ -154,13 +154,13 @@ function NotificationItem({ item }) {
       break;
 
     // Trường hợp khác (Cooksnap nhận được từ người khác)
-    case "COOKSNAP_RECEIVED":
+    case 'COOKSNAP_RECEIVED':
       config = {
         icon: <Utensils size={20} />,
-        color: "bg-yellow-100 text-yellow-600",
+        color: 'bg-yellow-100 text-yellow-600',
         content: (
           <span>
-            <strong>{senderName}</strong> vừa gửi Cooksnap cho món{" "}
+            <strong>{senderName}</strong> vừa gửi Psnap cho món{' '}
             <strong>{Recipe?.title}</strong> của bạn!
           </span>
         ),
@@ -192,7 +192,7 @@ function NotificationItem({ item }) {
                 addSuffix: true,
                 locale: vi,
               })
-            : "Vừa xong"}
+            : 'Vừa xong'}
         </p>
       </div>
 

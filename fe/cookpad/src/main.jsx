@@ -1,14 +1,12 @@
-import React from 'react'; // ✅ Phải import React
-import { createRoot } from 'react-dom/client'; // ✅ Import createRoot
+import React from 'react';
+import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
 
-// ⚠️ Đảm bảo bạn đã tạo file này và đường dẫn đúng
-import { AuthProvider } from './contexts/AuthContext'; 
+import { AuthProvider } from './contexts/AuthContext';
 
-// Xác định Root Element
 const container = document.getElementById('root');
-const root = createRoot(container); // Sử dụng createRoot
+const root = createRoot(container);
 
 root.render(
   <React.StrictMode>

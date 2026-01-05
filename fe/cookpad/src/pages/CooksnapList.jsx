@@ -1,8 +1,8 @@
 // src/pages/CooksnapList.jsx
-import { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { ChevronLeft, Heart } from "lucide-react";
-import { getRecipeCooksnaps, getRecipeById } from "../services/recipeApi";
+import { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { ChevronLeft, Heart } from 'lucide-react';
+import { getRecipeCooksnaps, getRecipeById } from '../services/recipeApi';
 
 export default function CooksnapList() {
   const { id } = useParams(); // Recipe ID
@@ -22,7 +22,7 @@ export default function CooksnapList() {
         setRecipe(recipeRes.data.data);
         setCooksnaps(snapsRes.data.data || []);
       } catch (error) {
-        console.error("Lỗi tải dữ liệu:", error);
+        console.error('Lỗi tải dữ liệu:', error);
       } finally {
         setLoading(false);
       }
@@ -41,12 +41,12 @@ export default function CooksnapList() {
         <div className="relative h-32 w-full overflow-hidden rounded-lg mb-4">
           {/* Ảnh banner món ăn (cắt lấy phần giữa) */}
           <img
-            src={recipe.image_url || "https://placehold.co/800x200"}
+            src={recipe.image_url || 'https://placehold.co/800x200'}
             alt={recipe.title}
             className="w-full h-full object-cover blur-sm opacity-50 absolute top-0 left-0"
           />
           <img
-            src={recipe.image_url || "https://placehold.co/800x200"}
+            src={recipe.image_url || 'https://placehold.co/800x200'}
             alt={recipe.title}
             className="h-full object-contain mx-auto relative z-10 shadow-md"
           />
@@ -76,7 +76,7 @@ export default function CooksnapList() {
             <Link to={`/cooksnaps/${snap.id}`} className="block relative group">
               <img
                 src={snap.image_url}
-                alt="cooksnap"
+                alt="psnap"
                 className="w-full h-64 object-cover bg-gray-100 transition duration-300 group-hover:opacity-90"
               />
             </Link>
@@ -85,7 +85,7 @@ export default function CooksnapList() {
               {/* Người gửi */}
               <div className="flex items-center gap-3 mb-3">
                 <img
-                  src={snap.User?.avatar_url || "https://placehold.co/40"}
+                  src={snap.User?.avatar_url || 'https://placehold.co/40'}
                   alt={snap.User?.username}
                   className="w-10 h-10 rounded-full object-cover border"
                 />
@@ -94,7 +94,7 @@ export default function CooksnapList() {
                     {snap.User?.username}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {new Date(snap.created_at).toLocaleDateString("vi-VN")}
+                    {new Date(snap.created_at).toLocaleDateString('vi-VN')}
                   </p>
                 </div>
               </div>
@@ -119,7 +119,7 @@ export default function CooksnapList() {
 
       {cooksnaps.length === 0 && (
         <p className="text-center text-gray-500 py-10">
-          Chưa có Cooksnap nào. Hãy là người đầu tiên!
+          Chưa có Psnap nào. Hãy là người đầu tiên!
         </p>
       )}
     </div>

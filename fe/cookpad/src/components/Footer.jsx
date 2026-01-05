@@ -7,10 +7,10 @@ export default function Footer() {
         {/* Phần mô tả app */}
         <div className="text-center mb-6">
           <p className="text-sm text-gray-700 leading-relaxed mb-4 max-w-2xl mx-auto">
-            Về Pcook: Làm cho việc nấu ăn trở nên dễ dàng và thú vị hơn với
-            hàng triệu công thức từ cộng đồng. Tìm kiếm và lưu công thức yêu
-            thích, chia sẻ với bạn bè, và khám phá nguyên liệu mới mỗi ngày.
-            Chúng tôi có hơn 100 triệu người dùng trên toàn thế giới!
+            Về Pcook: Làm cho việc nấu ăn trở nên dễ dàng và thú vị hơn với hàng
+            triệu công thức từ cộng đồng. Tìm kiếm và lưu công thức yêu thích,
+            chia sẻ với bạn bè, và khám phá nguyên liệu mới mỗi ngày. Chúng tôi
+            có hơn 100 triệu người dùng trên toàn thế giới!
           </p>
         </div>
 
@@ -44,7 +44,7 @@ export default function Footer() {
         {/* Phần Tìm Hiểu Thêm */}
         <div className="flex flex-wrap justify-center gap-4 mb-6 text-xs text-gray-600">
           <a href="#" className="hover:text-cookpad-orange transition-colors">
-            Sử dụng Cookpad
+            Sử dụng PCook
           </a>
           <a href="#" className="hover:text-cookpad-orange transition-colors">
             Góp ý
@@ -59,11 +59,10 @@ export default function Footer() {
             Liên hệ
           </a>
         </div>
-  
 
         {/* Copyright */}
         <div className="text-center text-xs text-gray-500 mb-4">
-          Bản quyền © Cookpad Inc. All Rights Reserved
+          Bản quyền © PCook Inc. All Rights Reserved
         </div>
       </div>
       {/* Minh họa rau củ ở dưới (dùng background SVG cho đơn giản, hoặc thêm image) */}

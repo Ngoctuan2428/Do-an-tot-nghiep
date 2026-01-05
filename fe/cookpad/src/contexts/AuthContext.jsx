@@ -1,8 +1,5 @@
-// src/contexts/AuthContext.jsx
-
-import React, { createContext, useContext, useState, useEffect } from "react";
-// ✅ [SỬA LỖI] Đổi tên fetchUserProfile thành getCurrentUser
-import { getCurrentUser } from "../services/userApi";
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getCurrentUser } from '../services/userApi';
 
 const AuthContext = createContext(null);
 
@@ -10,9 +7,9 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // [1] LOGIC KHỞI TẠO: Kiểm tra token và tải profile
+  // kiem tra token & tai profile khi app load
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem('accessToken');
 
     const loadUserProfile = async () => {
       if (!token) {
@@ -21,22 +18,17 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
-        // ✅ [SỬA LỖI] GỌI HÀM getCurrentUser()
-        // Token sẽ được tự động đính kèm qua interceptor của axios
         const response = await getCurrentUser();
 
-        // Giả định backend trả về user data trực tiếp (response.data)
-        // Chúng ta cần lấy data.user nếu backend đóng gói response
         const userData = response.data?.data;
-        // Kiểm tra xem dữ liệu user có phải là user: {...} không
         if (userData.user) {
-          setUser(userData.user); // Nếu backend trả về { user: {...} }
+          setUser(userData.user);
         } else {
-          setUser(userData); // Nếu backend trả về user object trực tiếp
+          setUser(userData);
         }
       } catch (error) {
-        console.error("Lỗi khi tải profile bằng token:", error);
-        localStorage.removeItem("accessToken");
+        console.error('Lỗi khi tải profile bằng token:', error);
+        localStorage.removeItem('accessToken');
         setUser(null);
       } finally {
         setLoading(false);
@@ -46,27 +38,27 @@ export const AuthProvider = ({ children }) => {
     loadUserProfile();
   }, []);
 
-  // [2] HÀM LOGIN: Lưu token và user data
+  // luu token va user data
   const login = (userData, token) => {
-    localStorage.setItem("accessToken", token);
+    localStorage.setItem('accessToken', token);
     setUser(userData);
   };
 
-  // [3] HÀM LOGOUT: Xóa token và user data
+  // xoa token va user data
   const logout = () => {
-    localStorage.removeItem("accessToken");
+    localStorage.removeItem('accessToken');
     setUser(null);
   };
 
-  // [4] RENDER: Hiển thị loading trong khi chờ tải
+  // hien thi loading trong khi cho tai
   if (loading) {
     return (
       <div
         style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         Đang tải dữ liệu người dùng...

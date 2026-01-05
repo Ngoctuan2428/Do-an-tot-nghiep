@@ -67,12 +67,9 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Top bar (md) và Bottom bar (sm) giữ nguyên, không cần sửa */}
-      {/* ... (Đã lược bỏ phần JSX không cần sửa) ... */}
-
-      {/* Top bar cho md (768-1023px) */}
-      <div className="md:block lg:hidden sticky top-0 z-40">
-        <aside className="w-full h-auto bg-white border-b border-gray-200 flex flex-row justify-between items-center px-4 py-2 overflow-x-auto">
+      {/* Top bar cho md (640-1023px) */}
+      <div className="hidden md:block lg:hidden sticky top-0z-50 bg-white border-b border-gray-200">
+        <div className="w-full h-auto bg-white border-b border-gray-200 flex flex-row justify-between items-center px-4 py-2 overflow-x-auto">
           <div className="flex-shrink-0 flex items-center space-x-2">
             <Link to="/" className="flex items-center space-x-1">
               <img src="/pCook.png" className="w-8 h-8" alt="logo" />
@@ -110,7 +107,7 @@ export default function Sidebar() {
               );
             })}
           </nav>
-        </aside>
+        </div>
       </div>
 
       {/* Bottom bar cho <md (sm-): Minimal 3 icons */}

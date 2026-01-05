@@ -1,13 +1,13 @@
 // src/pages/CooksnapDetail.jsx
-import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Edit2, Trash2, Save, X } from "lucide-react";
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { ArrowLeft, Edit2, Trash2, Save, X } from 'lucide-react';
 import {
   getCooksnapById,
   updateCooksnap,
   deleteCooksnap,
-} from "../services/recipeApi";
-import { getCurrentUser } from "../services/userApi";
+} from '../services/recipeApi';
+import { getCurrentUser } from '../services/userApi';
 
 export default function CooksnapDetail() {
   const { id } = useParams(); // Cooksnap ID
@@ -19,7 +19,7 @@ export default function CooksnapDetail() {
 
   // State cho việc chỉnh sửa
   const [isEditing, setIsEditing] = useState(false);
-  const [editComment, setEditComment] = useState("");
+  const [editComment, setEditComment] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,11 +30,11 @@ export default function CooksnapDetail() {
         ]);
 
         setCooksnap(snapRes.data.data);
-        setEditComment(snapRes.data.data.comment || "");
+        setEditComment(snapRes.data.data.comment || '');
         setCurrentUser(userRes.data.data);
       } catch (error) {
-        console.error("Lỗi tải cooksnap:", error);
-        alert("Không tìm thấy Cooksnap này.");
+        console.error('Lỗi tải psnap:', error);
+        alert('Không tìm thấy psnap này.');
         navigate(-1);
       } finally {
         setLoading(false);
@@ -48,21 +48,21 @@ export default function CooksnapDetail() {
       await updateCooksnap(id, { comment: editComment });
       setCooksnap((prev) => ({ ...prev, comment: editComment }));
       setIsEditing(false);
-      alert("Đã cập nhật thành công!");
+      alert('Đã cập nhật thành công!');
     } catch (error) {
-      alert("Cập nhật thất bại.");
+      alert('Cập nhật thất bại.');
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm("Bạn có chắc chắn muốn xóa Cooksnap này không?"))
+    if (!window.confirm('Bạn có chắc chắn muốn xóa Cooksnap này không?'))
       return;
     try {
       await deleteCooksnap(id);
-      alert("Đã xóa thành công.");
+      alert('Đã xóa thành công.');
       navigate(-1); // Quay lại trang trước
     } catch (error) {
-      alert("Xóa thất bại.");
+      alert('Xóa thất bại.');
     }
   };
 
@@ -113,7 +113,7 @@ export default function CooksnapDetail() {
           {/* Người đăng */}
           <div className="flex items-center gap-3 mb-4">
             <img
-              src={cooksnap.User.avatar_url || "https://placehold.co/50"}
+              src={cooksnap.User.avatar_url || 'https://placehold.co/50'}
               className="w-12 h-12 rounded-full object-cover border"
             />
             <div>
@@ -121,7 +121,7 @@ export default function CooksnapDetail() {
                 {cooksnap.User.username}
               </p>
               <p className="text-xs text-gray-500">
-                {new Date(cooksnap.created_at).toLocaleDateString("vi-VN")}
+                {new Date(cooksnap.created_at).toLocaleDateString('vi-VN')}
               </p>
             </div>
           </div>
@@ -154,7 +154,7 @@ export default function CooksnapDetail() {
               </div>
             ) : (
               <p className="text-gray-700 italic text-lg leading-relaxed">
-                "{cooksnap.comment || "Không có mô tả"}"
+                "{cooksnap.comment || 'Không có mô tả'}"
               </p>
             )}
           </div>
