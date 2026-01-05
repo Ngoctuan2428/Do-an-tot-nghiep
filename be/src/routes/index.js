@@ -19,7 +19,7 @@ router.use("/users", userRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/recipes", recipeRoutes);
 router.use("/admin", adminRoutes);
-router.use("/chatbot", chatbotRoutes);
+// router.use("/chatbot", chatbotRoutes);
 router.use("/search", searchRoutes);
 router.use("/media", mediaRoutes);
 router.use("/challenges", challengeRoutes);
