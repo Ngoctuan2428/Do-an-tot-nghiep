@@ -1,20 +1,20 @@
 // src/config/passport.js
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const FacebookStrategy = require("passport-facebook").Strategy;
 const config = require("./environment");
-const { User } = require("../models");
+// const { User } = require("../models"); // Dòng này có thể bỏ nếu không dùng trực tiếp ở đây
 const authService = require("../services/auth.service");
 
 /**
- * Hàm callback chung cho cả Google và Facebook
- * Sẽ tìm hoặc tạo user mới trong CSDL
+ * Hàm callback xử lý logic: Tìm hoặc Tạo user
  */
 const socialLoginCallback = async (profile, done) => {
   try {
+    // Gọi service (nơi sẽ ném lỗi nếu trùng email local)
     const user = await authService.findOrCreateUser(profile);
-    return done(null, user); // Gửi user cho bước tiếp theo
+    return done(null, user); // Thành công
   } catch (err) {
+    // QUAN TRỌNG: Chuyền lỗi ra ngoài cho Controller xử lý
     return done(err, null);
   }
 };
@@ -28,38 +28,23 @@ passport.use(
       callbackURL: config.google.callbackURL,
     },
     (accessToken, refreshToken, profile, done) => {
-      // Chuẩn hóa 'profile' object từ Google
+      // Chuẩn hóa dữ liệu từ Google
       const normalizedProfile = {
         provider: profile.provider,
         id: profile.id,
-        email: profile.emails[0].value,
+        email: profile.emails?.[0]?.value, // Thêm ?. để tránh lỗi crash nếu google không trả về email
         displayName: profile.displayName,
-        avatar: profile.photos[0].value,
+        avatar: profile.photos?.[0]?.value,
       };
+      
       socialLoginCallback(normalizedProfile, done);
     }
   )
 );
 
-// Cấu hình Facebook Strategy
-passport.use(
-  new FacebookStrategy(
-    {
-      clientID: config.facebook.clientID,
-      clientSecret: config.facebook.clientSecret,
-      callbackURL: config.facebook.callbackURL,
-      profileFields: ["id", "displayName", "emails", "picture.type(large)"],
-    },
-    (accessToken, refreshToken, profile, done) => {
-      // Chuẩn hóa 'profile' object từ Facebook
-      const normalizedProfile = {
-        provider: profile.provider,
-        id: profile.id,
-        email: profile.emails ? profile.emails[0].value : null,
-        displayName: profile.displayName,
-        avatar: profile.photos ? profile.photos[0].value : null,
-      };
-      socialLoginCallback(normalizedProfile, done);
-    }
-  )
-);
+// Lưu ý: Nếu bạn dùng session: false hoàn toàn thì không cần serialize/deserialize
+// Nhưng nếu Passport yêu cầu, bạn có thể thêm đoạn cơ bản này để tránh lỗi:
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((user, done) => done(null, user));
+
+module.exports = passport;

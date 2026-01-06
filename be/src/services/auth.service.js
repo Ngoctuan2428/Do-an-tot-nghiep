@@ -80,17 +80,19 @@ const findOrCreateUser = async (profile) => {
 
   // 2. Nếu không tìm thấy, kiểm tra xem email đã tồn tại với 'local' provider chưa
   if (email) {
-    const existingEmailUser = await User.findOne({
-      where: { email },
-    });
+      const existingEmailUser = await User.findOne({
+        where: { email },
+      });
 
-    if (existingEmailUser && existingEmailUser.provider === "local") {
-      // User đã đăng ký bằng email/pass, không thể đăng nhập bằng MXH
-      throw new ApiError(
-        400,
-        "Email này đã được đăng ký bằng mật khẩu. Vui lòng đăng nhập bằng mật khẩu."
-      );
-    }
+      if (existingEmailUser && existingEmailUser.provider === "local") {
+        // Tạo lỗi nhưng gắn thêm mã code để Controller nhận biết và Redirect
+        const error = new ApiError(
+          400,
+          "Email này đã được đăng ký bằng mật khẩu."
+        );
+        error.errorCode = "EMAIL_ALREADY_LOCAL"; // Thêm cờ này để nhận diện
+        throw error;
+      }
 
     // 3. Email chưa tồn tại (hoặc đã đăng nhập bằng MXH khác)
     // Tạo user mới

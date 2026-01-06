@@ -1,16 +1,12 @@
-// src/pages/Search.jsx
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Loader2, Crown, ArrowRight, Flame } from "lucide-react";
-import pCook from "../../public/pCook.png"; // Giữ nguyên logo của bạn
-
-// Import API và Component
-import { getPremiumRecipes } from "../services/recipeApi"; // API lấy top like
+import { useNavigate } from "react-router-dom";
+import { Loader2, Flame, TrendingUp } from "lucide-react";
+import pCook from "../../public/pCook.png";
+import { getPremiumRecipes } from "../services/recipeApi";
 import SearchBar from "../components/SearchBar";
 import KeywordCard from "../components/KeywordCard";
-import RecipeCard from "../components/RecipeCard"; // Dùng lại RecipeCard của bạn
+import RecipeCard from "../components/RecipeCard";
 
-// Danh sách từ khóa (Giữ nguyên như code cũ của bạn)
 const keywords = [
   {
     id: 1,
@@ -64,36 +60,34 @@ const keywords = [
 
 export default function Search() {
   const navigate = useNavigate();
-  const [premiumRecipes, setPremiumRecipes] = useState([]); // State lưu danh sách món Premium
-  const [loadingPremium, setLoadingPremium] = useState(true);
+  const [topRecipes, setTopRecipes] = useState([]);
+  const [loadingTop, setLoadingTop] = useState(true);
 
-  // Load dữ liệu Premium ngay khi vào trang
+  // Load dữ liệu Top Like
   useEffect(() => {
-    const fetchPremium = async () => {
+    const fetchTopRecipes = async () => {
       try {
         const res = await getPremiumRecipes();
-        setPremiumRecipes(res.data.data || []);
+        // Mẹo debug: Bạn có thể bỏ comment dòng dưới để xem chính xác tên biến là gì
+        // console.log("Data tu API:", res.data.data); 
+        setTopRecipes(res.data.data || []);
       } catch (error) {
-        console.error("Lỗi tải món premium:", error);
+        console.error("Lỗi tải món nổi bật:", error);
       } finally {
-        setLoadingPremium(false);
+        setLoadingTop(false);
       }
     };
-    fetchPremium();
+    fetchTopRecipes();
   }, []);
 
-  // Xử lý khi user nhập từ khóa vào SearchBar
   const handleSearchSubmit = (searchTerm) => {
     if (searchTerm.trim()) {
-      // Chuyển hướng sang trang chi tiết tìm kiếm (SearchDetail)
-      // Giả sử route của bạn là /search/:query
       navigate(`/search/${encodeURIComponent(searchTerm.toLowerCase())}`);
     }
   };
 
   return (
     <main className="max-w-7xl mx-auto p-6 min-h-screen bg-gray-50">
-      {/* Banner Logo */}
       <div className="flex justify-center mb-8">
         <img
           src={pCook}
@@ -102,14 +96,12 @@ export default function Search() {
         />
       </div>
 
-      {/* Search Bar */}
       <div className="flex flex-row justify-center mb-10">
         <div className="w-full max-w-2xl">
           <SearchBar onSearch={handleSearchSubmit} />
         </div>
       </div>
 
-      {/* Grid Keywords (Danh mục nhanh) */}
       <div className="mb-10">
         <h3 className="text-xl font-bold text-gray-800 mb-4 ml-1">
           Khám phá nhanh
@@ -121,42 +113,40 @@ export default function Search() {
         </div>
       </div>
 
-      {/* Premium Section (Dữ liệu thật từ API) */}
-      <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+      <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-10">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold flex items-center gap-2">
-            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-lg text-sm shadow-sm flex items-center gap-1">
-              <Crown size={16} fill="currentColor" /> Premium
-            </span>
-            <span className="text-gray-900">Top Món Ăn Yêu Thích</span>
+          <h3 className="text-xl font-bold flex items-center gap-2 text-gray-900">
+            <TrendingUp className="text-red-500" />
+            <span>Món Ăn Được Yêu Thích Nhất</span>
           </h3>
         </div>
 
-        {loadingPremium ? (
+        {loadingTop ? (
           <div className="flex justify-center py-10">
             <Loader2 className="animate-spin text-orange-500 w-8 h-8" />
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {premiumRecipes.length > 0 ? (
-              premiumRecipes.map((recipe, index) => (
+            {topRecipes.length > 0 ? (
+              topRecipes.map((recipe, index) => (
                 <div key={recipe.id} className="relative group">
-                  {/* Badge Top 1, 2, 3 */}
                   {index < 3 && (
-                    <div className="absolute top-3 left-3 z-10 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded shadow-md flex items-center gap-1">
+                    <div className="absolute top-3 left-3 z-10 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded shadow-md flex items-center gap-1">
                       <Flame size={12} fill="currentColor" /> Top {index + 1}
                     </div>
                   )}
 
-                  {/* Sử dụng lại RecipeCard của bạn, truyền đúng props */}
                   <RecipeCard
-                    id={recipe.id} // Quan trọng để Link hoạt động
+                    id={recipe.id}
                     title={recipe.title}
                     image={recipe.image_url}
-                    premium={true} // Prop để hiển thị style premium (nếu component hỗ trợ)
-                    views={recipe.view_count || 0}
+                    premium={false}
+                    // --- SỬA Ở ĐÂY ---
+                    // Ưu tiên lấy 'views', nếu không có thì thử 'view_count'
+                    views={recipe.views || recipe.view_count || 0}
+                    // ----------------
                     likes={recipe.likes || 0}
-                    user={recipe.User} // Truyền thông tin người đăng nếu cần
+                    user={recipe.User}
                   />
                 </div>
               ))
@@ -168,21 +158,6 @@ export default function Search() {
           </div>
         )}
       </section>
-
-      {/* Banner Quảng cáo Premium (Optional - Trang trí thêm cho đẹp) */}
-      <div className="mt-8 bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-6 md:p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg">
-        <div>
-          <h3 className="text-xl md:text-2xl font-bold mb-2 flex items-center gap-2">
-            <Crown className="text-yellow-400" /> Trải nghiệm PCook Premium
-          </h3>
-          <p className="text-gray-300 text-sm md:text-base">
-            Mở khóa công thức độc quyền và loại bỏ quảng cáo ngay hôm nay.
-          </p>
-        </div>
-        <button className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg hover:scale-105 transition transform text-sm md:text-base whitespace-nowrap">
-          Dùng thử miễn phí
-        </button>
-      </div>
     </main>
   );
 }

@@ -1,5 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./index.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; 
+
 import RecipesLayout from "./pages/Recipes/RecipesLayout";
 import AllRecipes from "./pages/Recipes/AllRecipes";
 import SavedRecipes from "./pages/Recipes/SavedRecipes";
@@ -28,10 +31,10 @@ import { RecipeCountProvider } from "./contexts/RecipeCountContext";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import CooksnapList from "./pages/CooksnapList";
-import CooksnapDetail from "./pages/CooksnapDetail"; // ✅ Import trang mới
+import CooksnapDetail from "./pages/CooksnapDetail";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-import RecipeStatistics from "./pages/RecipeStatistics"; // Import
+import RecipeStatistics from "./pages/RecipeStatistics";
 
 function App() {
   return (
@@ -82,7 +85,22 @@ function App() {
             <Footer />
           </div>
         </div>
+        
         <Chatbox />
+        
+        <ToastContainer 
+          position="top-right" 
+          autoClose={3000} 
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+        
       </Router>
     </RecipeCountProvider>
   );

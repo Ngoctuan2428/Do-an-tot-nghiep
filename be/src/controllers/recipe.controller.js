@@ -1,4 +1,7 @@
+// src/controllers/recipe.controller.js
 const recipeService = require("../services/recipe.service");
+// ✅ IMPORT SERVICE THỐNG KÊ (Để tăng view)
+const statsService = require("../services/stats.service");
 
 const { Recipe, User, Category, sequelize } = require("../models");
 const { Op } = require("sequelize");
@@ -21,9 +24,26 @@ const getAllRecipes = async (req, res, next) => {
   }
 };
 
+// ✅ HÀM LẤY CHI TIẾT (ĐÃ TÍCH HỢP TĂNG VIEW & LOG DEBUG)
 const getRecipeById = async (req, res, next) => {
   try {
-    const recipe = await recipeService.getRecipeById(req.params.id);
+    const { id } = req.params;
+    // Lấy ID người xem (nếu đã đăng nhập), nếu khách vãng lai thì null
+    const viewerId = req.user ? req.user.id : null;
+
+    // --- DEBUG LOG (Để kiểm tra lỗi) ---
+    console.log(`[DEBUG] Dang tang view cho recipe: ${id}, viewer: ${viewerId}`);
+
+    try {
+      await statsService.incrementViewCount(id, viewerId);
+      console.log("[DEBUG] Tang view THANH CONG!");
+    } catch (err) {
+      // Nếu lỗi, nó sẽ in ra lý do (Ví dụ: cột 'views' không tồn tại)
+      console.error("[ERROR] LOI TANG VIEW:", err.message);
+    }
+    // ----------------------------------
+
+    const recipe = await recipeService.getRecipeById(id);
     res.status(200).json({ status: "success", data: recipe });
   } catch (error) {
     next(error);
@@ -32,8 +52,6 @@ const getRecipeById = async (req, res, next) => {
 
 const updateRecipe = async (req, res, next) => {
   try {
-    // --- SỬA DÒNG NÀY ---
-    // Thêm req.user.role để truyền vào service
     const updatedRecipe = await recipeService.updateRecipe(
       req.params.id,
       req.user.id,
@@ -56,29 +74,17 @@ const deleteRecipe = async (req, res, next) => {
   }
 };
 
-/**
- * @desc    Lưu/Bỏ lưu món ăn
- * @route   POST /api/recipes/:id/save
- * @access  Private (Cần đăng nhập)
- */
 const saveRecipe = async (req, res, next) => {
   try {
-    const userId = req.user.id; // Lấy từ middleware 'protect'
+    const userId = req.user.id;
     const recipeId = req.params.id;
-
     const result = await recipeService.toggleFavoriteRecipe(userId, recipeId);
-
     res.status(200).json({ status: "success", data: result });
   } catch (error) {
     next(error);
   }
 };
 
-/**
- * @desc    Lấy số lượng món ăn cho sidebar
- * @route   GET /api/recipes/counts
- * @access  Private
- */
 const getRecipeCounts = async (req, res, next) => {
   try {
     const userId = req.user.id;
@@ -89,11 +95,6 @@ const getRecipeCounts = async (req, res, next) => {
   }
 };
 
-/**
- * @desc    Lấy món ăn của tôi
- * @route   GET /api/recipes/mine
- * @access  Private
- */
 const getMyRecipes = async (req, res, next) => {
   try {
     const userId = req.user.id;
@@ -104,11 +105,6 @@ const getMyRecipes = async (req, res, next) => {
   }
 };
 
-/**
- * @desc    Lấy món ăn đã lưu
- * @route   GET /api/recipes/saved
- * @access  Private
- */
 const getSavedRecipes = async (req, res, next) => {
   try {
     const userId = req.user.id;
@@ -119,11 +115,6 @@ const getSavedRecipes = async (req, res, next) => {
   }
 };
 
-/**
- * @desc    Lấy món ăn đã đăng
- * @route   GET /api/recipes/published
- * @access  Private
- */
 const getPublishedRecipes = async (req, res, next) => {
   try {
     const userId = req.user.id;
@@ -134,11 +125,6 @@ const getPublishedRecipes = async (req, res, next) => {
   }
 };
 
-/**
- * @desc    Lấy món ăn nháp
- * @route   GET /api/recipes/drafts
- * @access  Private
- */
 const getDraftRecipes = async (req, res, next) => {
   try {
     const userId = req.user.id;
@@ -151,7 +137,7 @@ const getDraftRecipes = async (req, res, next) => {
 
 const likeRecipe = async (req, res, next) => {
   try {
-    const userId = req.user.id; // Lấy ID user từ token
+    const userId = req.user.id;
     const recipeId = req.params.id;
     const result = await recipeService.toggleLike(userId, recipeId);
     res.status(200).json({ status: "success", data: result });
@@ -172,7 +158,7 @@ const getLikedRecipesIds = async (req, res, next) => {
 
 const getRecipeReacters = async (req, res, next) => {
   try {
-    const { id } = req.params; // recipeId
+    const { id } = req.params;
     const result = await recipeService.getRecipeReacters(id, req.query);
     res.status(200).json({ status: "success", data: result });
   } catch (error) {
@@ -180,12 +166,10 @@ const getRecipeReacters = async (req, res, next) => {
   }
 };
 
-// ✅ CONTROLLER MỚI: Xử lý gửi Cooksnap
 const sendCooksnap = async (req, res, next) => {
   try {
     const userId = req.user.id;
     const recipeId = req.params.id;
-    // Frontend sẽ gửi imageUrl lên trong body sau khi upload xong
     const { imageUrl, comment } = req.body;
 
     const result = await recipeService.markRecipeAsCooked(
@@ -200,7 +184,6 @@ const sendCooksnap = async (req, res, next) => {
   }
 };
 
-// ✅ CONTROLLER MỚI: Lấy danh sách đã nấu
 const getCookedRecipes = async (req, res, next) => {
   try {
     const userId = req.user.id;
@@ -231,7 +214,6 @@ const getRecipeCooksnaps = async (req, res, next) => {
   }
 };
 
-// ✅ Controller cho Cooksnap
 const getCooksnap = async (req, res, next) => {
   try {
     const cooksnap = await recipeService.getCooksnapById(req.params.id);
@@ -243,7 +225,6 @@ const getCooksnap = async (req, res, next) => {
 
 const updateCooksnap = async (req, res, next) => {
   try {
-    // req.user.id lấy từ token (middleware protect)
     const updated = await recipeService.updateCooksnap(
       req.params.id,
       req.user.id,
@@ -267,36 +248,23 @@ const deleteCooksnap = async (req, res, next) => {
   }
 };
 
-// ✅ HÀM MỚI: Lấy các món tương tự (cùng danh mục)
 const getRelatedRecipes = async (req, res, next) => {
   try {
-    const { id } = req.params; // ID của món hiện tại
-
-    // 1. Lấy thông tin món hiện tại để biết category_id
+    const { id } = req.params;
     const currentRecipe = await Recipe.findByPk(id);
     if (!currentRecipe) {
       return res.status(404).json({ message: "Recipe not found" });
     }
 
-    // 2. Tìm các món khác cùng category (Random hoặc mới nhất)
-    // Nếu món không có category thì tìm món ngẫu nhiên hoặc cùng tác giả
     const whereClause = {
-      id: { [Op.ne]: id }, // Không lấy chính món này
-      status: "public", // Chỉ lấy món công khai
+      id: { [Op.ne]: id },
+      status: "public",
     };
 
-    // Nếu có category thì lọc theo category
-    /* Lưu ý: Bạn cần đảm bảo Model Recipe có cột category_id hoặc bảng liên kết. 
-           Nếu bạn dùng bảng trung gian recipe_categories, query sẽ phức tạp hơn chút. 
-           Ở đây giả sử bạn có cột category_id trong recipes hoặc logic tương tự. 
-           Nếu chưa có, ta có thể lấy random các món khác.
-        */
-
-    // Tạm thời lấy random 3 món khác để hiển thị
     const relatedRecipes = await Recipe.findAll({
       where: whereClause,
       limit: 3,
-      order: sequelize.random(), // Lấy ngẫu nhiên
+      order: sequelize.random(),
       include: [{ model: User, attributes: ["id", "username", "avatar_url"] }],
     });
 
@@ -306,7 +274,6 @@ const getRelatedRecipes = async (req, res, next) => {
   }
 };
 
-// ✅ Controller mới
 const getPremiumRecipes = async (req, res, next) => {
   try {
     const recipes = await recipeService.getPremiumRecipes();
@@ -331,8 +298,8 @@ module.exports = {
   likeRecipe,
   getLikedRecipesIds,
   getRecipeReacters,
-  sendCooksnap, // ✅ Export
-  getCookedRecipes, // ✅ Export (ghi đè nếu bạn đã có placeholder cũ)
+  sendCooksnap,
+  getCookedRecipes,
   getPublicRecipesByUserId,
   getRecipeCooksnaps,
   getCooksnap,

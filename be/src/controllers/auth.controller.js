@@ -1,4 +1,3 @@
-// Giả định bạn sẽ tạo auth.service.js để xử lý logic
 const authService = require("../services/auth.service");
 const { generateToken } = require("../utils/jwt.helper");
 const ApiError = require("../utils/ApiError");
@@ -6,31 +5,22 @@ const ApiError = require("../utils/ApiError");
 /**
  * @desc    Đăng ký người dùng mới
  * @route   POST /api/auth/register
- * @access  Public
  */
 const register = async (req, res, next) => {
   try {
-    // Lấy username, email, password từ body của request
     const { username, email, password } = req.body;
-
-    // Gọi service để xử lý nghiệp vụ đăng ký
     const { newUser, accessToken } = await authService.registerUser({
       username,
       email,
       password,
     });
 
-    // Trả về response thành công
     res.status(201).json({
       status: "success",
       message: "User registered successfully.",
-      data: {
-        user: newUser,
-        accessToken,
-      },
+      data: { user: newUser, accessToken },
     });
   } catch (error) {
-    // Chuyển lỗi cho middleware xử lý lỗi tập trung
     next(error);
   }
 };
@@ -38,13 +28,10 @@ const register = async (req, res, next) => {
 /**
  * @desc    Đăng nhập
  * @route   POST /api/auth/login
- * @access  Public
  */
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-
-    // Gọi service để xử lý nghiệp vụ đăng nhập
     const { user, accessToken } = await authService.loginUser({
       email,
       password,
@@ -53,10 +40,7 @@ const login = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "User logged in successfully.",
-      data: {
-        user,
-        accessToken,
-      },
+      data: { user, accessToken },
     });
   } catch (error) {
     next(error);
@@ -66,30 +50,41 @@ const login = async (req, res, next) => {
 /**
  * @desc    Callback xử lý sau khi đăng nhập Mạng xã hội thành công
  * @route   GET /api/auth/google/callback, /api/auth/facebook/callback
- * @access  Public
  */
 const socialLoginCallback = async (req, res, next) => {
   try {
-    // Passport đã xác thực và gắn user vào req.user
     const user = req.user;
-
     if (!user) {
       throw new ApiError(401, "Xác thực qua mạng xã hội thất bại.");
     }
 
-    // Tạo JWT token giống như đăng nhập thường
     const accessToken = generateToken(user.id);
-
-    // ❗️ Quan trọng: Redirect về FE và gửi kèm token qua URL
-    // FE sẽ lấy token này từ URL, lưu vào localStorage và hoàn tất đăng nhập
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    
+    // Redirect về trang thành công
     res.redirect(`${frontendUrl}/login-success?token=${accessToken}`);
   } catch (error) {
     next(error);
   }
 };
 
-// ✅ Controller Quên mật khẩu
+// ✅ HÀM MỚI: Middleware chuyên xử lý lỗi cho Social Login
+// Hàm này phải có đủ 4 tham số (err, req, res, next) để Express nhận diện là Error Handler
+const socialLoginErrorHandler = (err, req, res, next) => {
+  if (err.errorCode === "EMAIL_ALREADY_LOCAL") {
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    
+    // Redirect về trang Login kèm thông báo lỗi
+    return res.redirect(`${frontendUrl}/login?error=email_exist_local`);
+  }
+  
+  // Nếu là lỗi khác, chuyển tiếp cho bộ xử lý lỗi chung của App
+  next(err);
+};
+
+/**
+ * @desc    Quên mật khẩu
+ */
 const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
@@ -100,11 +95,13 @@ const forgotPassword = async (req, res, next) => {
   }
 };
 
-// ✅ Controller Đặt lại mật khẩu
+/**
+ * @desc    Đặt lại mật khẩu
+ */
 const resetPassword = async (req, res, next) => {
   try {
     const { id, token } = req.params;
-    const { password } = req.body; // Mật khẩu mới
+    const { password } = req.body;
     const result = await authService.resetPassword(id, token, password);
     res.status(200).json({ status: "success", data: result });
   } catch (error) {
@@ -116,6 +113,7 @@ module.exports = {
   register,
   login,
   socialLoginCallback,
+  socialLoginErrorHandler, // Nhớ export hàm này
   forgotPassword,
   resetPassword,
 };

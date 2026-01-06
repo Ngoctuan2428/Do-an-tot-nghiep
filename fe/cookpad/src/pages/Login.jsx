@@ -1,11 +1,13 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react"; // ⬅️ Thêm useEffect
+import { Link, useNavigate, useSearchParams } from "react-router-dom"; // ⬅️ Thêm useSearchParams
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import axiosInstance from "../services/axiosClient";
+import { toast } from "react-toastify"; // ⬅️ Thêm Toast (nhớ cài thư viện này)
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams(); // ⬅️ Hook lấy tham số trên URL
   const { login } = useAuth();
 
   const [form, setForm] = useState({ email: "", password: "" });
@@ -13,6 +15,20 @@ export default function LoginPage() {
 
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // ✅ HÀM MỚI: Kiểm tra lỗi từ URL ngay khi trang load
+  useEffect(() => {
+    const errorType = searchParams.get("error");
+    
+    if (errorType === "email_exist_local") {
+      const msg = "Email này đã được đăng ký bằng mật khẩu. Vui lòng nhập mật khẩu để đăng nhập!";
+      setError(msg); // Hiển thị lỗi màu đỏ trong form
+      toast.error(msg); // Hiển thị thông báo nổi (nếu có dùng ToastContainer)
+      
+      // (Tuỳ chọn) Xóa param trên URL nhìn cho sạch
+      window.history.replaceState({}, document.title, "/login");
+    }
+  }, [searchParams]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -36,22 +52,17 @@ export default function LoginPage() {
         password: form.password,
       });
 
-      // ✅ [SỬA LỖI] ĐIỀU CHỈNH ĐỂ ĐỌC CẤU TRÚC LỒNG NHAU (response.data.data)
       const { user: userData, accessToken } = response.data.data;
 
       // CẬP NHẬT TRẠNG THÁI TOÀN CỤC SAU KHI ĐĂNG NHẬP THÀNH CÔNG
       login(userData, accessToken);
 
       if (userData.role === "admin") {
-        // Nếu là Admin -> Chuyển sang trang Admin (Port 3001)
-        // Gắn token vào URL để bên kia tự đăng nhập
         window.location.href = `http://localhost:3001/login-sso?token=${accessToken}`;
       } else {
-        // Nếu là User thường -> Vào trang tìm kiếm
         navigate("/search", { replace: true });
       }
     } catch (err) {
-      // Xử lý lỗi API (Lỗi 401, 404, 500)
       const errorMessage =
         err.response?.data?.message || "Lỗi: Email hoặc mật khẩu không đúng.";
       setError(errorMessage);
@@ -62,7 +73,8 @@ export default function LoginPage() {
 
   const handleGoogleLogin = () => {
     console.log("Đang chuyển hướng đến trang đăng nhập Google...");
-    window.location.href = "http://localhost:8000/api/auth/google";
+    // Đảm bảo URL này khớp với route backend của bạn
+    window.location.href = "http://localhost:8000/api/auth/google"; 
   };
 
   return (
@@ -81,7 +93,7 @@ export default function LoginPage() {
         <form onSubmit={handleLogin} className="space-y-4">
           {/* HIỂN THỊ LỖI CHUNG */}
           {error && (
-            <div className="p-3 bg-red-600/80 rounded-md text-sm font-medium">
+            <div className="p-3 bg-red-600/80 rounded-md text-sm font-medium border border-red-500">
               {error}
             </div>
           )}
@@ -124,7 +136,6 @@ export default function LoginPage() {
           <div className="flex justify-between text-sm">
             <p>
               Quên mật khẩu?{" "}
-              {/* ✅ Đổi span thành Link và thêm to="/forgot-password" */}
               <Link
                 to="/forgot-password"
                 className="text-blue-300 cursor-pointer hover:text-blue-200 transition"
