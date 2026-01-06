@@ -1,13 +1,12 @@
-// src/components/ChallengeDetail.jsx
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { ChefHat, Clock, Loader2, Plus, Trophy } from "lucide-react";
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { ChefHat, Clock, Loader2, Plus, Trophy } from 'lucide-react';
 import {
   getChallengeByHashtag,
   getChallengeParticipants,
-} from "../services/challengeApi";
-import RecipeCard from "./RecipeCard";
-import SelectRecipeModal from "./SelectRecipeModal"; // ✅ Import Modal
+} from '../services/challengeApi';
+import RecipeCard from './RecipeCard';
+import SelectRecipeModal from './SelectRecipeModal';
 
 const ChallengeDetail = () => {
   const { hashtag } = useParams();
@@ -15,7 +14,7 @@ const ChallengeDetail = () => {
   const [participants, setParticipants] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ State điều khiển Modal
+  // State điều khiển Modal
   const [showJoinModal, setShowJoinModal] = useState(false);
 
   const fetchData = async () => {
@@ -28,7 +27,7 @@ const ChallengeDetail = () => {
       setChallenge(challengeRes.data.data);
       setParticipants(participantsRes.data.data.rows || []);
     } catch (error) {
-      console.error("Lỗi tải chi tiết thử thách:", error);
+      console.error('Lỗi tải chi tiết thử thách:', error);
     } finally {
       setLoading(false);
     }
@@ -58,7 +57,7 @@ const ChallengeDetail = () => {
     ? Math.ceil(
         (new Date(challenge.end_date) - new Date()) / (1000 * 60 * 60 * 24)
       )
-    : "∞";
+    : '∞';
 
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-8">
@@ -68,7 +67,7 @@ const ChallengeDetail = () => {
           <img
             src={
               challenge.image_url ||
-              "https://placehold.co/800x400?text=Challenge"
+              'https://placehold.co/800x400?text=Challenge'
             }
             alt={challenge.title}
             className="w-full h-full object-cover"
@@ -109,7 +108,7 @@ const ChallengeDetail = () => {
             {challenge.description}
           </div>
 
-          {/* ✅ Nút Mở Modal */}
+          {/* Nút Mở Modal */}
           <div className="flex justify-center">
             <button
               onClick={() => setShowJoinModal(true)}
@@ -139,7 +138,7 @@ const ChallengeDetail = () => {
                 key={recipe.id}
                 id={recipe.id} // Đảm bảo truyền id để link hoạt động
                 title={recipe.title}
-                image={recipe.image_url || "https://placehold.co/300"}
+                image={recipe.image_url || 'https://placehold.co/300'}
                 likes={recipe.likes}
                 views={recipe.views}
                 user={recipe.User} // Truyền thông tin user nếu RecipeCard hỗ trợ
@@ -158,7 +157,7 @@ const ChallengeDetail = () => {
         )}
       </div>
 
-      {/* ✅ Modal Chọn Món */}
+      {/* Modal Chọn Món */}
       <SelectRecipeModal
         isOpen={showJoinModal}
         onClose={() => setShowJoinModal(false)}

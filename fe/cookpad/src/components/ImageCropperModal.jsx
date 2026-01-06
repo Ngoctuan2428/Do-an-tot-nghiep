@@ -1,8 +1,7 @@
-// src/components/ImageCropperModal.jsx
-import { useState, useCallback } from "react";
-import Cropper from "react-easy-crop";
-import { X, RotateCw, Image as ImageIcon } from "lucide-react";
-import getCroppedImg from "../utils/cropImage";
+import { useState, useCallback } from 'react';
+import Cropper from 'react-easy-crop';
+import { X, RotateCw, Image as ImageIcon } from 'lucide-react';
+import getCroppedImg from '../utils/cropImage';
 
 export default function ImageCropperModal({
   imageSrc,
@@ -35,7 +34,7 @@ export default function ImageCropperModal({
       onCropComplete(croppedImageBlob);
     } catch (e) {
       console.error(e);
-      alert("Có lỗi khi cắt ảnh");
+      alert('Có lỗi khi cắt ảnh');
     } finally {
       setLoading(false);
     }
@@ -48,7 +47,7 @@ export default function ImageCropperModal({
         <div className="flex items-center justify-between p-3 border-b">
           <button onClick={onClose} className="opacity-0 cursor-default">
             <X />
-          </button>{" "}
+          </button>{' '}
           {/* Spacer */}
           <h3 className="font-semibold text-gray-700">Cắt Hình</h3>
           <button
@@ -66,7 +65,7 @@ export default function ImageCropperModal({
             crop={crop}
             zoom={zoom}
             rotation={rotation}
-            aspect={4 / 3} // Tỉ lệ khung hình (bạn có thể đổi thành 1/1 cho avatar)
+            aspect={4 / 3} // Tỉ lệ khung hình
             onCropChange={onCropChange}
             onCropComplete={onCropAreaChange}
             onZoomChange={onZoomChange}
@@ -75,7 +74,7 @@ export default function ImageCropperModal({
 
         {/* Footer Controls */}
         <div className="p-4 border-t bg-gray-50 flex items-center justify-between gap-4">
-          {/* Nút Đổi Hình (Giả lập click input file gốc) */}
+          {/* Nút Đổi Hình */}
           <button
             onClick={onClose} // Tạm thời đóng để chọn lại, hoặc truyền callback đổi hình
             className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
@@ -98,7 +97,7 @@ export default function ImageCropperModal({
             disabled={loading}
             className="px-6 py-2 bg-gray-800 text-white rounded-md text-sm font-medium hover:bg-gray-900 disabled:opacity-50"
           >
-            {loading ? "Đang xử lý..." : "Tiếp theo"}
+            {loading ? 'Đang xử lý...' : 'Tiếp theo'}
           </button>
         </div>
       </div>

@@ -1,4 +1,3 @@
-// src/pages/User.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
@@ -11,23 +10,21 @@ import {
   Check,
   Camera,
 } from 'lucide-react';
-// Import API
 import {
   getUserById,
   getUserStats,
   followUser,
   getFollowers,
   getFollowing,
-  getCurrentUser, // ✅ Import thêm
+  getCurrentUser,
 } from '../services/userApi';
 import { getPublicRecipesByUserId } from '../services/recipeApi';
-import UserListItem from '../components/UserListItem'; // ✅ Import component
+import UserListItem from '../components/UserListItem';
 
 export default function User() {
   const { id: userId } = useParams();
   const navigate = useNavigate();
 
-  // activeTab có thể là: 'recipes', 'cooksnaps', 'following', 'followers'
   const [activeTab, setActiveTab] = useState('recipes');
 
   const [user, setUser] = useState(null);
@@ -45,7 +42,7 @@ export default function User() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isFollowLoading, setIsFollowLoading] = useState(false);
 
-  // ✅ State cho danh sách bạn bè
+  // State cho danh sách bạn bè
   const [userList, setUserList] = useState([]);
   const [listLoading, setListLoading] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
@@ -73,7 +70,7 @@ export default function User() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // 1. Lấy thông tin user, thống kê, và danh sách món ăn
+        // Lấy thông tin user, thống kê, và danh sách món ăn
         const [userRes, statsRes, recipesRes] = await Promise.all([
           getUserById(userId),
           getUserStats(userId),
@@ -86,7 +83,7 @@ export default function User() {
         setFilteredRecipes(recipesRes.data.data.rows || []);
         setIsFollowing(userRes.data.data.is_following || false);
 
-        // 2. Lấy ID người dùng hiện tại (nếu đã đăng nhập) để xử lý nút kết bạn trong list
+        // Lấy ID người dùng hiện tại (nếu đã đăng nhập) để xử lý nút kết bạn trong list
         try {
           const currentUserRes = await getCurrentUser();
           setCurrentUserId(currentUserRes.data.data.id);
@@ -132,7 +129,7 @@ export default function User() {
     }
   };
 
-  // ✅ Xử lý khi click vào số lượng Bạn bếp/Người quan tâm
+  // Xử lý khi click vào số lượng Bạn bếp/Người quan tâm
   const handleStatClick = async (tabName) => {
     setActiveTab(tabName);
     setListLoading(true);
@@ -180,9 +177,9 @@ export default function User() {
         <img
           src={user.avatar_url || 'https://placehold.co/112x112?text=U'}
           alt={user.username}
-          className="w-28 h-28 rounded-full border-4 border-white shadow-md object-cover" // Thêm object-cover để ảnh không bị méo
+          className="w-28 h-28 rounded-full border-4 border-white shadow-md object-cover"
           onError={(e) => {
-            e.target.onerror = null; // ✅ QUAN TRỌNG: Ngắt vòng lặp nếu ảnh thay thế cũng lỗi
+            e.target.onerror = null;
             e.target.src = 'https://placehold.co/112x112?text=U';
           }}
         />
@@ -200,7 +197,7 @@ export default function User() {
             </p>
           )}
 
-          {/* ✅ THỐNG KÊ (CLICKABLE) */}
+          {/* THỐNG KÊ (CLICKABLE) */}
           <div className="flex gap-6 mt-4 text-gray-600 justify-center sm:justify-start text-sm">
             <button
               onClick={() => handleStatClick('following')}
@@ -273,7 +270,7 @@ export default function User() {
         </div>
       </div>
 
-      {/* ✅ NAVIGATION / TABS */}
+      {/* NAVIGATION / TABS */}
       {activeTab === 'recipes' || activeTab === 'cooksnaps' ? (
         <div className="border-b flex items-center justify-center gap-8 mb-6 sticky top-[64px] bg-gray-50/90 z-10 backdrop-blur-sm">
           <button
@@ -316,7 +313,7 @@ export default function User() {
         </div>
       )}
 
-      {/* ✅ CONTENT */}
+      {/* CONTENT */}
       {/* Ô tìm kiếm chỉ hiện khi ở tab Recipes */}
       {activeTab === 'recipes' && (
         <div className="flex items-center gap-2 mb-6 max-w-sm">
@@ -355,7 +352,7 @@ export default function User() {
           </div>
         )}
 
-        {/* ✅ Tab Danh sách User */}
+        {/* Tab Danh sách User */}
         {(activeTab === 'following' || activeTab === 'followers') && (
           <div>
             {listLoading ? (

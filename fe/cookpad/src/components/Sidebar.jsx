@@ -1,4 +1,3 @@
-// src/components/Sidebar.jsx
 import { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import {
@@ -16,11 +15,11 @@ import {
 } from 'lucide-react';
 import { khoMonItems } from '../data/sidebarData';
 import { useRecipeCounts } from '../contexts/RecipeCountContext';
-import { useAuth } from '../contexts/AuthContext'; // ✅ ĐÃ IMPORT useAuth
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Sidebar() {
   const location = useLocation();
-  const { user } = useAuth(); // 👈 LẤY TRẠNG THÁI ĐĂNG NHẬP
+  const { user } = useAuth(); // lay trang thai dang nhap
 
   const [isKhoMonOpen, setIsKhoMonOpen] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -119,7 +118,7 @@ export default function Sidebar() {
               <img src="/pCook.png" className="w-8 h-8" alt="logo" />
             </Link>
           </div>
-          {/* 3 icons chính giữa/phải (không labels, chỉ icons để gọn) */}
+          {/* 3 icons chính giữa/phải */}
           <nav className="flex flex-row space-x-4 flex-1 justify-center">
             {bottomBarIcons.map((item) => {
               const Icon = item.icon;
@@ -142,7 +141,6 @@ export default function Sidebar() {
               );
             })}
           </nav>
-          {/* Spacer phải (nếu cần align) */}
           <div className="w-8" />
         </aside>
       </div>
@@ -219,7 +217,7 @@ export default function Sidebar() {
             );
           })}
 
-          {/* 👈 [3] PHẦN KHO MÓN NGON - LOGIC CHÍNH ĐÃ SỬA */}
+          {/* kho mon ngon */}
           {!effectiveCollapsed && (
             <div className="mt-4 p-2">
               <h3 className="flex items-center text-sm font-semibold text-gray-800 mb-3">
@@ -228,9 +226,6 @@ export default function Sidebar() {
               </h3>
 
               {user ? (
-                // ----------------------------------------------------
-                // HIỂN THỊ NỘI DUNG KHO MÓN KHI ĐÃ ĐĂNG NHẬP
-                // ----------------------------------------------------
                 <div>
                   <button
                     onClick={() => setIsKhoMonOpen(!isKhoMonOpen)}
@@ -296,9 +291,6 @@ export default function Sidebar() {
                   )}
                 </div>
               ) : (
-                // ----------------------------------------------------
-                // HIỂN THỊ THÔNG BÁO ĐĂNG NHẬP KHI CHƯA ĐĂNG NHẬP
-                // ----------------------------------------------------
                 <p className="text-sm text-gray-600 px-2">
                   Để bắt đầu tạo kho lưu trữ món ngon của riêng bạn, vui lòng
                   <Link
@@ -321,7 +313,6 @@ export default function Sidebar() {
           )}
         </nav>
 
-        {/* Floating + button (Giữ nguyên) */}
         <button
           onClick={handleAddRecipe}
           className="md:hidden fixed bottom-4 right-4 z-50 w-14 h-14 bg-cookpad-orange text-white rounded-full shadow-lg flex items-center justify-center hover:bg-orange-500 transition-colors"

@@ -1,16 +1,15 @@
-// src/components/CooksnapSection.jsx
-import { Camera, SendHorizontal, MessageCircle } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { getComments, createComment } from "../services/commentApi";
-import CooksnapModal from "./CooksnapModal"; // ✅ Đảm bảo đã import Modal mới
+import { Camera, SendHorizontal, MessageCircle } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { getComments, createComment } from '../services/commentApi';
+import CooksnapModal from './CooksnapModal';
 
 // Component con hiển thị từng comment (Giữ nguyên logic cũ của bạn)
 function CommentItem({ comment, recipeId, onReplySuccess, currentUserAvatar }) {
   const [isReplying, setIsReplying] = useState(false);
-  const [replyContent, setReplyContent] = useState("");
+  const [replyContent, setReplyContent] = useState('');
   const [submittingReply, setSubmittingReply] = useState(false);
-  const userProfileUrl = comment.User?.id ? `/user/${comment.User.id}` : "#";
+  const userProfileUrl = comment.User?.id ? `/user/${comment.User.id}` : '#';
 
   const handleSendReply = async () => {
     if (!replyContent.trim()) return;
@@ -20,12 +19,12 @@ function CommentItem({ comment, recipeId, onReplySuccess, currentUserAvatar }) {
         content: replyContent,
         parent_id: comment.id,
       });
-      setReplyContent("");
+      setReplyContent('');
       setIsReplying(false);
       onReplySuccess();
     } catch (error) {
-      console.error("Lỗi gửi phản hồi:", error);
-      alert("Gửi phản hồi thất bại. Vui lòng đăng nhập.");
+      console.error('Lỗi gửi phản hồi:', error);
+      alert('Gửi phản hồi thất bại. Vui lòng đăng nhập.');
     } finally {
       setSubmittingReply(false);
     }
@@ -35,10 +34,10 @@ function CommentItem({ comment, recipeId, onReplySuccess, currentUserAvatar }) {
     <div className="flex gap-3">
       <Link to={userProfileUrl} className="flex-shrink-0">
         <img
-          src={comment.User?.avatar_url || "https://placehold.co/40x40?text=U"}
+          src={comment.User?.avatar_url || 'https://placehold.co/40x40?text=U'}
           alt={comment.User?.username}
           className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover"
-          onError={(e) => (e.target.src = "https://placehold.co/40x40?text=U")}
+          onError={(e) => (e.target.src = 'https://placehold.co/40x40?text=U')}
         />
       </Link>
       <div className="flex-1">
@@ -47,7 +46,7 @@ function CommentItem({ comment, recipeId, onReplySuccess, currentUserAvatar }) {
             to={userProfileUrl}
             className="font-semibold text-sm text-gray-900 hover:text-cookpad-orange hover:underline"
           >
-            {comment.User?.username || "Người dùng ẩn danh"}
+            {comment.User?.username || 'Người dùng ẩn danh'}
           </Link>
           <p className="text-gray-800 mt-0.5 whitespace-pre-wrap text-sm md:text-base">
             {comment.content}
@@ -55,7 +54,7 @@ function CommentItem({ comment, recipeId, onReplySuccess, currentUserAvatar }) {
         </div>
         <div className="text-xs text-gray-500 mt-1 ml-4 flex gap-3 items-center">
           <span>
-            {new Date(comment.created_at).toLocaleDateString("vi-VN")}
+            {new Date(comment.created_at).toLocaleDateString('vi-VN')}
           </span>
           <button className="font-semibold hover:underline hover:text-cookpad-orange">
             Thích
@@ -74,7 +73,7 @@ function CommentItem({ comment, recipeId, onReplySuccess, currentUserAvatar }) {
               alt="me"
               className="w-6 h-6 rounded-full object-cover"
               onError={(e) =>
-                (e.target.src = "https://placehold.co/30x30?text=Me")
+                (e.target.src = 'https://placehold.co/30x30?text=Me')
               }
             />
             <div className="flex-1 relative">
@@ -116,26 +115,26 @@ function CommentItem({ comment, recipeId, onReplySuccess, currentUserAvatar }) {
 
 // --- COMPONENT CHÍNH ---
 export default function CooksnapSection({ recipe }) {
-  const authorProfileUrl = recipe.User?.id ? `/user/${recipe.User.id}` : "#";
+  const authorProfileUrl = recipe.User?.id ? `/user/${recipe.User.id}` : '#';
   const [isFriend, setIsFriend] = useState(false);
 
   // State comment
   const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState("");
+  const [newComment, setNewComment] = useState('');
   const [loadingComments, setLoadingComments] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   // State điều khiển Modal Cooksnap
   const [showCooksnapModal, setShowCooksnapModal] = useState(false);
 
-  const currentUserAvatar = "https://placehold.co/40x40?text=Me";
+  const currentUserAvatar = 'https://placehold.co/40x40?text=Me';
 
   const fetchComments = async () => {
     try {
       const res = await getComments(recipe.id);
       setComments(res.data.data.rows || []);
     } catch (error) {
-      console.error("Failed to load comments:", error);
+      console.error('Failed to load comments:', error);
     }
   };
 
@@ -151,14 +150,14 @@ export default function CooksnapSection({ recipe }) {
     try {
       setSubmitting(true);
       await createComment(recipe.id, { content: newComment });
-      setNewComment("");
+      setNewComment('');
       await fetchComments();
     } catch (error) {
-      console.error("Lỗi gửi bình luận:", error);
+      console.error('Lỗi gửi bình luận:', error);
       if (error.response && error.response.status === 401) {
-        alert("Vui lòng đăng nhập để bình luận!");
+        alert('Vui lòng đăng nhập để bình luận!');
       } else {
-        alert("Gửi bình luận thất bại. Vui lòng thử lại.");
+        alert('Gửi bình luận thất bại. Vui lòng thử lại.');
       }
     } finally {
       setSubmitting(false);
@@ -201,12 +200,12 @@ export default function CooksnapSection({ recipe }) {
           <Link to={authorProfileUrl} className="flex-shrink-0">
             <img
               src={
-                recipe.User?.avatar_url || "https://placehold.co/80x80?text=U"
+                recipe.User?.avatar_url || 'https://placehold.co/80x80?text=U'
               }
               alt={recipe.User?.username}
               className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border-2 border-white shadow-sm"
               onError={(e) =>
-                (e.target.src = "https://placehold.co/80x80?text=U")
+                (e.target.src = 'https://placehold.co/80x80?text=U')
               }
             />
           </Link>
@@ -215,24 +214,24 @@ export default function CooksnapSection({ recipe }) {
               to={authorProfileUrl}
               className="font-semibold text-lg hover:text-cookpad-orange hover:underline block truncate"
             >
-              {recipe.User?.username || "Ẩn danh"}
+              {recipe.User?.username || 'Ẩn danh'}
             </Link>
             <p className="text-gray-600 text-sm line-clamp-2 mt-1">
-              {recipe.User?.bio || "Thành viên yêu bếp núc."}
+              {recipe.User?.bio || 'Thành viên yêu bếp núc.'}
             </p>
             <button
               onClick={() => setIsFriend(!isFriend)}
               className={`mt-2 px-4 py-1 rounded-lg text-sm border border-gray-300 ${
-                isFriend ? "text-black bg-white" : "bg-gray-700 text-white"
+                isFriend ? 'text-black bg-white' : 'bg-gray-700 text-white'
               }`}
             >
-              {isFriend ? "Bạn bếp" : "Kết bạn bếp"}
+              {isFriend ? 'Bạn bếp' : 'Kết bạn bếp'}
             </button>
           </div>
         </div>
       )}
 
-      <p className="mt-4 text-gray-700">{recipe.author?.bio || ""}</p>
+      <p className="mt-4 text-gray-700">{recipe.author?.bio || ''}</p>
 
       {/* Phần Bình luận */}
       <div className="mt-10">
@@ -272,10 +271,10 @@ export default function CooksnapSection({ recipe }) {
       {showCooksnapModal && (
         <CooksnapModal
           recipeId={recipe.id}
-          recipeAuthorName={recipe.User?.username || "Đầu bếp"} // ✅ Truyền thêm prop này
+          recipeAuthorName={recipe.User?.username || 'Đầu bếp'} // ✅ Truyền thêm prop này
           onClose={() => setShowCooksnapModal(false)}
           onSuccess={() => {
-            console.log("Cooksnap sent successfully");
+            console.log('Cooksnap sent successfully');
             // Bạn có thể thêm logic reload trang hoặc fetch lại data ở đây nếu cần
           }}
         />

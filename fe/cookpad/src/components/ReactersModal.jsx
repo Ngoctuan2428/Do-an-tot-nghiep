@@ -1,21 +1,15 @@
-// src/components/ReactersModal.jsx
-import { useEffect, useState } from "react";
-import { X, Check, Heart } from "lucide-react";
-import { getRecipeReacters } from "../services/recipeApi";
-import { followUser, getCurrentUser } from "../services/userApi";
-import { Link } from "react-router-dom"; // ✅ Import Link
+import { useEffect, useState } from 'react';
+import { X, Check, Heart } from 'lucide-react';
+import { getRecipeReacters } from '../services/recipeApi';
+import { followUser, getCurrentUser } from '../services/userApi';
+import { Link } from 'react-router-dom'; // ✅ Import Link
 
-// =========================================
-// COMPONENT CON: UserRow (Đưa ra ngoài để tránh lỗi render lại không cần thiết)
-// =========================================
 function UserRow({ user, currentUserId }) {
   const [isFollowing, setIsFollowing] = useState(user.is_following || false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const profileUrl = user.id ? `/user/${user.id}` : "#";
+  const profileUrl = user.id ? `/user/${user.id}` : '#';
 
-  // ✅ Kiểm tra chính xác xem có phải là mình không
-  // Dùng "==" để an toàn nếu một bên là string '123', một bên là number 123
   const isMe = currentUserId && currentUserId == user.id;
 
   const handleFollowClick = async () => {
@@ -24,8 +18,8 @@ function UserRow({ user, currentUserId }) {
       const response = await followUser(user.id);
       setIsFollowing(response.data.data.is_following);
     } catch (error) {
-      console.error("Lỗi kết bạn:", error);
-      // ✅ Hiển thị đúng thông báo lỗi từ Backend (ví dụ: "You cannot follow yourself")
+      console.error('Lỗi kết bạn:', error);
+
       if (
         error.response &&
         error.response.data &&
@@ -33,7 +27,7 @@ function UserRow({ user, currentUserId }) {
       ) {
         alert(error.response.data.message);
       } else {
-        alert("Vui lòng đăng nhập để thực hiện chức năng này.");
+        alert('Vui lòng đăng nhập để thực hiện chức năng này.');
       }
     } finally {
       setIsLoading(false);
@@ -49,10 +43,10 @@ function UserRow({ user, currentUserId }) {
         onClick={(e) => e.stopPropagation()}
       >
         <img
-          src={user?.avatar_url || "https://placehold.co/64x64?text=U"}
+          src={user?.avatar_url || 'https://placehold.co/64x64?text=U'}
           alt={user?.username}
           className="w-10 h-10 rounded-full object-cover border hover:opacity-80 transition-opacity"
-          onError={(e) => (e.target.src = "https://placehold.co/64x64?text=U")}
+          onError={(e) => (e.target.src = 'https://placehold.co/64x64?text=U')}
         />
       </Link>
 
@@ -63,7 +57,7 @@ function UserRow({ user, currentUserId }) {
           className="font-semibold text-gray-900 truncate text-sm md:text-base hover:text-cookpad-orange hover:underline block"
           onClick={(e) => e.stopPropagation()}
         >
-          {user?.username || "Người dùng ẩn danh"}
+          {user?.username || 'Người dùng ẩn danh'}
           {isMe && (
             <span className="text-gray-500 font-normal text-xs ml-2">
               (Bạn)
@@ -80,16 +74,16 @@ function UserRow({ user, currentUserId }) {
           disabled={isLoading}
           className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors flex items-center gap-1 flex-shrink-0 ${
             isFollowing
-              ? "bg-gray-100 text-gray-600 border border-gray-300 hover:bg-gray-200"
-              : "bg-orange-500 text-white border border-transparent hover:bg-orange-600"
-          } ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
+              ? 'bg-gray-100 text-gray-600 border border-gray-300 hover:bg-gray-200'
+              : 'bg-orange-500 text-white border border-transparent hover:bg-orange-600'
+          } ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
         >
           {isFollowing ? (
             <>
               <Check size={14} /> Bạn bếp
             </>
           ) : (
-            "Kết bạn"
+            'Kết bạn'
           )}
         </button>
       )}
@@ -97,31 +91,25 @@ function UserRow({ user, currentUserId }) {
   );
 }
 
-// =========================================
-// COMPONENT CHÍNH: ReactersModal
-// =========================================
 export default function ReactersModal({ recipeId, onClose }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [error, setError] = useState(null);
-  // ✅ State để lưu ID người dùng hiện tại
   const [currentUserId, setCurrentUserId] = useState(null);
 
   useEffect(() => {
-    // ✅ 1. Gọi API để biết "tôi là ai"
     const fetchCurrentUser = async () => {
       try {
         const res = await getCurrentUser();
         setCurrentUserId(res.data.data.id);
       } catch (e) {
-        // Lỗi này không nghiêm trọng nếu user chưa đăng nhập, chỉ là không lấy được ID thôi
-        console.warn("Chưa đăng nhập hoặc lỗi lấy thông tin user.");
+        console.warn('Chưa đăng nhập hoặc lỗi lấy thông tin user.');
       }
     };
     fetchCurrentUser();
 
-    // 2. Gọi API lấy danh sách người thả tim
+    // lấy danh sách người thả tim
     const fetchReacters = async () => {
       try {
         setLoading(true);
@@ -129,8 +117,8 @@ export default function ReactersModal({ recipeId, onClose }) {
         setUsers(res.data.data.users || []);
         setTotal(res.data.data.total || 0);
       } catch (err) {
-        console.error("Failed to fetch reacters:", err);
-        setError("Không thể tải danh sách.");
+        console.error('Failed to fetch reacters:', err);
+        setError('Không thể tải danh sách.');
       } finally {
         setLoading(false);
       }
@@ -185,7 +173,6 @@ export default function ReactersModal({ recipeId, onClose }) {
               <UserRow
                 key={user?.id || Math.random()}
                 user={user}
-                // ✅ QUAN TRỌNG: Truyền ID xuống cho con
                 currentUserId={currentUserId}
               />
             ))}

@@ -1,14 +1,6 @@
 import React, { useRef } from 'react';
 import { Trash2, Save, UploadCloud } from 'lucide-react';
 
-/**
- * Props:
- * - onDelete: () => void
- * - onSave: () => void
- * - onPublish: () => void
- * - image, onImageChange
- * - title, onTitleChange
- */
 export default function RecipeFormHeader({
   onDelete,
   onSave,

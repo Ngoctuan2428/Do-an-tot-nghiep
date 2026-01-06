@@ -1,5 +1,4 @@
-// src/components/RecipeDraftView.jsx
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
 import {
   Lock,
@@ -9,64 +8,60 @@ import {
   Upload,
   Users,
   Clock,
-} from "lucide-react";
+} from 'lucide-react';
 
-import { useState } from "react"; // Thêm useState
-import { updateRecipe } from "../services/recipeApi"; // 1. Import API update
+import { useState } from 'react';
+import { updateRecipe } from '../services/recipeApi';
 
 export default function RecipeDraftView({ recipe }) {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false); // 2. Thêm state loading
+  const [loading, setLoading] = useState(false);
 
-  // (Các hàm xử lý: handlePublish, handleEdit)
   const handlePublish = async () => {
     if (loading) return;
     setLoading(true);
     try {
       // Gọi API để cập nhật status
-      await updateRecipe(recipe.id, { status: "public" });
-      alert("Đã lên sóng thành công!");
+      await updateRecipe(recipe.id, { status: 'public' });
+      alert('Đã lên sóng thành công!');
       // Tải lại trang để RecipeDetail hiển thị giao diện public
       window.location.reload();
     } catch (error) {
-      console.error("Lỗi khi lên sóng:", error);
-      alert("Đã xảy ra lỗi khi lên sóng.");
+      console.error('Lỗi khi lên sóng:', error);
+      alert('Đã xảy ra lỗi khi lên sóng.');
       setLoading(false);
     }
   };
 
   const handleEdit = () => {
-    // Chuyển đến trang CreateRecipe và mang theo dữ liệu của món ăn
     navigate(`/create-recipe`, { state: { recipeToEdit: recipe } });
   };
 
-  // (Logic parse 'ingredients' và 'steps')
   let ingredients = [];
   let steps = [];
   try {
     ingredients =
-      typeof recipe.ingredients === "string" &&
-      recipe.ingredients.startsWith("[")
+      typeof recipe.ingredients === 'string' &&
+      recipe.ingredients.startsWith('[')
         ? JSON.parse(recipe.ingredients)
         : Array.isArray(recipe.ingredients)
           ? recipe.ingredients
           : [];
   } catch (e) {
-    console.error("Lỗi parse Ingredients:", e);
+    console.error('Lỗi parse Ingredients:', e);
   }
   try {
     steps =
-      typeof recipe.steps === "string" && recipe.steps.startsWith("[")
+      typeof recipe.steps === 'string' && recipe.steps.startsWith('[')
         ? JSON.parse(recipe.steps)
         : Array.isArray(recipe.steps)
           ? recipe.steps
           : [];
   } catch (e) {
-    console.error("Lỗi parse Steps:", e);
+    console.error('Lỗi parse Steps:', e);
   }
 
   return (
-    // ✅ BỐ CỤC MỚI: Dùng max-w-6xl (rộng) thay vì max-w-4xl
     <div className="max-w-6xl mx-auto p-4 md:p-8">
       {/* PHẦN 1: Ảnh (trái) và Thông tin (phải) */}
       <div className="grid grid-cols-1 lg:grid-cols-[35%_65%] gap-8">
@@ -74,17 +69,16 @@ export default function RecipeDraftView({ recipe }) {
         <div className="lg:sticky lg:top-20 h-fit">
           <img
             src={
-              recipe.image_url || "https://placehold.co/400x500?text=No+Image"
+              recipe.image_url || 'https://placehold.co/400x500?text=No+Image'
             }
             alt={recipe.title}
             className="w-full h-auto object-cover rounded-lg shadow-lg"
             onError={(e) => {
-              e.target.src = "https://placehold.co/400x500?text=Error";
+              e.target.src = 'https://placehold.co/400x500?text=Error';
             }}
           />
         </div>
         {/* Cột phải: Thông tin (Tiêu đề, Tác giả, Nút) */}
-        {/* Đây là code user yêu cầu đặt bên phải ảnh */}
         <div>
           {/* Tiêu đề + Icon Khóa (Món nháp) */}
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 flex items-center gap-2 mb-4">
@@ -95,7 +89,7 @@ export default function RecipeDraftView({ recipe }) {
           {/* Thông tin tác giả */}
           <div className="flex items-center gap-2 mb-6">
             <span className="w-6 h-6 bg-green-200 text-green-700 rounded-full flex items-center justify-center text-sm font-bold">
-              {recipe.User?.username[0]?.toUpperCase() || "A"}
+              {recipe.User?.username[0]?.toUpperCase() || 'A'}
             </span>
             <span className="text-sm font-medium">{recipe.User?.username}</span>
             <span className="text-sm text-gray-500">
@@ -124,12 +118,9 @@ export default function RecipeDraftView({ recipe }) {
               <MoreHorizontal size={16} />
             </button>
           </div>
-        </div>{" "}
-        {/* Hết Cột phải */}
-      </div>{" "}
-      {/* Hết Grid 2 cột (Phần 1) */}
+        </div>{' '}
+      </div>{' '}
       {/* PHẦN 2: Nguyên liệu và Hướng dẫn (Bên dưới) */}
-      {/* Code user yêu cầu giữ nguyên bên dưới */}
       <div className="mt-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Phần Nguyên Liệu */}
@@ -137,7 +128,7 @@ export default function RecipeDraftView({ recipe }) {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold">Nguyên Liệu</h2>
               <div className="flex items-center text-gray-600">
-                <Users className="w-4 h-4 mr-1" /> {recipe.servings || "—"}
+                <Users className="w-4 h-4 mr-1" /> {recipe.servings || '—'}
               </div>
             </div>
             <ul className="space-y-3 text-gray-700">
@@ -157,13 +148,13 @@ export default function RecipeDraftView({ recipe }) {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold">Hướng dẫn cách làm</h2>
               <div className="flex items-center text-gray-600">
-                <Clock className="w-4 h-4 mr-1" /> {recipe.cook_time || "—"}
+                <Clock className="w-4 h-4 mr-1" /> {recipe.cook_time || '—'}
               </div>
             </div>
             <ol className="space-y-6">
               {steps.map((step, i) => {
                 // Kiểm tra xem 'step' là 'string' hay 'object'
-                const isString = typeof step === "string";
+                const isString = typeof step === 'string';
                 const stepText = isString ? step : step.text;
                 const stepImage = isString ? null : step.image;
 
@@ -221,6 +212,6 @@ export default function RecipeDraftView({ recipe }) {
           ID Công thức: {recipe.id}
         </p>
       </div>
-    </div> // Hết div bọc toàn bộ
+    </div>
   );
 }

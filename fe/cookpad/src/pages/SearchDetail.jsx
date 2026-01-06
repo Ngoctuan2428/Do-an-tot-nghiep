@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Search,
   Filter,
@@ -8,21 +8,19 @@ import {
   Clock,
   Users,
   User,
-  Bookmark, // ✅ 1. Import icon Bookmark
-} from "lucide-react";
-import { searchRecipes, getTrendingTags } from "../services/searchApi";
-//✅ 2. Import API để lưu và lấy danh sách đã lưu
-import { saveRecipe } from "../services/recipeApi";
+  Bookmark,
+} from 'lucide-react';
+import { searchRecipes, getTrendingTags } from '../services/searchApi';
+import { saveRecipe } from '../services/recipeApi';
 
-import { useRecipeCounts } from "../contexts/RecipeCountContext";
+import { useRecipeCounts } from '../contexts/RecipeCountContext';
 
-// (Hàm stringToArray/arrayToString giữ nguyên)
 const stringToArray = (str) =>
   str
-    .split(",")
+    .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
-const arrayToString = (arr) => arr.join(",");
+const arrayToString = (arr) => arr.join(',');
 
 export default function SearchDetail() {
   const { query } = useParams();
@@ -30,15 +28,15 @@ export default function SearchDetail() {
   const [recipes, setRecipes] = useState([]);
   const [rankedRecipes, setRankedRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("mới nhất");
-  const [sort, setSort] = useState("mới nhất");
-  const [filterInclude, setFilterInclude] = useState("");
-  const [filterExclude, setFilterExclude] = useState("");
+  const [activeTab, setActiveTab] = useState('mới nhất');
+  const [sort, setSort] = useState('mới nhất');
+  const [filterInclude, setFilterInclude] = useState('');
+  const [filterExclude, setFilterExclude] = useState('');
   const [totalCount, setTotalCount] = useState(0);
   const [error, setError] = useState(null);
 
-  const [tempIncludeInput, setTempIncludeInput] = useState("");
-  const [tempExcludeInput, setTempExcludeInput] = useState("");
+  const [tempIncludeInput, setTempIncludeInput] = useState('');
+  const [tempExcludeInput, setTempExcludeInput] = useState('');
 
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -52,21 +50,19 @@ export default function SearchDetail() {
     const fetchTrendingTags = async () => {
       try {
         const res = await getTrendingTags({ limit: 8 });
-        setSuggestions(res.data.tags || []); // API trả về { tags: [...] }
+        setSuggestions(res.data.tags || []);
       } catch (err) {
-        console.error("Failed to fetch trending tags:", err);
+        console.error('Failed to fetch trending tags:', err);
         setSuggestions([]); // Gặp lỗi thì trả về mảng rỗng
       }
     };
     fetchTrendingTags();
-  }, []); // [] nghĩa là chỉ chạy 1 lần khi trang tải
+  }, []); // chỉ chạy 1 lần khi trang tải
 
-  // (useEffect cho activeTab giữ nguyên)
   useEffect(() => {
     setSort(activeTab);
   }, [activeTab]);
 
-  // (Hàm fetchRecipes giữ nguyên)
   const fetchRecipes = useCallback(
     async (pageNum = 1, append = false) => {
       if (!query) return;
@@ -76,7 +72,7 @@ export default function SearchDetail() {
       try {
         const params = {
           q: query,
-          sortBy: sort.toLowerCase().includes("phổ biến") ? "views" : "newest",
+          sortBy: sort.toLowerCase().includes('phổ biến') ? 'views' : 'newest',
           page: pageNum,
           limit: 10,
         };
@@ -90,8 +86,8 @@ export default function SearchDetail() {
         setTotalCount(recipesRes.data.count || 0);
         setHasMore(newRecipes.length > 0);
       } catch (error) {
-        console.error("Search failed:", error.response?.data || error);
-        setError(error.response?.data?.message || "Có lỗi xảy ra khi tìm kiếm");
+        console.error('Search failed:', error.response?.data || error);
+        setError(error.response?.data?.message || 'Có lỗi xảy ra khi tìm kiếm');
       } finally {
         setLoading(false);
       }
@@ -99,42 +95,22 @@ export default function SearchDetail() {
     [query, sort, filterInclude, filterExclude]
   );
 
-  // (useEffect cho rankedRecipes giữ nguyên)
   useEffect(() => {
     const fetchRanked = async () => {
       try {
         const rankedRes = await searchRecipes({
           q: query,
-          sortBy: "views",
+          sortBy: 'views',
           limit: 3,
         });
         setRankedRecipes(rankedRes.data.rows || []);
       } catch (err) {
-        console.error("Fetch ranked failed:", err);
+        console.error('Fetch ranked failed:', err);
       }
     };
     fetchRanked();
   }, [query]);
 
-  // ✅ 4. Lấy danh sách ID các món đã lưu khi tải trang
-  // (Để biết ban đầu nên hiển thị nút Lưu hay Đã Lưu)
-  // useEffect(() => {
-  //   const fetchSavedRecipeIds = async () => {
-  //     try {
-  //       const response = await getSavedRecipes();
-  //       const ids = new Set(response.data.data.rows.map((r) => r.id));
-  //       setSavedRecipeIds(ids);
-  //     } catch (error) {
-  //       // Lỗi (ví dụ: chưa đăng nhập)
-  //       console.warn("Không thể lấy danh sách món đã lưu.");
-  //       setSavedRecipeIds(new Set());
-  //     }
-  //   };
-  //   // Chỉ gọi khi trang tải lần đầu (hoặc khi query thay đổi nếu muốn)
-  //   fetchSavedRecipeIds();
-  // }, []);
-
-  // (useEffect cho fetchRecipes và page giữ nguyên)
   useEffect(() => {
     setPage(1);
     setRecipes([]);
@@ -145,7 +121,6 @@ export default function SearchDetail() {
     if (page > 1) fetchRecipes(page, true);
   }, [page, fetchRecipes]);
 
-  // (Hàm lastRecipeRef, handleSearch giữ nguyên)
   const lastRecipeRef = useCallback(
     (node) => {
       if (loading) return;
@@ -161,7 +136,7 @@ export default function SearchDetail() {
   );
 
   const handleSearch = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       const searchValue = e.target.value.trim();
       if (searchValue) {
         navigate(`/search/${searchValue}`);
@@ -169,27 +144,24 @@ export default function SearchDetail() {
     }
   };
 
-  // ✅ 5. Hàm xử lý khi bấm nút Lưu/Bỏ lưu
+  // Hàm xử lý khi bấm nút Lưu/Bỏ lưu
   const handleSaveToggle = async (recipeId) => {
     try {
-      // 1. Gọi API
       await saveRecipe(recipeId);
-      // 2. Yêu cầu Context cập nhật lại
       await refreshCounts();
     } catch (error) {
-      console.error("Lỗi khi lưu món:", error);
-      alert("Đã xảy ra lỗi. Bạn vui lòng đăng nhập để thực hiện thao tác này.");
+      console.error('Lỗi khi lưu món:', error);
+      alert('Đã xảy ra lỗi. Bạn vui lòng đăng nhập để thực hiện thao tác này.');
     }
   };
 
-  // (Các hàm handleAddInclude/Remove/Exclude giữ nguyên)
   const handleAddInclude = (e) => {
-    if (e.key === "Enter" && tempIncludeInput.trim()) {
+    if (e.key === 'Enter' && tempIncludeInput.trim()) {
       const currentKeywords = stringToArray(filterInclude);
       const newKeywords = stringToArray(tempIncludeInput);
       const uniqueKeywords = [...new Set([...currentKeywords, ...newKeywords])];
       setFilterInclude(arrayToString(uniqueKeywords));
-      setTempIncludeInput("");
+      setTempIncludeInput('');
     }
   };
   const handleRemoveInclude = (keywordToRemove) => {
@@ -200,12 +172,12 @@ export default function SearchDetail() {
     setFilterInclude(arrayToString(newKeywords));
   };
   const handleAddExclude = (e) => {
-    if (e.key === "Enter" && tempExcludeInput.trim()) {
+    if (e.key === 'Enter' && tempExcludeInput.trim()) {
       const currentKeywords = stringToArray(filterExclude);
       const newKeywords = stringToArray(tempExcludeInput);
       const uniqueKeywords = [...new Set([...currentKeywords, ...newKeywords])];
       setFilterExclude(arrayToString(uniqueKeywords));
-      setTempExcludeInput("");
+      setTempExcludeInput('');
     }
   };
   const handleRemoveExclude = (keywordToRemove) => {
@@ -220,7 +192,6 @@ export default function SearchDetail() {
     return <div className="text-center py-10 text-red-600">{error}</div>;
   }
 
-  // --- (Render JSX) ---
   return (
     <div className="min-h-screen bg-gray-50 py-6">
       <div className="max-w-7xl mx-auto px-4">
@@ -228,7 +199,7 @@ export default function SearchDetail() {
         <div className="relative mb-6">
           <input
             type="text"
-            defaultValue={query || ""}
+            defaultValue={query || ''}
             onKeyDown={handleSearch}
             className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cookpad-orange text-lg"
             placeholder="Tìm kiếm công thức..."
@@ -240,21 +211,21 @@ export default function SearchDetail() {
         <div className="flex space-x-4 mb-4">
           <button
             className={`text-sm font-medium pb-2 border-b-2 ${
-              activeTab === "mới nhất"
-                ? "border-cookpad-orange text-cookpad-orange"
-                : "border-transparent text-gray-600"
+              activeTab === 'mới nhất'
+                ? 'border-cookpad-orange text-cookpad-orange'
+                : 'border-transparent text-gray-600'
             }`}
-            onClick={() => setActiveTab("mới nhất")}
+            onClick={() => setActiveTab('mới nhất')}
           >
             Mới Nhất
           </button>
           <button
             className={`text-sm font-medium pb-2 border-b-2 ${
-              activeTab === "phổ biến"
-                ? "border-cookpad-orange text-cookpad-orange"
-                : "border-transparent text-gray-600"
+              activeTab === 'phổ biến'
+                ? 'border-cookpad-orange text-cookpad-orange'
+                : 'border-transparent text-gray-600'
             }`}
-            onClick={() => setActiveTab("phổ biến")}
+            onClick={() => setActiveTab('phổ biến')}
           >
             Phổ Biến
           </button>
@@ -275,7 +246,7 @@ export default function SearchDetail() {
                       : [];
                 const mainSrc =
                   (imgs[0] && (imgs[0].url || imgs[0])) ||
-                  "/placeholder-recipe.jpg";
+                  '/placeholder-recipe.jpg';
 
                 return (
                   <div
@@ -303,7 +274,7 @@ export default function SearchDetail() {
                       </h4>
                       <p className="text-xs text-gray-500 mt-1">
                         {recipe.short_description ||
-                          (recipe.description || "").slice(0, 80)}
+                          (recipe.description || '').slice(0, 80)}
                       </p>
                     </div>
                   </div>
@@ -322,7 +293,6 @@ export default function SearchDetail() {
               </div>
             )}
 
-            {/* ✅ 6. CHỈNH SỬA VÒNG LẶP KẾT QUẢ */}
             {recipes.map((recipe, index) => {
               const isLast = index === recipes.length - 1;
               // Kiểm tra xem món này có trong Set đã lưu không
@@ -344,7 +314,7 @@ export default function SearchDetail() {
                           : [];
                     const mainSrc =
                       (imgs[0] && (imgs[0].url || imgs[0])) ||
-                      "/placeholder-recipe.jpg";
+                      '/placeholder-recipe.jpg';
 
                     return (
                       // Thêm onClick vào ảnh
@@ -379,11 +349,9 @@ export default function SearchDetail() {
                   })()}
 
                   <div className="flex-1">
-                    {/* Thêm flex wrapper cho Tiêu đề và Nút lưu */}
                     <div className="flex justify-between items-start gap-2">
                       <h3
                         className="text-lg font-medium text-gray-900 hover:text-cookpad-orange cursor-pointer"
-                        // Thêm onClick vào tiêu đề
                         onClick={() => navigate(`/recipes/${recipe.id}`)}
                       >
                         {recipe.title}
@@ -396,14 +364,14 @@ export default function SearchDetail() {
                           handleSaveToggle(recipe.id);
                         }}
                         className="p-1 text-gray-500 hover:text-cookpad-orange flex-shrink-0 z-10"
-                        title={isSaved ? "Bỏ lưu" : "Lưu món"}
+                        title={isSaved ? 'Bỏ lưu' : 'Lưu món'}
                       >
                         <Bookmark
                           size={20}
                           className={
                             isSaved
-                              ? "fill-current text-cookpad-orange" // Icon đầy
-                              : "" // Icon rỗng
+                              ? 'fill-current text-cookpad-orange' // Icon đầy
+                              : '' // Icon rỗng
                           }
                         />
                       </button>
@@ -412,28 +380,28 @@ export default function SearchDetail() {
                     <p className="text-sm text-gray-600 mb-2">
                       {recipe.short_description ||
                         recipe.description?.slice(0, 150) ||
-                        "Không có mô tả."}
+                        'Không có mô tả.'}
                       ...
                     </p>
                     <div className="text-sm text-gray-600 mb-2">
                       <span className="font-medium">Nguyên liệu: </span>
                       {Array.isArray(recipe.ingredients)
-                        ? recipe.ingredients.slice(0, 3).join(", ")
+                        ? recipe.ingredients.slice(0, 3).join(', ')
                         : recipe.ingredients}
                     </div>
 
                     <div className="flex items-center mt-2 space-x-4 text-sm text-gray-500">
                       <span className="flex items-center">
                         <Clock className="w-4 h-4 mr-1" />
-                        {recipe.total_time || "30"} phút
+                        {recipe.total_time || '30'} phút
                       </span>
                       <span className="flex items-center">
                         <Users className="w-4 h-4 mr-1" />
-                        {recipe.servings || "2"} người
+                        {recipe.servings || '2'} người
                       </span>
                       <span className="flex items-center">
                         <User className="w-4 h-4 mr-1" />
-                        {recipe.User?.username || "Anonymous"}
+                        {recipe.User?.username || 'Anonymous'}
                       </span>
                     </div>
                   </div>
@@ -526,7 +494,7 @@ export default function SearchDetail() {
                 ))}
               </div>
             </div>
-            <div className="bg-yellow-50 rounded-md p-4 shadow-sm text-center">
+            {/* <div className="bg-yellow-50 rounded-md p-4 shadow-sm text-center">
               <p className="text-sm font-bold text-yellow-800 mb-2">
                 Bộ lọc Premium
               </p>
@@ -534,7 +502,7 @@ export default function SearchDetail() {
                 <Crown size={16} className="mr-1" />
                 Bỏ lọc Premium
               </button>
-            </div>
+            </div> */}
           </aside>
         </div>
       </div>

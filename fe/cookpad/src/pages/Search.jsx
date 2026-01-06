@@ -1,64 +1,62 @@
-// src/pages/Search.jsx
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Loader2, Crown, ArrowRight, Flame } from "lucide-react";
-import pCook from "../../public/pCook.png"; // Giữ nguyên logo của bạn
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Loader2, Crown, ArrowRight, Flame } from 'lucide-react';
+import pCook from '../../public/pCook.png';
 
-// Import API và Component
-import { getPremiumRecipes } from "../services/recipeApi"; // API lấy top like
-import SearchBar from "../components/SearchBar";
-import KeywordCard from "../components/KeywordCard";
-import RecipeCard from "../components/RecipeCard"; // Dùng lại RecipeCard của bạn
+import { getPremiumRecipes } from '../services/recipeApi';
+import SearchBar from '../components/SearchBar';
+import KeywordCard from '../components/KeywordCard';
+import RecipeCard from '../components/RecipeCard';
 
-// Danh sách từ khóa (Giữ nguyên như code cũ của bạn)
+// Danh sách từ khóa mẫu
 const keywords = [
   {
     id: 1,
-    title: "Thịt",
+    title: 'Thịt',
     image:
-      "https://spicyfoodstudio.com/wp-content/uploads/2023/03/chup-anh-do-an-02.jpg",
+      'https://spicyfoodstudio.com/wp-content/uploads/2023/03/chup-anh-do-an-02.jpg',
   },
   {
     id: 2,
-    title: "Bánh mì",
+    title: 'Bánh mì',
     image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAknClSjZDs61TvQURlzDASUnuJ1YTrUXAI4fegJEl6D4jkIE9sCtx1GnOPuV23bld-X8&usqp=CAU",
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAknClSjZDs61TvQURlzDASUnuJ1YTrUXAI4fegJEl6D4jkIE9sCtx1GnOPuV23bld-X8&usqp=CAU',
   },
   {
     id: 3,
-    title: "Cá",
+    title: 'Cá',
     image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-UcWvavWqUdsUTeb8wNp_eJ-qwUsPcaeAXvvmQbri6BcgjyXh_9eflk2ifhMSEEZfc2k&usqp=CAU",
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-UcWvavWqUdsUTeb8wNp_eJ-qwUsPcaeAXvvmQbri6BcgjyXh_9eflk2ifhMSEEZfc2k&usqp=CAU',
   },
   {
     id: 4,
-    title: "Đậu hũ",
+    title: 'Đậu hũ',
     image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpt5UtC_8kYFm52vw4fMA0NxcBBQ7Z_wkA8g&s",
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpt5UtC_8kYFm52vw4fMA0NxcBBQ7Z_wkA8g&s',
   },
   {
     id: 5,
-    title: "Cá tầm",
+    title: 'Cá tầm',
     image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsVVy6lcBU8KFdy06tNmQgOFryd_-Htv7V_w&s",
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsVVy6lcBU8KFdy06tNmQgOFryd_-Htv7V_w&s',
   },
   {
     id: 6,
-    title: "Trứng",
+    title: 'Trứng',
     image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReLhbbCEAGduomuDYEn3PHufu9yoG-FchdbQ&s",
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReLhbbCEAGduomuDYEn3PHufu9yoG-FchdbQ&s',
   },
   {
     id: 7,
-    title: "Món ngon mỗi ngày",
+    title: 'Món ngon mỗi ngày',
     image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgircv16aYN3FPY4ae9t-JEBWBMcVIIfYzUw&s",
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgircv16aYN3FPY4ae9t-JEBWBMcVIIfYzUw&s',
   },
   {
     id: 8,
-    title: "Spaghetti",
+    title: 'Spaghetti',
     image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmieI6GUbehVX6sK9g4PWyrN4Y7-1IVQfFQw&s",
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmieI6GUbehVX6sK9g4PWyrN4Y7-1IVQfFQw&s',
   },
 ];
 
@@ -74,7 +72,7 @@ export default function Search() {
         const res = await getPremiumRecipes();
         setPremiumRecipes(res.data.data || []);
       } catch (error) {
-        console.error("Lỗi tải món premium:", error);
+        console.error('Lỗi tải món premium:', error);
       } finally {
         setLoadingPremium(false);
       }
@@ -85,8 +83,6 @@ export default function Search() {
   // Xử lý khi user nhập từ khóa vào SearchBar
   const handleSearchSubmit = (searchTerm) => {
     if (searchTerm.trim()) {
-      // Chuyển hướng sang trang chi tiết tìm kiếm (SearchDetail)
-      // Giả sử route của bạn là /search/:query
       navigate(`/search/${encodeURIComponent(searchTerm.toLowerCase())}`);
     }
   };
@@ -122,7 +118,7 @@ export default function Search() {
       </div>
 
       {/* Premium Section (Dữ liệu thật từ API) */}
-      <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+      {/* <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-bold flex items-center gap-2">
             <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-lg text-sm shadow-sm flex items-center gap-1">
@@ -141,22 +137,19 @@ export default function Search() {
             {premiumRecipes.length > 0 ? (
               premiumRecipes.map((recipe, index) => (
                 <div key={recipe.id} className="relative group">
-                  {/* Badge Top 1, 2, 3 */}
                   {index < 3 && (
                     <div className="absolute top-3 left-3 z-10 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded shadow-md flex items-center gap-1">
                       <Flame size={12} fill="currentColor" /> Top {index + 1}
                     </div>
                   )}
-
-                  {/* Sử dụng lại RecipeCard của bạn, truyền đúng props */}
                   <RecipeCard
-                    id={recipe.id} // Quan trọng để Link hoạt động
+                    id={recipe.id}
                     title={recipe.title}
                     image={recipe.image_url}
-                    premium={true} // Prop để hiển thị style premium (nếu component hỗ trợ)
+                    premium={true}
                     views={recipe.view_count || 0}
                     likes={recipe.likes || 0}
-                    user={recipe.User} // Truyền thông tin người đăng nếu cần
+                    user={recipe.User}
                   />
                 </div>
               ))
@@ -167,10 +160,10 @@ export default function Search() {
             )}
           </div>
         )}
-      </section>
+      </section> */}
 
       {/* Banner Quảng cáo Premium (Optional - Trang trí thêm cho đẹp) */}
-      <div className="mt-8 bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-6 md:p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg">
+      {/* <div className="mt-8 bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-6 md:p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg">
         <div>
           <h3 className="text-xl md:text-2xl font-bold mb-2 flex items-center gap-2">
             <Crown className="text-yellow-400" /> Trải nghiệm PCook Premium
@@ -182,7 +175,7 @@ export default function Search() {
         <button className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg hover:scale-105 transition transform text-sm md:text-base whitespace-nowrap">
           Dùng thử miễn phí
         </button>
-      </div>
+      </div> */}
     </main>
   );
 }

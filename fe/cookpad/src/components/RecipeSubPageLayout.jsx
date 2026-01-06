@@ -1,17 +1,16 @@
-// src/components/RecipeSubPageLayout.jsx
-import { useState } from "react";
-import { Search, ArrowDownUp, ChevronDown } from "lucide-react";
-import EmptyState from "./EmptyState";
-import { khoMonItems } from "../data/sidebarData";
+import { useState } from 'react';
+import { Search, ArrowDownUp, ChevronDown } from 'lucide-react';
+import EmptyState from './EmptyState';
+import { khoMonItems } from '../data/sidebarData';
 
 function FeedbackCard() {
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Feedback submitted:", message);
-    alert("Cảm ơn bạn đã gửi góp ý!");
-    setMessage("");
+    console.log('Feedback submitted:', message);
+    alert('Cảm ơn bạn đã gửi góp ý!');
+    setMessage('');
   };
 
   return (
@@ -37,11 +36,11 @@ function FeedbackCard() {
         </button>
       </form>
       <p className="text-xs text-gray-500 mt-4">
-        Bằng cách gửi phản hồi, bạn đồng ý với{" "}
+        Bằng cách gửi phản hồi, bạn đồng ý với{' '}
         <a href="#" className="underline">
           Chính Sách Bảo Mật
-        </a>{" "}
-        và{" "}
+        </a>{' '}
+        và{' '}
         <a href="#" className="underline">
           Điều Khoản Dịch Vụ
         </a>
@@ -55,16 +54,16 @@ export default function RecipeSubPageLayout({
   title,
   count = 0,
   children,
-  descriptionEmpty = "Bạn chưa có món nào ở đây. Hãy thêm món yêu thích để lưu lại!",
+  descriptionEmpty = 'Bạn chưa có món nào ở đây. Hãy thêm món yêu thích để lưu lại!',
   onSearchSubmit,
-  onSortChange, // ✅ callback mới để xử lý sắp xếp
+  onSortChange, // callback mới để xử lý sắp xếp
 }) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortOption, setSortOption] = useState("Đã xem gần nhất");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOption, setSortOption] = useState('Đã xem gần nhất');
   const [showSortMenu, setShowSortMenu] = useState(false);
 
   const handleSearchKeyDown = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       e.preventDefault();
       onSearchSubmit?.(searchTerm);
     }
@@ -121,19 +120,19 @@ export default function RecipeSubPageLayout({
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
                   <button
                     className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                      sortOption === "Đã xem gần nhất"
-                        ? "text-cookpad-orange"
-                        : ""
+                      sortOption === 'Đã xem gần nhất'
+                        ? 'text-cookpad-orange'
+                        : ''
                     }`}
-                    onClick={() => handleSortSelect("Đã xem gần nhất")}
+                    onClick={() => handleSortSelect('Đã xem gần nhất')}
                   >
                     Đã xem gần nhất
                   </button>
                   <button
                     className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                      sortOption === "Mới nhất" ? "text-cookpad-orange" : ""
+                      sortOption === 'Mới nhất' ? 'text-cookpad-orange' : ''
                     }`}
-                    onClick={() => handleSortSelect("Mới nhất")}
+                    onClick={() => handleSortSelect('Mới nhất')}
                   >
                     Mới nhất
                   </button>

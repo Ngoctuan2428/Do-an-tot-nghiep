@@ -1,10 +1,7 @@
-// src/services/auth.service.js (hoặc file API tương ứng)
-import axiosInstance from "./axiosClient";
-
-// ...
+import axiosInstance from './axiosClient';
 
 export const forgotPassword = (email) => {
-  return axiosInstance.post("/auth/forgot-password", { email });
+  return axiosInstance.post('/auth/forgot-password', { email });
 };
 
 export const resetPassword = (id, token, newPassword) => {
@@ -14,7 +11,6 @@ export const resetPassword = (id, token, newPassword) => {
 };
 
 export default {
-  // ...
   forgotPassword,
   resetPassword,
 };

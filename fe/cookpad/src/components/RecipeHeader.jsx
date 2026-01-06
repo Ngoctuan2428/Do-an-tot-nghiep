@@ -1,6 +1,6 @@
 // src/components/RecipeHeader.jsx
-import { useNavigate } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
 import {
   Soup,
   Bookmark,
@@ -14,8 +14,8 @@ import {
   Heart,
   Hand,
   Loader2,
-} from "lucide-react";
-import { Link } from "react-router-dom";
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 // Import API
 import {
@@ -23,13 +23,13 @@ import {
   likeRecipe,
   sendCooksnap,
   getRecipeCooksnaps,
-} from "../services/recipeApi";
-import { uploadMedia } from "../services/uploadApi";
-import { useRecipeCounts } from "../contexts/RecipeCountContext";
+} from '../services/recipeApi';
+import { uploadMedia } from '../services/uploadApi';
+import { useRecipeCounts } from '../contexts/RecipeCountContext';
 
 // Import Components
-import ReactersModal from "./ReactersModal";
-import CooksnapModal from "./CooksnapModal";
+import ReactersModal from './ReactersModal';
+import CooksnapModal from './CooksnapModal';
 
 export default function RecipeHeader({ recipe }) {
   const navigate = useNavigate();
@@ -63,7 +63,7 @@ export default function RecipeHeader({ recipe }) {
       const res = await getRecipeCooksnaps(recipe.id);
       setCooksnaps(res.data.data || []);
     } catch (error) {
-      console.error("Lỗi tải cooksnap:", error);
+      console.error('Lỗi tải cooksnap:', error);
     }
   };
 
@@ -82,8 +82,8 @@ export default function RecipeHeader({ recipe }) {
         setShowMenu(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   // Xử lý Thích món ăn
@@ -99,9 +99,9 @@ export default function RecipeHeader({ recipe }) {
       setLikeCount(likes); // Cập nhật lại số thật từ server
       await refreshCounts(); // Đồng bộ Context
     } catch (error) {
-      console.error("Lỗi khi like:", error);
+      console.error('Lỗi khi like:', error);
       // Revert nếu lỗi (có thể thêm logic revert setLikeCount ở đây)
-      alert("Vui lòng đăng nhập để thể hiện cảm xúc!");
+      alert('Vui lòng đăng nhập để thể hiện cảm xúc!');
     }
   };
 
@@ -112,8 +112,8 @@ export default function RecipeHeader({ recipe }) {
       await saveRecipe(recipe.id);
       await refreshCounts();
     } catch (error) {
-      console.error("Lỗi khi lưu món:", error);
-      alert("Đã xảy ra lỗi. Bạn vui lòng đăng nhập để thực hiện thao tác này.");
+      console.error('Lỗi khi lưu món:', error);
+      alert('Đã xảy ra lỗi. Bạn vui lòng đăng nhập để thực hiện thao tác này.');
     }
   };
 
@@ -128,11 +128,11 @@ export default function RecipeHeader({ recipe }) {
       try {
         await navigator.share(shareData);
       } catch (err) {
-        console.log("Chia sẻ bị hủy:", err);
+        console.log('Chia sẻ bị hủy:', err);
       }
     } else {
       navigator.clipboard.writeText(window.location.href);
-      alert("Đã sao chép link vào clipboard!");
+      alert('Đã sao chép link vào clipboard!');
     }
   };
 
@@ -150,16 +150,16 @@ export default function RecipeHeader({ recipe }) {
 
   // Callback khi gửi Cooksnap thành công từ Modal
   const handleCooksnapSuccess = () => {
-    console.log("Cooksnap sent via Header!");
+    console.log('Cooksnap sent via Header!');
     fetchCooksnaps(); // Tải lại danh sách để hiển thị ngay lập tức
   };
 
   if (!recipe) return null;
 
   const imageUrl =
-    recipe.image_url || "https://placehold.co/600x400?text=No+Image";
+    recipe.image_url || 'https://placehold.co/600x400?text=No+Image';
   const author = recipe.User || {};
-  const authorProfileUrl = author.id ? `/user/${author.id}` : "#";
+  const authorProfileUrl = author.id ? `/user/${author.id}` : '#';
 
   return (
     <section className="bg-white pb-8">
@@ -174,11 +174,11 @@ export default function RecipeHeader({ recipe }) {
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src =
-                  "https://placehold.co/600x400?text=Image+Not+Found";
+                  'https://placehold.co/600x400?text=Image+Not+Found';
               }}
             />
             <div className="absolute bottom-3 right-4 bg-black/60 text-white text-sm px-2 py-1 rounded">
-              {author.username?.substring(0, 10) || "PCook"}
+              {author.username?.substring(0, 10) || 'PCook'}
             </div>
           </div>
 
@@ -197,7 +197,7 @@ export default function RecipeHeader({ recipe }) {
               >
                 {likeCount > 0
                   ? `${likeCount} người đã bày tỏ cảm xúc`
-                  : "Hãy là người đầu tiên thả tim!"}
+                  : 'Hãy là người đầu tiên thả tim!'}
               </button>
 
               <ul className="flex items-center gap-2">
@@ -206,11 +206,11 @@ export default function RecipeHeader({ recipe }) {
                     onClick={handleLike}
                     className={`flex items-center h-8 rounded-full px-3 text-sm border transition-colors ${
                       isLiked
-                        ? "bg-red-50 text-red-600 border-red-200"
-                        : "bg-gray-100 text-gray-600 border-transparent hover:bg-gray-200"
+                        ? 'bg-red-50 text-red-600 border-red-200'
+                        : 'bg-gray-100 text-gray-600 border-transparent hover:bg-gray-200'
                     }`}
                   >
-                    <span className="mr-1">{isLiked ? "❤️" : "🤍"}</span>
+                    <span className="mr-1">{isLiked ? '❤️' : '🤍'}</span>
                     <span className="font-medium">{likeCount}</span>
                   </button>
                 </li>
@@ -232,11 +232,11 @@ export default function RecipeHeader({ recipe }) {
                           key={i}
                           className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover bg-gray-200"
                           src={
-                            snap.User?.avatar_url || "https://placehold.co/32"
+                            snap.User?.avatar_url || 'https://placehold.co/32'
                           }
                           alt="user"
                           onError={(e) =>
-                            (e.target.src = "https://placehold.co/32")
+                            (e.target.src = 'https://placehold.co/32')
                           }
                         />
                       ))}
@@ -263,19 +263,19 @@ export default function RecipeHeader({ recipe }) {
                         className="w-16 h-16 object-cover rounded-md flex-shrink-0 bg-gray-100 border border-gray-100"
                         alt="cooksnap"
                         onError={(e) =>
-                          (e.target.src = "https://placehold.co/64")
+                          (e.target.src = 'https://placehold.co/64')
                         }
                       />
                       <div className="flex flex-col min-w-0 justify-center h-full">
                         <div className="flex items-center gap-1.5 mb-1">
                           <img
                             src={
-                              snap.User?.avatar_url || "https://placehold.co/20"
+                              snap.User?.avatar_url || 'https://placehold.co/20'
                             }
                             className="w-5 h-5 rounded-full object-cover border border-gray-100"
                             alt="user"
                             onError={(e) =>
-                              (e.target.src = "https://placehold.co/20")
+                              (e.target.src = 'https://placehold.co/20')
                             }
                           />
                           <span className="text-xs font-bold text-gray-800 truncate max-w-[100px]">
@@ -316,7 +316,7 @@ export default function RecipeHeader({ recipe }) {
 
             {/* Số người lưu */}
             <p className="text-gray-600 flex items-center gap-2 mb-4 text-sm">
-              <User className="w-4 h-4" />{" "}
+              <User className="w-4 h-4" />{' '}
               {recipe.favorites_count > 0 ? (
                 <span>
                   Có <strong>{recipe.favorites_count}</strong> bếp khác đang
@@ -331,12 +331,12 @@ export default function RecipeHeader({ recipe }) {
             <div className="flex items-center gap-3 p-3 rounded-lg border border-transparent hover:border-gray-100 hover:bg-gray-50 transition-all cursor-pointer group">
               <Link to={authorProfileUrl} className="flex-shrink-0">
                 <img
-                  src={author.avatar_url || "https://placehold.co/64x64?text=U"}
-                  alt={author.username || "Tác giả"}
+                  src={author.avatar_url || 'https://placehold.co/64x64?text=U'}
+                  alt={author.username || 'Tác giả'}
                   className="w-12 h-12 rounded-full object-cover border border-gray-200 group-hover:border-orange-200 transition-colors"
                   onError={(e) => {
                     e.target.onerror = null;
-                    e.target.src = "https://placehold.co/64x64?text=U";
+                    e.target.src = 'https://placehold.co/64x64?text=U';
                   }}
                 />
               </Link>
@@ -345,11 +345,11 @@ export default function RecipeHeader({ recipe }) {
                   to={authorProfileUrl}
                   className="font-bold text-gray-900 hover:text-orange-600 hover:underline transition-colors"
                 >
-                  {author.username || "Ẩn danh"}
+                  {author.username || 'Ẩn danh'}
                 </Link>
                 <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                  <MapPin className="w-3 h-3" />{" "}
-                  {author.location || "Không rõ nơi chốn"}
+                  <MapPin className="w-3 h-3" />{' '}
+                  {author.location || 'Không rõ nơi chốn'}
                 </p>
               </div>
             </div>
@@ -370,15 +370,15 @@ export default function RecipeHeader({ recipe }) {
                 onClick={handleSaveToggle}
                 className={`flex-1 px-4 py-2.5 rounded-lg font-semibold border flex items-center justify-center gap-2 transition-all ${
                   isSaved
-                    ? "bg-orange-50 text-orange-600 border-orange-200"
-                    : "border-orange-500 text-orange-600 hover:bg-orange-50"
+                    ? 'bg-orange-50 text-orange-600 border-orange-200'
+                    : 'border-orange-500 text-orange-600 hover:bg-orange-50'
                 }`}
               >
                 <Bookmark
-                  className={`w-5 h-5 ${isSaved ? "fill-current" : ""}`}
+                  className={`w-5 h-5 ${isSaved ? 'fill-current' : ''}`}
                 />
                 <span className="text-sm">
-                  {isSaved ? "Đã lưu" : "Lưu món"}
+                  {isSaved ? 'Đã lưu' : 'Lưu món'}
                 </span>
               </button>
 
@@ -386,8 +386,8 @@ export default function RecipeHeader({ recipe }) {
                 onClick={() => setIsFavourite(!isFavourite)}
                 className={`px-4 py-2.5 rounded-lg font-semibold border flex items-center gap-2 transition-all ${
                   isFavourite
-                    ? "bg-gray-100 text-gray-700 border-gray-300"
-                    : "border-gray-300 text-gray-600 hover:bg-gray-50"
+                    ? 'bg-gray-100 text-gray-700 border-gray-300'
+                    : 'border-gray-300 text-gray-600 hover:bg-gray-50'
                 }`}
                 title="Thêm vào Bộ sưu tập"
               >
@@ -445,13 +445,13 @@ export default function RecipeHeader({ recipe }) {
       {showCooksnap && (
         <CooksnapModal
           recipeId={recipe.id}
-          recipeAuthorName={recipe.User?.username || "Đầu bếp"}
+          recipeAuthorName={recipe.User?.username || 'Đầu bếp'}
           onClose={() => setShowCooksnap(false)}
           onSuccess={handleCooksnapSuccess}
         />
       )}
 
-      {/* Modal Reacters (Người thả tim) */}
+      {/* Modal Reacters */}
       {showReacters && (
         <ReactersModal
           recipeId={recipe?.id}

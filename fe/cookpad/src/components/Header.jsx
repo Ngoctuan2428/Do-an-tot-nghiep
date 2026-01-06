@@ -1,8 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { ChevronLeft, Plus, LogOut, Settings } from 'lucide-react';
-import { ShieldCheck } from 'lucide-react'; // Icon khiên cho admin
-// ✅ BẮT BUỘC: Import Context API
+import { ShieldCheck } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const backPathMap = {
@@ -18,22 +17,18 @@ export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // 👈 [1] LẤY user VÀ logout TỪ GLOBAL CONTEXT
   const { user, logout } = useAuth();
 
-  // 1. Cấu hình URL của trang Admin (Thay port cho đúng với máy bạn)
-  const ADMIN_URL = 'http://localhost:3001'; // Ví dụ Admin chạy port 3000
+  const ADMIN_URL = 'http://localhost:3001';
 
   const handleGoToAdmin = () => {
-    // Lấy token hiện tại
     const token = localStorage.getItem('accessToken');
     if (!token) return;
 
-    // Chuyển hướng sang trang Admin kèm token trên URL
+    // redirect sang admin
     window.location.href = `${ADMIN_URL}/login-sso?token=${token}`;
   };
 
-  // State local chỉ dùng cho menu dropdown
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const backPath = useMemo(() => {
@@ -45,7 +40,7 @@ export default function Header() {
   }, [location.pathname]);
 
   const handleLogout = () => {
-    logout(); // Gọi hàm logout từ Context
+    logout();
     setIsMenuOpen(false);
     navigate('/');
   };
@@ -91,14 +86,10 @@ export default function Header() {
             </button>
           )}
 
-          {user ? ( // 👈 [2] KIỂM TRA user TỪ CONTEXT
-            // ----------------------------------------------------
-            // HIỂN THỊ USERNAME VÀ DROPDOWN MENU KHI ĐÃ ĐĂNG NHẬP
-            // ----------------------------------------------------
+          {user ? (
             <div className="relative z-50">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                // ✅ [FIX] Thiết kế nút tinh tế (nền trắng, viền nhẹ)
                 className="flex items-center space-x-2 px-3 py-1 rounded-full border border-gray-300 bg-white shadow-sm hover:bg-gray-100 transition focus:outline-none text-gray-800"
               >
                 <img
@@ -136,7 +127,6 @@ export default function Header() {
               )}
             </div>
           ) : (
-            // HIỂN THỊ NÚT ĐĂNG NHẬP KHI CHƯA ĐĂNG NHẬP
             <button
               onClick={() => navigate('/login')}
               className="px-4 py-2 bg-cookpad-orange text-white text-sm font-medium rounded-md hover:bg-orange-500 transition-colors"

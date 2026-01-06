@@ -1,9 +1,7 @@
-// src/pages/Challenges.jsx
-import { useState, useEffect } from "react";
-import { Loader2 } from "lucide-react";
-import ChallengeItem from "../components/ChallengeItem";
-// ✅ Import API
-import { getAllChallenges } from "../services/challengeApi";
+import { useState, useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
+import ChallengeItem from '../components/ChallengeItem';
+import { getAllChallenges } from '../services/challengeApi';
 
 export default function Challenges() {
   const [challenges, setChallenges] = useState([]);
@@ -13,9 +11,9 @@ export default function Challenges() {
     const fetchChallenges = async () => {
       try {
         const res = await getAllChallenges();
-        setChallenges(res.data.data.rows || []); // ✅ Thêm .rows
+        setChallenges(res.data.data.rows || []);
       } catch (error) {
-        console.error("Lỗi tải thử thách:", error);
+        console.error('Lỗi tải thử thách:', error);
       } finally {
         setLoading(false);
       }
@@ -43,26 +41,24 @@ export default function Challenges() {
                   id={challenge.id}
                   img={
                     challenge.image_url ||
-                    "https://placehold.co/300x200?text=Challenge"
+                    'https://placehold.co/300x200?text=Challenge'
                   }
                   title={challenge.title}
-                  hashtag={challenge.hashtag} // ✅ Truyền hashtag
-                  // Tạm thời giữ mock data cho 2 trường này vì model chưa có
+                  hashtag={challenge.hashtag}
                   daysLeft={
                     challenge.end_date
                       ? Math.ceil(
                           (new Date(challenge.end_date) - new Date()) /
                             (1000 * 60 * 60 * 24)
                         )
-                      : "∞"
+                      : '∞'
                   }
-                  number={0} // Sẽ cần API đếm participants
+                  number={0}
                 />
               ))}
             </ul>
           )}
         </div>
-        {/* ... (phần thống kê giữ nguyên) ... */}
       </div>
     </div>
   );

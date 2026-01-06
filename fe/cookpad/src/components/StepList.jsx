@@ -1,19 +1,18 @@
-// src/components/StepList.jsx
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Camera,
   Plus,
   MoreHorizontal,
   GripVertical,
   Loader2,
-} from "lucide-react";
-import { uploadMedia } from "../services/uploadApi";
+} from 'lucide-react';
+import { uploadMedia } from '../services/uploadApi';
 
 const uid = () =>
   `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 
 export default function StepList({ stepsData = [], onChange }) {
-  const [cookTime, setCookTime] = useState("1 tiếng 30 phút");
+  const [cookTime, setCookTime] = useState('1 tiếng 30 phút');
   const [menuOpen, setMenuOpen] = useState(null);
   const [dragId, setDragId] = useState(null);
   const [uploadingId, setUploadingId] = useState(null);
@@ -23,7 +22,7 @@ export default function StepList({ stepsData = [], onChange }) {
   };
 
   const addStep = () => {
-    const next = [...stepsData, { id: uid(), text: "", image: null }];
+    const next = [...stepsData, { id: uid(), text: '', image: null }];
     publish(next);
   };
 
@@ -34,14 +33,14 @@ export default function StepList({ stepsData = [], onChange }) {
 
   const handleDragStart = (e, id) => {
     setDragId(id);
-    e.dataTransfer.setData("text/plain", id);
+    e.dataTransfer.setData('text/plain', id);
   };
   const handleDragOver = (e) => {
     e.preventDefault();
   };
   const handleDrop = (e, targetId) => {
     e.preventDefault();
-    const sourceId = e.dataTransfer.getData("text/plain") || dragId;
+    const sourceId = e.dataTransfer.getData('text/plain') || dragId;
     if (!sourceId || sourceId === targetId) return;
     const srcIndex = stepsData.findIndex((s) => s.id === sourceId);
     const tgtIndex = stepsData.findIndex((s) => s.id === targetId);
@@ -66,8 +65,8 @@ export default function StepList({ stepsData = [], onChange }) {
         stepsData.map((s) => (s.id === stepId ? { ...s, image: serverUrl } : s))
       );
     } catch (error) {
-      console.error("Lỗi upload ảnh bước:", error);
-      alert("Upload ảnh thất bại!");
+      console.error('Lỗi upload ảnh bước:', error);
+      alert('Upload ảnh thất bại!');
     } finally {
       setUploadingId(null);
     }

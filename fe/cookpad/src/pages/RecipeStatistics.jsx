@@ -1,6 +1,5 @@
-// src/pages/RecipeStatistics.jsx
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   Eye,
@@ -9,7 +8,7 @@ import {
   MessageCircle,
   TrendingUp,
   Loader2,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   AreaChart,
   Area,
@@ -18,8 +17,8 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-} from "recharts";
-import { getRecipeStats, getRecipeChart } from "../services/statsApi";
+} from 'recharts';
+import { getRecipeStats, getRecipeChart } from '../services/statsApi';
 
 export default function RecipeStatistics() {
   const { id } = useParams();
@@ -46,7 +45,7 @@ export default function RecipeStatistics() {
         });
         setChartData(formattedChart);
       } catch (error) {
-        console.error("Lỗi:", error);
+        console.error('Lỗi:', error);
       } finally {
         setLoading(false);
       }
@@ -67,7 +66,7 @@ export default function RecipeStatistics() {
     <div className="max-w-6xl mx-auto py-8 px-4">
       {/* Header */}
       <button
-        onClick={() => navigate("/statistics")}
+        onClick={() => navigate('/statistics')}
         className="flex items-center gap-2 text-gray-500 hover:text-orange-500 mb-4 transition"
       >
         <ArrowLeft size={20} /> Quay lại danh sách
@@ -134,7 +133,7 @@ export default function RecipeStatistics() {
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="displayDate" axisLine={false} tickLine={false} />
               <YAxis axisLine={false} tickLine={false} allowDecimals={false} />
-              <Tooltip contentStyle={{ borderRadius: "8px", border: "none" }} />
+              <Tooltip contentStyle={{ borderRadius: '8px', border: 'none' }} />
               <Area
                 type="monotone"
                 dataKey="count"

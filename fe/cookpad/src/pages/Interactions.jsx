@@ -42,7 +42,7 @@ export default function Interactions() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto min-h-screen bg-gray-50 py-6 px-4">
+    <div className="min-w-5/6 min-h-screen bg-gray-50 py-6 px-4">
       <div className="flex items-center gap-3 mb-6">
         <Bell className="text-orange-500" />
         <h1 className="text-2xl font-bold text-gray-900">Thông báo</h1>
@@ -56,7 +56,7 @@ export default function Interactions() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 text-gray-500">
+          <div className="text-center py-16 text-gray-500 min-w-3/4">
             <Bell className="w-12 h-12 mx-auto mb-3 text-gray-300" />
             <p>Bạn chưa có thông báo nào.</p>
           </div>

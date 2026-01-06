@@ -1,7 +1,6 @@
-// src/components/SelectRecipeModal.jsx
-import { useState, useEffect } from "react";
-import { X, Search, Loader2, ChefHat } from "lucide-react";
-import { getMyRecipes, updateRecipe } from "../services/recipeApi";
+import { useState, useEffect } from 'react';
+import { X, Search, Loader2, ChefHat } from 'lucide-react';
+import { getMyRecipes, updateRecipe } from '../services/recipeApi';
 
 export default function SelectRecipeModal({
   isOpen,
@@ -12,7 +11,7 @@ export default function SelectRecipeModal({
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
 
   // 1. Tải danh sách món của tôi khi mở modal
   useEffect(() => {
@@ -27,11 +26,11 @@ export default function SelectRecipeModal({
       const res = await getMyRecipes();
       // Chỉ lấy các món đã public (status='public')
       const publicRecipes = (res.data.data.rows || []).filter(
-        (r) => r.status === "public"
+        (r) => r.status === 'public'
       );
       setRecipes(publicRecipes);
     } catch (error) {
-      console.error("Lỗi tải món ăn:", error);
+      console.error('Lỗi tải món ăn:', error);
     } finally {
       setLoading(false);
     }
@@ -59,12 +58,12 @@ export default function SelectRecipeModal({
 
       await updateRecipe(recipe.id, { description: newDescription });
 
-      alert("Tham gia thành công!");
+      alert('Tham gia thành công!');
       if (onSuccess) onSuccess(); // Callback để tải lại danh sách bên ngoài
       onClose();
     } catch (error) {
-      console.error("Lỗi tham gia:", error);
-      alert("Có lỗi xảy ra. Vui lòng thử lại.");
+      console.error('Lỗi tham gia:', error);
+      alert('Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setSubmitting(false);
     }
@@ -142,7 +141,7 @@ export default function SelectRecipeModal({
                   className="flex items-center gap-3 p-2 rounded-lg hover:bg-orange-50 cursor-pointer transition-colors border border-transparent hover:border-orange-200 group"
                 >
                   <img
-                    src={recipe.image_url || "https://placehold.co/60"}
+                    src={recipe.image_url || 'https://placehold.co/60'}
                     alt={recipe.title}
                     className="w-14 h-14 rounded-md object-cover bg-gray-200 border"
                   />
@@ -151,7 +150,7 @@ export default function SelectRecipeModal({
                       {recipe.title}
                     </h4>
                     <p className="text-xs text-gray-500 line-clamp-1">
-                      {recipe.description || "Không có mô tả"}
+                      {recipe.description || 'Không có mô tả'}
                     </p>
                   </div>
                   <div className="p-2 text-gray-300 group-hover:text-orange-500">

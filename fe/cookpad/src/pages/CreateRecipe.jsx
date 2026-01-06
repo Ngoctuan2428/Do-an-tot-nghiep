@@ -1,17 +1,15 @@
-// src/pages/CreateRecipe.jsx
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { Camera, Trash2, Upload, Loader2, Save, X } from "lucide-react";
-import IngredientList from "../components/IngredientList";
-import StepList from "../components/StepList";
-import { createRecipe, updateRecipe } from "../services/recipeApi";
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Camera, Trash2, Upload, Loader2, Save, X } from 'lucide-react';
+import IngredientList from '../components/IngredientList';
+import StepList from '../components/StepList';
+import { createRecipe, updateRecipe } from '../services/recipeApi';
 
 // Import API services
-import { uploadMedia } from "../services/uploadApi";
-import { getCurrentUser } from "../services/userApi";
-import { useRecipeCounts } from "../contexts/RecipeCountContext";
+import { uploadMedia } from '../services/uploadApi';
+import { getCurrentUser } from '../services/userApi';
+import { useRecipeCounts } from '../contexts/RecipeCountContext';
 
-// ✅ 1. THÊM HÀM uid() BỊ THIẾU
 const uid = () =>
   `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -26,7 +24,6 @@ export default function CreateRecipe() {
   let initialIngredients = [];
   let initialSteps = [];
 
-  // ✅ SỬA LỖI 4: Parse dữ liệu (nếu ở chế độ Chỉnh sửa)
   if (recipeToEdit) {
     try {
       const ingredientsData = recipeToEdit.ingredients;
@@ -34,24 +31,23 @@ export default function CreateRecipe() {
       if (Array.isArray(ingredientsData)) {
         initialIngredients = ingredientsData;
       } else if (
-        typeof ingredientsData === "string" &&
-        ingredientsData.startsWith("[")
+        typeof ingredientsData === 'string' &&
+        ingredientsData.startsWith('[')
       ) {
         initialIngredients = JSON.parse(ingredientsData);
       } else {
         initialIngredients = [];
       }
     } catch (e) {
-      console.error("Lỗi parse ingredients khi sửa:", e);
+      console.error('Lỗi parse ingredients khi sửa:', e);
     }
 
     try {
-      // 2. Xử lý Steps (JSON)
-      // (Bị lỗi tương tự nếu steps là "" hoặc null)
+      // Xử lý Steps (JSON)
       const stepsData = recipeToEdit.steps;
       if (Array.isArray(stepsData)) {
         initialSteps = stepsData.map((s) => ({ ...s, id: s.id || uid() }));
-      } else if (typeof stepsData === "string" && stepsData.startsWith("[")) {
+      } else if (typeof stepsData === 'string' && stepsData.startsWith('[')) {
         initialSteps = JSON.parse(stepsData).map((s) => ({
           ...s,
           id: s.id || uid(),
@@ -60,13 +56,13 @@ export default function CreateRecipe() {
         initialSteps = [];
       }
     } catch (e) {
-      console.error("Lỗi parse steps khi sửa:", e);
+      console.error('Lỗi parse steps khi sửa:', e);
     }
   }
 
   // Khởi tạo state với dữ liệu (nếu có)
-  const [title, setTitle] = useState(recipeToEdit?.title || "");
-  const [desc, setDesc] = useState(recipeToEdit?.description || "");
+  const [title, setTitle] = useState(recipeToEdit?.title || '');
+  const [desc, setDesc] = useState(recipeToEdit?.description || '');
   const [imageUrl, setImageUrl] = useState(recipeToEdit?.image_url || null);
   const [imageFile, setImageFile] = useState(null);
 
@@ -75,7 +71,7 @@ export default function CreateRecipe() {
   const [steps, setSteps] = useState(initialSteps);
 
   const [loading, setLoading] = useState(false);
-  const [saveStatus, setSaveStatus] = useState("Đã lưu");
+  const [saveStatus, setSaveStatus] = useState('Đã lưu');
   const [user, setUser] = useState(null);
 
   // Lấy dữ liệu user thật khi component tải
@@ -85,7 +81,7 @@ export default function CreateRecipe() {
         const res = await getCurrentUser();
         setUser(res.data.data);
       } catch (error) {
-        console.error("Không thể tải thông tin user:", error);
+        console.error('Không thể tải thông tin user:', error);
       }
     };
     fetchUser();
@@ -117,7 +113,7 @@ export default function CreateRecipe() {
     }));
 
     return {
-      title: title || "Không đề",
+      title: title || 'Không đề',
       description: desc,
       image_url: finalImageUrl,
       ingredients: JSON.stringify(ingredientsList),
@@ -129,9 +125,9 @@ export default function CreateRecipe() {
   // --- Sửa handlePublish ---
   const handlePublish = async () => {
     setLoading(true);
-    setSaveStatus("Đang lưu...");
+    setSaveStatus('Đang lưu...');
     try {
-      const payload = await createPayload("public");
+      const payload = await createPayload('public');
       let response;
 
       if (isEditMode) {
@@ -141,23 +137,23 @@ export default function CreateRecipe() {
       }
 
       await refreshCounts();
-      setSaveStatus("Đã lưu");
+      setSaveStatus('Đã lưu');
       setLoading(false);
-      alert("Đăng món thành công!");
+      alert('Đăng món thành công!');
       navigate(`/recipes/${response.data.data.id}`);
     } catch (error) {
       setLoading(false);
-      setSaveStatus("Lỗi!");
-      console.error("Lỗi khi đăng món:", error);
+      setSaveStatus('Lỗi!');
+      console.error('Lỗi khi đăng món:', error);
       alert(`Đã xảy ra lỗi: ${error.response?.data?.message || error.message}`);
     }
   };
 
   const handleSaveDraft = async () => {
     setLoading(true);
-    setSaveStatus("Đang lưu (Nháp)...");
+    setSaveStatus('Đang lưu (Nháp)...');
     try {
-      const payload = await createPayload("draft");
+      const payload = await createPayload('draft');
 
       if (isEditMode) {
         await updateRecipe(recipeToEdit.id, payload);
@@ -166,22 +162,22 @@ export default function CreateRecipe() {
       }
 
       await refreshCounts();
-      setSaveStatus("Đã lưu");
+      setSaveStatus('Đã lưu');
       setLoading(false);
-      alert("Đã lưu bản nháp thành công!");
-      navigate("/recipes/all");
+      alert('Đã lưu bản nháp thành công!');
+      navigate('/recipes/all');
     } catch (error) {
       setLoading(false);
-      setSaveStatus("Lỗi!");
-      console.error("Lỗi khi lưu nháp:", error);
+      setSaveStatus('Lỗi!');
+      console.error('Lỗi khi lưu nháp:', error);
       alert(`Đã xảy ra lỗi: ${error.response?.data?.message || error.message}`);
     }
   };
 
   const handleDelete = () => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa công thức này?")) {
-      alert("Chức năng đang phát triển!");
-      navigate("/recipes/all");
+    if (window.confirm('Bạn có chắc chắn muốn xóa công thức này?')) {
+      alert('Chức năng đang phát triển!');
+      navigate('/recipes/all');
     }
   };
 
@@ -190,17 +186,16 @@ export default function CreateRecipe() {
     return (
       <div
         className="flex justify-center items-center"
-        style={{ height: "calc(100vh - 70px)" }}
+        style={{ height: 'calc(100vh - 70px)' }}
       >
         <Loader2 className="w-10 h-10 animate-spin text-orange-500" />
       </div>
     );
   }
 
-  // --- (Render JSX) ---
   return (
     <div className="bg-white lg:bg-gray-50">
-      {/* 1. Header (Nút Lên Sóng, Lưu, Xóa) */}
+      {/* Header (Nút Lên Sóng, Lưu, Xóa) */}
       <div className="sticky top-0 z-30 bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -236,13 +231,13 @@ export default function CreateRecipe() {
               ) : (
                 <Upload className="w-4 h-4" />
               )}
-              {loading ? "Đang xử lý..." : "Lên sóng"}
+              {loading ? 'Đang xử lý...' : 'Lên sóng'}
             </button>
           </div>
         </div>
       </div>
 
-      {/* 2. Bố cục 2 cột (Grid) */}
+      {/* Bố cục 2 cột (Grid) */}
       <div className="max-w-7xl mx-auto p-4 lg:grid lg:grid-cols-[min(35%,300px)_1fr] lg:gap-8">
         {/* CỘT TRÁI (Ảnh và Nguyên liệu) */}
         <div className="lg:sticky lg:top-20 h-fit">
@@ -276,7 +271,6 @@ export default function CreateRecipe() {
             />
           </div>
 
-          {/* ✅ 2. THÊM PROP 'ingredientsData' (Sửa lỗi 2) */}
           <IngredientList
             ingredientsData={initialIngredients}
             onChange={setIngredients}
@@ -292,17 +286,17 @@ export default function CreateRecipe() {
             placeholder="Tên món: Món canh bí ngon nhất nhà mình"
             rows={1}
             className="w-full text-2xl md:text-3xl font-bold border-0 border-b-2 border-gray-200 p-2 focus:ring-0 focus:border-orange-400 resize-none overflow-hidden"
-            style={{ height: "auto", minHeight: "54px" }}
+            style={{ height: 'auto', minHeight: '54px' }}
           />
 
           {/* Tác giả (Sử dụng 'user' từ state) */}
           <div className="flex items-center gap-3 my-4">
             <img
-              src={user.avatar_url || "https://placehold.co/40"}
+              src={user.avatar_url || 'https://placehold.co/40'}
               alt="author"
               className="w-10 h-10 rounded-full object-cover"
               onError={(e) => {
-                e.target.src = "https://placehold.co/40";
+                e.target.src = 'https://placehold.co/40';
               }}
             />
             <div>
@@ -321,7 +315,7 @@ export default function CreateRecipe() {
           />
 
           <p className="text-xs text-gray-500 mt-1 px-2">
-            Để tham gia thử thách, hãy thêm hashtag (ví dụ:{" "}
+            Để tham gia thử thách, hãy thêm hashtag (ví dụ:{' '}
             <span className="text-orange-500">#monchay7ngay</span>) vào đây nhé!
           </p>
 

@@ -1,7 +1,5 @@
-// src/pages/Statistics.jsx
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-// ✅ Đã thêm ChefHat vào đây
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   BarChart3,
   TrendingUp,
@@ -10,7 +8,7 @@ import {
   ArrowRight,
   Eye,
   Heart,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   AreaChart,
   Area,
@@ -19,9 +17,9 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-} from "recharts";
-import { getMyStats, getMyChart } from "../services/statsApi";
-import { getMyRecipes } from "../services/recipeApi";
+} from 'recharts';
+import { getMyStats, getMyChart } from '../services/statsApi';
+import { getMyRecipes } from '../services/recipeApi';
 
 export default function Statistics() {
   const [stats, setStats] = useState(null);

@@ -1,10 +1,8 @@
-// src/components/RelatedRecipes.jsx
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { Loader2 } from "lucide-react";
-import { getRelatedRecipes } from "../services/recipeApi";
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
+import { getRelatedRecipes } from '../services/recipeApi';
 
-// ✅ Nhận props là currentRecipeId chứ không phải recipes
 export default function RelatedRecipes({ currentRecipeId }) {
   const [recipes, setRecipes] = useState([]); // Khởi tạo mảng rỗng để tránh lỗi map
   const [loading, setLoading] = useState(true);
@@ -18,7 +16,7 @@ export default function RelatedRecipes({ currentRecipeId }) {
         // Đảm bảo dữ liệu là mảng, nếu không thì fallback về mảng rỗng
         setRecipes(Array.isArray(res.data.data) ? res.data.data : []);
       } catch (error) {
-        console.error("Lỗi lấy món tương tự:", error);
+        console.error('Lỗi lấy món tương tự:', error);
         setRecipes([]);
       } finally {
         setLoading(false);
@@ -54,12 +52,12 @@ export default function RelatedRecipes({ currentRecipeId }) {
             <div className="relative h-48 overflow-hidden">
               <img
                 src={
-                  r.image_url || "https://placehold.co/600x400?text=No+Image"
+                  r.image_url || 'https://placehold.co/600x400?text=No+Image'
                 }
                 alt={r.title}
                 className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
                 onError={(e) =>
-                  (e.target.src = "https://placehold.co/600x400?text=No+Image")
+                  (e.target.src = 'https://placehold.co/600x400?text=No+Image')
                 }
               />
             </div>
@@ -70,16 +68,16 @@ export default function RelatedRecipes({ currentRecipeId }) {
               </h3>
 
               <p className="text-gray-600 text-sm mb-3 line-clamp-2 h-10">
-                {r.description || "Món ăn ngon hấp dẫn..."}
+                {r.description || 'Món ăn ngon hấp dẫn...'}
               </p>
 
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <img
-                  src={r.User?.avatar_url || "https://placehold.co/30"}
+                  src={r.User?.avatar_url || 'https://placehold.co/30'}
                   className="w-6 h-6 rounded-full object-cover"
-                  onError={(e) => (e.target.src = "https://placehold.co/30")}
+                  onError={(e) => (e.target.src = 'https://placehold.co/30')}
                 />
-                <span>{r.User?.username || "Ẩn danh"}</span>
+                <span>{r.User?.username || 'Ẩn danh'}</span>
               </div>
             </div>
           </Link>

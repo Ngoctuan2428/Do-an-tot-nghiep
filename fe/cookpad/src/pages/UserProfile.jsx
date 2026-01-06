@@ -1,16 +1,15 @@
-// src/pages/UserProfile.jsx
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // ✅ Thêm Link
+import { useNavigate, Link } from 'react-router-dom';
 import { Edit3, FileText, Loader2, Camera, Users } from 'lucide-react';
-// Import API
+
 import {
   getCurrentUser,
   getUserStats,
   getFollowers,
   getFollowing,
 } from '../services/userApi';
-import { getMyRecipes, getCookedRecipes } from '../services/recipeApi'; // ✅ Thêm getCookedRecipes
-// Import Components
+import { getMyRecipes, getCookedRecipes } from '../services/recipeApi';
+
 import RecipeListItem from '../components/RecipeListItem';
 import EditProfileModal from '../components/EditProfileModal';
 import UserListItem from '../components/UserListItem';
@@ -25,7 +24,7 @@ export default function UserProfile() {
   });
 
   const [recipes, setRecipes] = useState([]);
-  const [cooksnaps, setCooksnaps] = useState([]); // ✅ State mới lưu cooksnaps
+  const [cooksnaps, setCooksnaps] = useState([]); // State mới lưu cooksnaps
 
   const [userList, setUserList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,7 +36,7 @@ export default function UserProfile() {
   // Hàm tải dữ liệu
   const fetchData = async () => {
     try {
-      // ✅ Gọi thêm getCookedRecipes trong Promise.all
+      //  Gọi thêm getCookedRecipes trong Promise.all
       const [userRes, statsRes, recipesRes, cooksnapsRes] = await Promise.all([
         getCurrentUser(),
         getUserStats('me'),
@@ -48,7 +47,7 @@ export default function UserProfile() {
       setUser(userRes.data.data);
       setStats(statsRes.data.data);
       setRecipes(recipesRes.data.data.rows || []);
-      // ✅ Lưu dữ liệu cooksnaps
+      // Lưu dữ liệu cooksnaps
       setCooksnaps(cooksnapsRes.data.data.rows || []);
     } catch (error) {
       console.error('Lỗi tải profile:', error);
@@ -175,7 +174,7 @@ export default function UserProfile() {
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            {/* ✅ Cập nhật số lượng Cooksnaps */}
+            {/* Cập nhật số lượng Cooksnaps */}
             Psnaps ({cooksnaps.length})
             {activeTab === 'cooksnaps' && (
               <span className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-600 rounded-t-full"></span>
@@ -202,7 +201,7 @@ export default function UserProfile() {
 
       {/* --- Nội dung chính --- */}
       <div className="min-h-[200px]">
-        {/* 1. Tab Món ăn */}
+        {/* Tab Món ăn */}
         {activeTab === 'recipes' && (
           <>
             {recipes.length > 0 ? (
@@ -237,7 +236,7 @@ export default function UserProfile() {
           </>
         )}
 
-        {/* ✅ 2. Tab Cooksnaps (Hiển thị dạng lưới ảnh) */}
+        {/* Tab Cooksnaps (Hiển thị dạng lưới ảnh) */}
         {activeTab === 'cooksnaps' && (
           <>
             {cooksnaps.length > 0 ? (
@@ -314,7 +313,7 @@ export default function UserProfile() {
           </>
         )}
 
-        {/* 3. Danh sách Bạn bè / Follower */}
+        {/* Danh sách Bạn bè / Follower */}
         {(activeTab === 'following' || activeTab === 'followers') && (
           <div>
             {listLoading ? (

@@ -1,14 +1,12 @@
-// src/pages/RecipeDetail.jsx
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import RecipeHeader from "../components/RecipeHeader";
-import RecipeContent from "../components/RecipeContent";
-import CooksnapSection from "../components/CooksnapSection";
-import RelatedRecipes from "../components/RelatedRecipes";
-import { getRecipeById } from "../services/recipeApi";
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import RecipeHeader from '../components/RecipeHeader';
+import RecipeContent from '../components/RecipeContent';
+import CooksnapSection from '../components/CooksnapSection';
+import RelatedRecipes from '../components/RelatedRecipes';
+import { getRecipeById } from '../services/recipeApi';
 
-// 1. Import component mới
-import RecipeDraftView from "../components/RecipeDraftView";
+import RecipeDraftView from '../components/RecipeDraftView';
 
 export default function RecipeDetail() {
   const { id } = useParams();
@@ -25,7 +23,7 @@ export default function RecipeDetail() {
         const res = await getRecipeById(id);
         setRecipe(res.data.data);
       } catch (err) {
-        console.error("Failed to load recipe:", err);
+        console.error('Failed to load recipe:', err);
         setError(err);
       } finally {
         setLoading(false);
@@ -39,9 +37,8 @@ export default function RecipeDetail() {
   if (error || !recipe)
     return <div className="p-6">Không tìm thấy công thức hoặc đã có lỗi.</div>;
 
-  // 2. ✅ KIỂM TRA TRẠNG THÁI (STATUS)
   // Nếu là 'draft' (Món nháp), hiển thị giao diện chỉnh sửa
-  if (recipe.status === "draft") {
+  if (recipe.status === 'draft') {
     return (
       <div className="bg-white text-gray-900">
         <RecipeDraftView recipe={recipe} />
@@ -49,13 +46,13 @@ export default function RecipeDetail() {
     );
   }
 
-  // 3. Nếu là 'public', hiển thị giao diện xem chi tiết như cũ
+  // nếu là 'public' => hien thi binh thuong
   return (
     <div className="bg-white text-gray-900">
       <RecipeHeader recipe={recipe} />
       <RecipeContent recipe={recipe} />
       <CooksnapSection recipe={recipe} />
-      <RelatedRecipes currentRecipeId={id} />{" "}
+      <RelatedRecipes currentRecipeId={id} />{' '}
     </div>
   );
 }
