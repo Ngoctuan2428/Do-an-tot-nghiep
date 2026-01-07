@@ -13,7 +13,7 @@ const uid = () =>
   `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 
 export default function StepList({ stepsData = [], onChange }) {
-  const [cookTime, setCookTime] = useState("1 tiếng 30 phút");
+  // const [cookTime, setCookTime] = useState("1 tiếng 30 phút");
   const [menuOpen, setMenuOpen] = useState(null);
   const [dragId, setDragId] = useState(null);
   const [uploadingId, setUploadingId] = useState(null);

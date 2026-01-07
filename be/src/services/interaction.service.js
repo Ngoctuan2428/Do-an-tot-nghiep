@@ -89,4 +89,95 @@ const getInteractionFeed = async (userId) => {
   return feed.slice(0, 20);
 };
 
+const toggleLikeRecipe = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { recipeId } = req.params;
+
+    // Kiểm tra món ăn
+    const recipe = await Recipe.findByPk(recipeId);
+    if (!recipe) throw new ApiError(404, "Món ăn không tồn tại");
+
+    // Kiểm tra đã like chưa
+    const existingLike = await Like.findOne({
+      where: { user_id: userId, recipe_id: recipeId },
+    });
+
+    if (existingLike) {
+      await existingLike.destroy(); // Unlike
+      return res
+        .status(200)
+        .json({ status: "success", message: "Đã bỏ thích", liked: false });
+    } else {
+      await Like.create({ user_id: userId, recipe_id: recipeId }); // Like
+
+      // 🔥 TẠO THÔNG BÁO LIKE (Nếu không phải tự like bài mình)
+      if (recipe.user_id !== userId) {
+        await notificationService.createNotification({
+          recipient_id: recipe.user_id,
+          sender_id: userId,
+          type: "like",
+          reference_id: recipeId,
+          message: `đã thích món ăn "${recipe.title}" của bạn`,
+        });
+      }
+
+      return res
+        .status(201)
+        .json({ status: "success", message: "Đã thích món ăn", liked: true });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+const toggleFollowUser = async (req, res, next) => {
+  try {
+    const followerId = req.user.id; // Người đi follow
+    const { userId: followingId } = req.params; // Người được follow
+
+    if (parseInt(followerId) === parseInt(followingId)) {
+      throw new ApiError(400, "Không thể tự theo dõi chính mình");
+    }
+
+    const targetUser = await User.findByPk(followingId);
+    if (!targetUser) throw new ApiError(404, "Người dùng không tồn tại");
+
+    const existingFollow = await Follow.findOne({
+      where: { follower_id: followerId, following_id: followingId },
+    });
+
+    if (existingFollow) {
+      await existingFollow.destroy(); // Unfollow
+      return res
+        .status(200)
+        .json({
+          status: "success",
+          message: "Đã hủy theo dõi",
+          following: false,
+        });
+    } else {
+      await Follow.create({
+        follower_id: followerId,
+        following_id: followingId,
+      }); // Follow
+
+      // 🔥 TẠO THÔNG BÁO FOLLOW
+      await notificationService.createNotification({
+        recipient_id: followingId,
+        sender_id: followerId,
+        type: "follow",
+        reference_id: followerId, // Link về trang cá nhân người follow
+        message: `đã bắt đầu theo dõi bạn`,
+      });
+
+      return res
+        .status(201)
+        .json({ status: "success", message: "Đã theo dõi", following: true });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = { getInteractionFeed };

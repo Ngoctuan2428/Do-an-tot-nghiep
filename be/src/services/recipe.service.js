@@ -13,6 +13,8 @@ const {
 const { Op } = require("sequelize");
 const ApiError = require("../utils/ApiError");
 const generateSlug = require("../utils/slugify");
+const cooksnapService = require("./cooksnap.service");
+const notificationService = require("./notification.service");
 
 // 2. HÀM createRecipe
 const createRecipe = async (userId, recipeData) => {
@@ -234,6 +236,23 @@ const toggleLike = async (userId, recipeId) => {
     // Chưa like -> Tạo like mới (thêm bản ghi và tăng đếm)
     await Like.create({ user_id: userId, recipe_id: recipeId });
     await recipe.increment("likes", { by: 1 });
+
+    // 🔥 TẠO THÔNG BÁO CHO NGƯỜI TẠO BÀI VIẾT (Nếu không phải tự like bài mình)
+    try {
+      if (recipe.user_id !== userId) {
+        await notificationService.createNotification({
+          recipient_id: recipe.user_id,
+          sender_id: userId,
+          type: "like",
+          reference_id: recipeId,
+          message: `đã thích món ăn "${recipe.title}" của bạn`,
+        });
+      }
+    } catch (error) {
+      console.error("Lỗi tạo thông báo like:", error);
+      // Không throw lỗi để tránh ảnh hưởng luồng chính
+    }
+
     return { liked: true, likes: recipe.likes + 1 };
   }
 };
@@ -285,6 +304,22 @@ const markRecipeAsCooked = async (userId, recipeId, imageUrl, comment = "") => {
     image_url: imageUrl,
     comment: comment,
   });
+
+  // 🔥 TẠO THÔNG BÁO CHO NGƯỜI TẠO BÀI VIẾT (Nếu không phải tự đang cooksnap bài mình)
+  try {
+    if (recipe.user_id !== userId) {
+      await notificationService.createNotification({
+        recipient_id: recipe.user_id,
+        sender_id: userId,
+        type: "cooksnap",
+        reference_id: recipeId,
+        message: `đã nấu thử món ăn "${recipe.title}" của bạn`,
+      });
+    }
+  } catch (error) {
+    console.error("Lỗi tạo thông báo cooksnap:", error);
+    // Không throw lỗi để tránh ảnh hưởng luồng chính
+  }
 
   return cooksnap;
 };

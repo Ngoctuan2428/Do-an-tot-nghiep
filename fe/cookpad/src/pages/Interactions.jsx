@@ -1,64 +1,150 @@
-// src/pages/Interactions.jsx
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Heart,
   MessageCircle,
   UserPlus,
-  CheckCircle,
-  Camera,
+  CheckCircle, // Dùng cho System notification nếu có
   Loader2,
   Bell,
   Utensils,
+  CheckCheck,
+  Filter,
 } from "lucide-react";
-import { getInteractions } from "../services/interactionApi"; // Đảm bảo bạn đã có API này
+// Import service mới
+import {
+  getNotifications,
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
+} from "../services/notificationApi";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
+import { toast } from "react-toastify";
 
 export default function Interactions() {
   const [interactions, setInteractions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filterType, setFilterType] = useState("all"); // State cho bộ lọc
 
+  // Danh sách các tabs bộ lọc
+  const filters = [
+    { id: "all", label: "Tất cả" },
+    { id: "like", label: "Yêu thích" },
+    { id: "comment", label: "Bình luận" },
+    { id: "follow", label: "Theo dõi" },
+  ];
+
+  // Hàm tải dữ liệu
+  const fetchInteractions = async () => {
+    setLoading(true);
+    try {
+      // Gọi API với tham số filterType
+      const response = await getNotifications(filterType);
+      setInteractions(response.data.data.notifications);
+    } catch (error) {
+      console.error("Lỗi tải thông báo:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Gọi lại API mỗi khi filterType thay đổi
   useEffect(() => {
-    const fetchInteractions = async () => {
-      try {
-        const response = await getInteractions();
-        setInteractions(response.data.data);
-      } catch (error) {
-        console.error("Lỗi tải thông báo:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchInteractions();
-  }, []);
+  }, [filterType]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
-        <Loader2 className="animate-spin text-orange-500 w-8 h-8" />
-      </div>
-    );
-  }
+  // Xử lý đánh dấu tất cả đã đọc
+  const handleMarkAllRead = async () => {
+    try {
+      await markAllNotificationsAsRead();
+      // Cập nhật UI: set tất cả is_read = true
+      setInteractions((prev) =>
+        prev.map((item) => ({ ...item, is_read: true }))
+      );
+      toast.success("Đã đánh dấu tất cả là đã đọc");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Xử lý khi click vào một thông báo (đánh dấu đã đọc)
+  const handleItemClick = async (id, isRead) => {
+    if (!isRead) {
+      try {
+        await markNotificationAsRead(id);
+        // Cập nhật UI cục bộ
+        setInteractions((prev) =>
+          prev.map((item) =>
+            item.id === id ? { ...item, is_read: true } : item
+          )
+        );
+      } catch (error) {
+        console.error("Lỗi cập nhật trạng thái:", error);
+      }
+    }
+  };
 
   return (
     <div className="max-w-2xl mx-auto min-h-screen bg-gray-50 py-6 px-4">
-      <div className="flex items-center gap-3 mb-6">
-        <Bell className="text-orange-500" />
-        <h1 className="text-2xl font-bold text-gray-900">Thông báo</h1>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <Bell className="text-orange-500" />
+          <h1 className="text-2xl font-bold text-gray-900">Thông báo</h1>
+        </div>
+
+        {/* Nút đánh dấu đã đọc tất cả */}
+        <button
+          onClick={handleMarkAllRead}
+          className="text-sm text-gray-500 hover:text-orange-600 flex items-center gap-1 transition-colors"
+          title="Đánh dấu tất cả đã đọc"
+        >
+          <CheckCheck size={16} /> Đã đọc
+        </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        {interactions.length > 0 ? (
+      {/* Filter Tabs */}
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+        {filters.map((f) => (
+          <button
+            key={f.id}
+            onClick={() => setFilterType(f.id)}
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+              filterType === f.id
+                ? "bg-orange-500 text-white shadow-md"
+                : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+            }`}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Content */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden min-h-[400px]">
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <Loader2 className="animate-spin text-orange-500 w-8 h-8" />
+          </div>
+        ) : interactions.length > 0 ? (
           <div className="divide-y divide-gray-100">
             {interactions.map((item) => (
-              <NotificationItem key={item.id} item={item} />
+              <NotificationItem
+                key={item.id}
+                item={item}
+                onClick={() => handleItemClick(item.id, item.is_read)}
+              />
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 text-gray-500">
-            <Bell className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p>Bạn chưa có thông báo nào.</p>
+          <div className="text-center py-16 text-gray-500 flex flex-col items-center">
+            <div className="bg-gray-100 p-4 rounded-full mb-3">
+              <Bell className="w-8 h-8 text-gray-400" />
+            </div>
+            <p className="text-lg font-medium text-gray-600">
+              Không có thông báo nào
+            </p>
+            <p className="text-sm">Chưa có hoạt động nào trong mục này.</p>
           </div>
         )}
       </div>
@@ -67,104 +153,50 @@ export default function Interactions() {
 }
 
 // Component con để render từng loại thông báo
-function NotificationItem({ item }) {
-  // Cấu hình nội dung dựa trên loại thông báo (type)
+function NotificationItem({ item, onClick }) {
+  const { type, Sender, message, created_at, is_read, reference_id } = item;
+  const senderName = Sender?.username || "Người dùng Cookpad";
+  const avatarUrl = Sender?.avatar_url || "https://via.placeholder.com/150";
+
+  // Cấu hình mặc định
   let config = {
-    icon: <Bell size={20} />,
+    icon: <Bell size={16} />,
     color: "bg-gray-100 text-gray-600",
-    content: "Thông báo mới",
     link: "#",
   };
 
-  const { type, Sender, Recipe, Comment } = item;
-  const senderName = Sender?.username || "Ai đó";
-
+  // Xác định icon và link dựa trên type (lowercase từ Backend)
   switch (type) {
-    // 1. Đăng món ăn thành công
-    case "RECIPE_PUBLISHED":
+    case "like":
       config = {
-        icon: <CheckCircle size={20} />,
-        color: "bg-green-100 text-green-600",
-        content: (
-          <span>
-            Chúc mừng! Món <strong>{Recipe?.title}</strong> của bạn đã được xuất
-            bản thành công.
-          </span>
-        ),
-        link: `/recipes/${Recipe?.id}`,
+        icon: <Heart size={16} fill="currentColor" />, // Fill icon cho đẹp
+        color: "bg-red-100 text-red-500",
+        link: `/recipes/${reference_id}`, // reference_id là recipe_id
       };
       break;
 
-    // 2. Gửi Cooksnap thành công
-    case "COOKSNAP_SENT":
+    case "comment":
+    case "reply":
       config = {
-        icon: <Camera size={20} />,
-        color: "bg-blue-100 text-blue-600",
-        content: (
-          <span>
-            Bạn đã gửi Cooksnap cho món <strong>{Recipe?.title}</strong>.
-          </span>
-        ),
-        link: `/recipes/${Recipe?.id}`,
+        icon: <MessageCircle size={16} fill="currentColor" />,
+        color: "bg-blue-100 text-blue-500",
+        link: `/recipes/${reference_id}`, // reference_id có thể cần logic điều hướng
       };
       break;
 
-    // 3. Có người phản hồi bình luận
-    case "COMMENT_REPLY":
+    case "follow":
       config = {
-        icon: <MessageCircle size={20} />,
-        color: "bg-purple-100 text-purple-600",
-        content: (
-          <span>
-            <strong>{senderName}</strong> đã trả lời bình luận của bạn trong món{" "}
-            <strong>{Recipe?.title}</strong>.
-          </span>
-        ),
-        link: `/recipes/${Recipe?.id}`,
+        icon: <UserPlus size={16} />,
+        color: "bg-orange-100 text-orange-500",
+        link: `/profile/${Sender?.id}`, // Link đến trang cá nhân người follow
       };
       break;
 
-    // 4. Có lượt thích
-    case "LIKE":
+    case "cooksnap":
       config = {
-        icon: <Heart size={20} />,
-        color: "bg-red-100 text-red-600",
-        content: (
-          <span>
-            <strong>{senderName}</strong> đã thích món{" "}
-            <strong>{Recipe?.title}</strong> của bạn.
-          </span>
-        ),
-        link: `/recipes/${Recipe?.id}`,
-      };
-      break;
-
-    // 5. Có người kết bạn (Follow)
-    case "FOLLOW":
-      config = {
-        icon: <UserPlus size={20} />,
-        color: "bg-orange-100 text-orange-600",
-        content: (
-          <span>
-            <strong>{senderName}</strong> đã bắt đầu theo dõi bạn.
-          </span>
-        ),
-        link: `/profile/${Sender?.id}`,
-      };
-      break;
-
-    // Trường hợp khác (Cooksnap nhận được từ người khác)
-    case "COOKSNAP_RECEIVED":
-      config = {
-        icon: <Utensils size={20} />,
+        icon: <Utensils size={16} />,
         color: "bg-yellow-100 text-yellow-600",
-        content: (
-          <span>
-            <strong>{senderName}</strong> vừa gửi Cooksnap cho món{" "}
-            <strong>{Recipe?.title}</strong> của bạn!
-          </span>
-        ),
-        link: `/recipes/${Recipe?.id}`,
+        link: `/recipes/${reference_id}`,
       };
       break;
 
@@ -175,20 +207,36 @@ function NotificationItem({ item }) {
   return (
     <Link
       to={config.link}
-      className="flex items-start gap-4 p-4 hover:bg-gray-50 transition-colors group relative"
+      onClick={onClick}
+      className={`flex items-start gap-4 p-4 transition-colors relative group ${
+        is_read
+          ? "bg-white hover:bg-gray-50"
+          : "bg-orange-50/60 hover:bg-orange-50"
+      }`}
     >
-      {/* Icon đại diện */}
-      <div className={`p-3 rounded-full flex-shrink-0 ${config.color}`}>
-        {config.icon}
+      {/* Avatar người gửi + Icon nhỏ ở góc */}
+      <div className="relative flex-shrink-0">
+        <img
+          src={avatarUrl}
+          alt={senderName}
+          className="w-12 h-12 rounded-full object-cover border border-gray-200"
+        />
+        <div
+          className={`absolute -bottom-1 -right-1 p-1 rounded-full border-2 border-white ${config.color}`}
+        >
+          {config.icon}
+        </div>
       </div>
 
-      <div className="flex-1 min-w-0">
-        <div className="text-gray-800 text-sm leading-relaxed mb-1">
-          {config.content}
+      <div className="flex-1 min-w-0 pt-1">
+        <div className="text-gray-900 text-sm leading-snug">
+          <span className="font-bold hover:underline">{senderName}</span>{" "}
+          <span className="text-gray-700">{message}</span>
         </div>
-        <p className="text-xs text-gray-500 font-medium">
-          {item.created_at
-            ? formatDistanceToNow(new Date(item.created_at), {
+
+        <p className="text-xs text-gray-400 font-medium mt-1">
+          {created_at
+            ? formatDistanceToNow(new Date(created_at), {
                 addSuffix: true,
                 locale: vi,
               })
@@ -196,9 +244,9 @@ function NotificationItem({ item }) {
         </p>
       </div>
 
-      {/* Dấu chấm đỏ nếu chưa đọc (Tùy chọn backend có trả về is_read không) */}
-      {!item.is_read && (
-        <span className="w-2.5 h-2.5 bg-orange-500 rounded-full absolute top-1/2 right-4 -translate-y-1/2"></span>
+      {/* Dấu chấm xanh báo chưa đọc */}
+      {!is_read && (
+        <span className="w-2.5 h-2.5 bg-orange-500 rounded-full absolute top-1/2 right-4 -translate-y-1/2 shadow-sm"></span>
       )}
     </Link>
   );

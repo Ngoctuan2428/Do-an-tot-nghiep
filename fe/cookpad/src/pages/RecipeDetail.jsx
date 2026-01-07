@@ -23,9 +23,9 @@ export default function RecipeDetail() {
     // 3. Logic chặn gọi 2 lần (Anti-Double-Fetch):
     // Nếu ID hiện tại giống hệt ID đã fetch trước đó -> Dừng lại, không gọi API nữa.
     if (fetchedIdRef.current === id) {
-      return; 
+      return;
     }
-    
+
     // Đánh dấu là đã bắt đầu fetch ID này
     fetchedIdRef.current = id;
 

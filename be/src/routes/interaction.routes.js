@@ -5,7 +5,11 @@ const controller = require("../controllers/interaction.controller");
 
 const router = express.Router();
 
-// GET /api/interactions/ (Yêu cầu đăng nhập)
-router.get("/", protect, controller.getInteractionFeed);
+router.use(protect);
+
+router.get("/", controller.getInteractionFeed);
+
+router.post("/like/:recipeId", controller.toggleLikeRecipe);
+router.post("/follow/:userId", controller.toggleFollowUser);
 
 module.exports = router;

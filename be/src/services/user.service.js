@@ -1,5 +1,6 @@
 const { User, Follow, Recipe } = require("../models"); // ✅ Đảm bảo import đủ User, Follow, Recipe
 const ApiError = require("../utils/ApiError");
+const notificationService = require("./notification.service");
 
 const getUserProfile = async (targetUserId, currentUserId = null) => {
   const user = await User.findByPk(targetUserId, {
@@ -10,18 +11,20 @@ const getUserProfile = async (targetUserId, currentUserId = null) => {
     throw new ApiError(404, "User not found.");
   }
 
-  // Nếu người xem đã đăng nhập (có currentUserId)
-  if (currentUserId) {
-    // Kiểm tra xem có đang follow không
-    const isFollowing = await Follow.count({
+  // Kiểm tra xem có đang follow không
+  let isFollowing = false;
+  if (currentUserId && parseInt(currentUserId) !== parseInt(targetUserId)) {
+    const followCount = await Follow.count({
       where: {
         follower_id: currentUserId,
         following_id: targetUserId,
       },
     });
-    // Gán cờ is_following vào kết quả trả về
-    user.dataValues.is_following = isFollowing > 0;
+    isFollowing = followCount > 0;
   }
+
+  // Luôn gán is_following (true hoặc false)
+  user.dataValues.is_following = isFollowing;
 
   return user;
 };
@@ -89,6 +92,21 @@ const toggleFollowUser = async (followerId, followingId) => {
       follower_id: followerId,
       following_id: followingId,
     });
+
+    // 🔥 TẠO THÔNG BÁO CHO NGƯỜI ĐƯỢC FOLLOW
+    try {
+      await notificationService.createNotification({
+        recipient_id: followingId,
+        sender_id: followerId,
+        type: "follow",
+        reference_id: followerId,
+        message: `đã bắt đầu theo dõi bạn`,
+      });
+    } catch (error) {
+      console.error("Lỗi tạo thông báo follow:", error);
+      // Không throw lỗi để tránh ảnh hưởng luồng chính
+    }
+
     return { is_following: true };
   }
 };

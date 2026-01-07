@@ -1,8 +1,10 @@
 // src/components/CooksnapSection.jsx
-import { Camera, SendHorizontal, MessageCircle } from "lucide-react";
+import { Camera, SendHorizontal, MessageCircle, Loader2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getComments, createComment } from "../services/commentApi";
+import { followUser, unfollowUser, getUserById } from "../services/userApi";
+import { useAuth } from "../contexts/AuthContext";
 import CooksnapModal from "./CooksnapModal"; // ✅ Đảm bảo đã import Modal mới
 
 // Component con hiển thị từng comment (Giữ nguyên logic cũ của bạn)
@@ -116,8 +118,11 @@ function CommentItem({ comment, recipeId, onReplySuccess, currentUserAvatar }) {
 
 // --- COMPONENT CHÍNH ---
 export default function CooksnapSection({ recipe }) {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const authorProfileUrl = recipe.User?.id ? `/user/${recipe.User.id}` : "#";
   const [isFriend, setIsFriend] = useState(false);
+  const [loadingFollow, setLoadingFollow] = useState(false);
 
   // State comment
   const [comments, setComments] = useState([]);
@@ -139,12 +144,76 @@ export default function CooksnapSection({ recipe }) {
     }
   };
 
+  // 🔥 Kiểm tra trạng thái follow ban đầu
+  useEffect(() => {
+    if (!recipe?.User?.id) {
+      return;
+    }
+
+    // Nếu chính mình
+    if (user && user.id === recipe.User.id) {
+      setIsFriend(false);
+      return;
+    }
+
+    // Fetch user profile để get is_following status
+    // Có thể call API ngay cả khi chưa login (middleware optionalAuth sẽ xử lý)
+    const checkFollowStatus = async () => {
+      try {
+        const res = await getUserById(recipe.User.id);
+        const userData = res.data.data;
+        setIsFriend(userData.is_following || false);
+      } catch (error) {
+        console.error("Lỗi kiểm tra trạng thái follow:", error);
+        setIsFriend(false);
+      }
+    };
+
+    checkFollowStatus();
+  }, [recipe?.User?.id, user?.id]);
+
   useEffect(() => {
     if (recipe?.id) {
       setLoadingComments(true);
       fetchComments().finally(() => setLoadingComments(false));
     }
   }, [recipe?.id]);
+
+  // 🔥 Xử lý Follow/Unfollow
+  const handleToggleFollow = async () => {
+    if (!user) {
+      alert("Vui lòng đăng nhập để kết bạn!");
+      navigate("/login");
+      return;
+    }
+
+    if (!recipe?.User?.id) return;
+
+    // Không thể follow chính mình
+    if (user.id === recipe.User.id) {
+      alert("Bạn không thể kết bạn với chính mình!");
+      return;
+    }
+
+    try {
+      setLoadingFollow(true);
+
+      if (isFriend) {
+        // Unfollow
+        await unfollowUser(recipe.User.id);
+        setIsFriend(false);
+      } else {
+        // Follow
+        await followUser(recipe.User.id);
+        setIsFriend(true);
+      }
+    } catch (error) {
+      console.error("Lỗi thay đổi trạng thái bạn bếp:", error);
+      alert("Không thể thay đổi trạng thái bạn bếp. Vui lòng thử lại.");
+    } finally {
+      setLoadingFollow(false);
+    }
+  };
 
   const handleSendComment = async () => {
     if (!newComment.trim()) return;
@@ -221,11 +290,15 @@ export default function CooksnapSection({ recipe }) {
               {recipe.User?.bio || "Thành viên yêu bếp núc."}
             </p>
             <button
-              onClick={() => setIsFriend(!isFriend)}
-              className={`mt-2 px-4 py-1 rounded-lg text-sm border border-gray-300 ${
-                isFriend ? "text-black bg-white" : "bg-gray-700 text-white"
-              }`}
+              onClick={handleToggleFollow}
+              disabled={loadingFollow}
+              className={`mt-2 px-4 py-1 rounded-lg text-sm border transition-all flex items-center gap-2 ${
+                isFriend
+                  ? "text-black bg-white border-gray-300 hover:bg-gray-50"
+                  : "bg-gray-700 text-white border-gray-700 hover:bg-gray-800"
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
+              {loadingFollow && <Loader2 size={14} className="animate-spin" />}
               {isFriend ? "Bạn bếp" : "Kết bạn bếp"}
             </button>
           </div>

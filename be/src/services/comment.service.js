@@ -1,16 +1,56 @@
-const { Comment, User } = require("../models");
+const { Comment, User, Recipe } = require("../models");
 const ApiError = require("../utils/ApiError");
+const notificationService = require("./notification.service");
 
 // ✅ CẬP NHẬT: Nhận thêm parent_id
 const createComment = async (userId, recipeId, commentData) => {
-  const { content, rating, parent_id } = commentData; // Lấy parent_id từ request
-  return await Comment.create({
+  const { content, rating, parent_id } = commentData;
+
+  // 1. Tạo comment như cũ
+  const newComment = await Comment.create({
     user_id: userId,
     recipe_id: recipeId,
     content,
     rating,
-    parent_id: parent_id || null, // Nếu không có thì là null (bình luận gốc)
+    parent_id: parent_id || null,
   });
+
+  // 2. Logic tạo thông báo
+  try {
+    if (parent_id) {
+      // Trường hợp Reply: Thông báo cho người viết comment gốc
+      const parentComment = await Comment.findByPk(parent_id);
+      if (parentComment && parentComment.user_id !== userId) {
+        await notificationService.createNotification({
+          recipient_id: parentComment.user_id,
+          sender_id: userId,
+          type: "reply",
+          reference_id: newComment.id, // Link đến comment mới
+          message: `đã trả lời bình luận của bạn: "${content.substring(
+            0,
+            30
+          )}..."`,
+        });
+      }
+    } else {
+      // Trường hợp Comment vào bài viết: Thông báo cho chủ bài viết
+      const recipe = await Recipe.findByPk(recipeId);
+      if (recipe && recipe.user_id !== userId) {
+        await notificationService.createNotification({
+          recipient_id: recipe.user_id,
+          sender_id: userId,
+          type: "comment",
+          reference_id: recipeId, // Link đến bài viết
+          message: `đã bình luận vào bài viết "${recipe.title}"`,
+        });
+      }
+    }
+  } catch (error) {
+    console.error("Lỗi tạo thông báo comment:", error);
+    // Không throw lỗi để tránh ảnh hưởng luồng chính
+  }
+
+  return newComment;
 };
 
 // ✅ CẬP NHẬT: Lấy bình luận kèm theo các phản hồi (Replies)

@@ -13,6 +13,7 @@ const Follow = require("./follow.model");
 const Cooked = require("./cooked.model");
 const Challenge = require("./challenge.model");
 const RecipeView = require("./recipe_view.model");
+const Notification = require("./notification.model");
 
 const db = {};
 
@@ -30,6 +31,7 @@ db.Media = Media;
 db.Cooked = Cooked;
 db.Challenge = Challenge;
 db.RecipeView = RecipeView;
+db.Notification = Notification;
 // === ĐỊNH NGHĨA QUAN HỆ SỬ DỤNG CÁC MODEL TỪ `db` ===
 
 // User relationships
@@ -155,6 +157,21 @@ db.User.belongsToMany(db.Recipe, {
   through: db.Cooked,
   foreignKey: "user_id",
   as: "CookedRecipes",
+});
+
+db.Notification.belongsTo(db.User, { as: "Sender", foreignKey: "sender_id" });
+db.Notification.belongsTo(db.User, {
+  as: "Recipient",
+  foreignKey: "recipient_id",
+});
+
+db.User.hasMany(db.Notification, {
+  foreignKey: "recipient_id",
+  onDelete: "CASCADE",
+});
+db.User.hasMany(db.Notification, {
+  foreignKey: "sender_id",
+  onDelete: "CASCADE",
 });
 
 module.exports = db;

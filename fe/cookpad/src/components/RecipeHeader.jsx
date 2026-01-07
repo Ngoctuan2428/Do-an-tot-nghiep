@@ -19,12 +19,11 @@ import { Link } from "react-router-dom";
 
 // Import API
 import {
-  saveRecipe,
+  saveRecipe, // sendCooksnap,
   likeRecipe,
-  sendCooksnap,
   getRecipeCooksnaps,
 } from "../services/recipeApi";
-import { uploadMedia } from "../services/uploadApi";
+// import { uploadMedia } from "../services/uploadApi";
 import { useRecipeCounts } from "../contexts/RecipeCountContext";
 
 // Import Components
@@ -41,7 +40,7 @@ export default function RecipeHeader({ recipe }) {
 
   // Các state nội bộ
   const [likeCount, setLikeCount] = useState(recipe?.likes || 0);
-  const [isLikedTemp, setIsLikedTemp] = useState(false);
+  // const [isLikedTemp, setIsLikedTemp] = useState(false);
   const [showReacters, setShowReacters] = useState(false);
 
   const [isFavourite, setIsFavourite] = useState(false); // State cho "Thêm vào BST" (nếu cần logic riêng)
@@ -54,7 +53,7 @@ export default function RecipeHeader({ recipe }) {
   const [cooksnaps, setCooksnaps] = useState([]);
 
   const menuRef = useRef(null);
-  const fileInputRef = useRef(null); // Dùng cho input file trong menu dropdown (nếu còn dùng)
+  // const fileInputRef = useRef(null); // Dùng cho input file trong menu dropdown (nếu còn dùng)
 
   // Hàm tải danh sách Cooksnap từ API
   const fetchCooksnaps = async () => {
@@ -142,11 +141,11 @@ export default function RecipeHeader({ recipe }) {
   };
 
   // Xử lý chọn file từ menu dropdown (nếu dùng)
-  const handleChooseFile = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
+  // const handleChooseFile = () => {
+  //   if (fileInputRef.current) {
+  //     fileInputRef.current.click();
+  //   }
+  // };
 
   // Callback khi gửi Cooksnap thành công từ Modal
   const handleCooksnapSuccess = () => {
