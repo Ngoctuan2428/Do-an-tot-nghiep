@@ -24,7 +24,6 @@ const getAllRecipes = async (req, res, next) => {
   }
 };
 
-// ✅ HÀM LẤY CHI TIẾT (ĐÃ TÍCH HỢP TĂNG VIEW & LOG DEBUG)
 const getRecipeById = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -32,7 +31,9 @@ const getRecipeById = async (req, res, next) => {
     const viewerId = req.user ? req.user.id : null;
 
     // --- DEBUG LOG (Để kiểm tra lỗi) ---
-    console.log(`[DEBUG] Dang tang view cho recipe: ${id}, viewer: ${viewerId}`);
+    console.log(
+      `[DEBUG] Dang tang view cho recipe: ${id}, viewer: ${viewerId}`
+    );
 
     try {
       await statsService.incrementViewCount(id, viewerId);

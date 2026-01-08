@@ -32,7 +32,6 @@ const getPublicUserProfile = async (req, res, next) => {
     const { id } = req.params; // ID của chủ hồ sơ
     const currentUserId = req.user?.id || null; // ID của người đang xem (lấy từ token, có thể null)
 
-    // ✅ Sửa lại: Truyền cả 2 ID xuống service
     const publicProfile = await userService.getUserProfile(id, currentUserId);
 
     res.status(200).json({
@@ -108,6 +107,6 @@ module.exports = {
   toggleFollow,
   getFollowers,
   getFollowing,
-  updateCurrentUserProfile, // ✅ Export
-  getUserStats, // ✅ Export
+  updateCurrentUserProfile,
+  getUserStats,
 };

@@ -44,8 +44,11 @@ export default function IngredientList({ ingredientsData, onChange }) {
   const [dragData, setDragData] = useState(null);
 
   useEffect(() => {
-    onChange?.(sections);
-  }, [sections, onChange]);
+    onChange?.({
+      sections,
+      serving,
+    });
+  }, [sections, serving, onChange]);
 
   // Call onChange if provided
   const publish = (next) => {

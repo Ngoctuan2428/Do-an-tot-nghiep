@@ -21,7 +21,7 @@ const createCooksnap = async (req, res) => {
       data
     );
 
-    // --- 🔥 PHẦN THÊM VÀO: TẠO THÔNG BÁO ---
+    // --- TẠO THÔNG BÁO ---
     try {
       // Tìm thông tin bài viết gốc để lấy ID tác giả (user_id)
       const recipe = await Recipe.findByPk(recipeId);

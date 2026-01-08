@@ -1,17 +1,19 @@
-// src/pages/CreateRecipe.jsx
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Camera, Trash2, Upload, Loader2, Save, X } from "lucide-react";
 import IngredientList from "../components/IngredientList";
 import StepList from "../components/StepList";
-import { createRecipe, updateRecipe } from "../services/recipeApi";
+import {
+  createRecipe,
+  updateRecipe,
+  deleteRecipe,
+} from "../services/recipeApi";
 
 // Import API services
 import { uploadMedia } from "../services/uploadApi";
 import { getCurrentUser } from "../services/userApi";
 import { useRecipeCounts } from "../contexts/RecipeCountContext";
 
-// ✅ 1. THÊM HÀM uid() BỊ THIẾU
 const uid = () =>
   `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -26,7 +28,6 @@ export default function CreateRecipe() {
   let initialIngredients = [];
   let initialSteps = [];
 
-  // ✅ SỬA LỖI 4: Parse dữ liệu (nếu ở chế độ Chỉnh sửa)
   if (recipeToEdit) {
     try {
       const ingredientsData = recipeToEdit.ingredients;
@@ -46,8 +47,7 @@ export default function CreateRecipe() {
     }
 
     try {
-      // 2. Xử lý Steps (JSON)
-      // (Bị lỗi tương tự nếu steps là "" hoặc null)
+      // Xử lý Steps (JSON)
       const stepsData = recipeToEdit.steps;
       if (Array.isArray(stepsData)) {
         initialSteps = stepsData.map((s) => ({ ...s, id: s.id || uid() }));
@@ -73,6 +73,7 @@ export default function CreateRecipe() {
   // State của Ingredients/Steps
   const [ingredients, setIngredients] = useState(initialIngredients);
   const [steps, setSteps] = useState(initialSteps);
+  const [serving, setServing] = useState(recipeToEdit?.servings || "2 người");
 
   const [loading, setLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState("Đã lưu");
@@ -121,6 +122,7 @@ export default function CreateRecipe() {
       description: desc,
       image_url: finalImageUrl,
       ingredients: JSON.stringify(ingredientsList),
+      servings: serving,
       steps: stepsList,
       status: status,
     };
@@ -149,7 +151,9 @@ export default function CreateRecipe() {
       setLoading(false);
       setSaveStatus("Lỗi!");
       console.error("Lỗi khi đăng món:", error);
-      alert(`Đã xảy ra lỗi: ${error.response?.data?.message || error.message}`);
+      alert(
+        `Đã xảy ra lỗi: '${error.response?.data?.message || error.message}'`
+      );
     }
   };
 
@@ -174,14 +178,38 @@ export default function CreateRecipe() {
       setLoading(false);
       setSaveStatus("Lỗi!");
       console.error("Lỗi khi lưu nháp:", error);
-      alert(`Đã xảy ra lỗi: ${error.response?.data?.message || error.message}`);
+      alert(
+        `Đã xảy ra lỗi: '${error.response?.data?.message || error.message}'`
+      );
     }
   };
 
-  const handleDelete = () => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa công thức này?")) {
-      alert("Chức năng đang phát triển!");
-      navigate("/recipes/all");
+  const handleDelete = async () => {
+    if (!isEditMode) {
+      alert("Công thức này chưa được lưu!");
+      return;
+    }
+
+    if (
+      window.confirm(
+        "Bạn có chắc chắn muốn xóa công thức này? Hành động này không thể hoàn tác."
+      )
+    ) {
+      setLoading(true);
+      setSaveStatus("Đang xóa...");
+      try {
+        await deleteRecipe(recipeToEdit.id);
+        await refreshCounts();
+        alert("Xóa công thức thành công!");
+        navigate("/recipes/all");
+      } catch (error) {
+        setLoading(false);
+        setSaveStatus("Lỗi!");
+        console.error("Lỗi khi xóa công thức:", error);
+        alert(
+          `Đã xảy ra lỗi: '${error.response?.data?.message || error.message}'`
+        );
+      }
     }
   };
 
@@ -197,10 +225,9 @@ export default function CreateRecipe() {
     );
   }
 
-  // --- (Render JSX) ---
   return (
     <div className="bg-white lg:bg-gray-50">
-      {/* 1. Header (Nút Lên Sóng, Lưu, Xóa) */}
+      {/* Header (Nút Lên Sóng, Lưu, Xóa) */}
       <div className="sticky top-0 z-30 bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -228,7 +255,13 @@ export default function CreateRecipe() {
             </button>
             <button
               onClick={handlePublish}
-              disabled={loading || !title}
+              disabled={
+                loading ||
+                !title.trim() ||
+                !ingredients?.length ||
+                !steps?.length ||
+                steps.some((step) => !step.text?.trim())
+              }
               className="px-4 py-2 rounded-md bg-orange-500 text-white hover:bg-orange-600 text-sm font-medium flex items-center gap-2 disabled:bg-orange-300"
             >
               {loading ? (
@@ -242,7 +275,7 @@ export default function CreateRecipe() {
         </div>
       </div>
 
-      {/* 2. Bố cục 2 cột (Grid) */}
+      {/* Bố cục 2 cột (Grid) */}
       <div className="max-w-7xl mx-auto p-4 lg:grid lg:grid-cols-[min(35%,300px)_1fr] lg:gap-8">
         {/* CỘT TRÁI (Ảnh và Nguyên liệu) */}
         <div className="lg:sticky lg:top-20 h-fit">
@@ -276,10 +309,13 @@ export default function CreateRecipe() {
             />
           </div>
 
-          {/* ✅ 2. THÊM PROP 'ingredientsData' (Sửa lỗi 2) */}
           <IngredientList
             ingredientsData={initialIngredients}
-            onChange={setIngredients}
+            // onChange={setIngredients}
+            onChange={({ sections, serving }) => {
+              setIngredients(sections);
+              setServing(serving);
+            }}
           />
         </div>
 

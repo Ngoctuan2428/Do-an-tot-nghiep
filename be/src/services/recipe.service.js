@@ -56,7 +56,7 @@ const getRecipeById = async (recipeId) => {
 
   if (!recipe) throw new ApiError(404, "Recipe not found");
 
-  // ✅ THÊM: Đếm số lượng người đã lưu (Favorite) món này
+  // Đếm số lượng người đã lưu (Favorite) món này
   const favoritesCount = await Favorite.count({
     where: { recipe_id: recipeId },
   });

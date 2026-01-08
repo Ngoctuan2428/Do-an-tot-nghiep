@@ -107,11 +107,11 @@ export default function CooksnapList() {
               )}
 
               {/* Nút Like (UI only) */}
-              <div className="pt-3 border-t flex items-center gap-2 mt-auto">
+              {/* <div className="pt-3 border-t flex items-center gap-2 mt-auto">
                 <button className="p-2 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200 transition-colors">
                   <Heart size={18} />
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
         ))}
