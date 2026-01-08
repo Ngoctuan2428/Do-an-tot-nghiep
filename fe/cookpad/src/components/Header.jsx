@@ -138,7 +138,8 @@ export default function Header() {
           ) : (
             // HIỂN THỊ NÚT ĐĂNG NHẬP KHI CHƯA ĐĂNG NHẬP
             <button
-              onClick={() => navigate("/login")}
+              // onClick={() => navigate("/login")}
+                            onClick={() => console.log("API URL =", import.meta.env.VITE_API_URL)}
               className="px-4 py-2 bg-cookpad-orange text-white text-sm font-medium rounded-md hover:bg-orange-500 transition-colors"
             >
               Đăng nhập
