@@ -23,7 +23,6 @@ const corsOptions = {
   origin: [
     'http://localhost:5173', // Client
     'http://localhost:3001', // Admin (hoặc 5174 tùy máy bạn)
-    'https://pcook-qyfb.vercel.app',
   ],
   credentials: true,
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
